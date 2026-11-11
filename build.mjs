@@ -5,6 +5,7 @@ import { mkdir, writeFile, readFile, cp, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { budgetPage } from './lib/budget.mjs';
+import { statesPage } from './lib/states.mjs';
 
 const SITE = 'thekakisto.wordpress.com';
 const API = `https://public-api.wordpress.com/wp/v2/sites/${SITE}`;
@@ -25,6 +26,7 @@ const TOPIC_ORDER = Object.keys(TOPICS);
 const TOOLS = [
   { url: '/data/', kicker: 'India macro tape', title: 'Latest, previous, revised', blurb: 'CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.' },
   { url: '/tools/budget-x-ray/', kicker: 'Budget X-Ray', title: 'Halfway through the Budget', blurb: 'Receipts, spending and the deficit against the full-year plan, with a year-end calculator.' },
+  { url: '/tools/india-by-state/', kicker: 'India by State', title: 'Thirty-one states compared', blurb: 'Income, growth, inflation and state debt on a tile map, with any two measures plotted against each other.' },
   { url: '/tools/shock-lab/', kicker: 'Shock Lab', title: 'Oil and the rupee', blurb: 'Change crude and the exchange rate. See who pays: importer, pump or household.' },
   { url: '/ledger/', kicker: 'Policy Ledger', title: 'Announced to measured', blurb: 'Every scheme we cover, tracked from promise to outcome, with the date we check again.' },
   { url: '/forecasts/', kicker: 'Forecast Book', title: 'Calls on the record', blurb: 'Testable calls with probabilities, revisions and results, dated when made.' },
@@ -348,7 +350,7 @@ function notFound() { return pageHead('404', 'Page not found', 'It may have move
 
 // ---------------------------------------------------------------- main
 async function main() {
-  const [wp, tape, ledger, fc, budget] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
+  const [wp, tape, ledger, fc, budget, states] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
   __tapeRef = tape;
   const m = model(wp);
   if (existsSync(OUT)) await rm(OUT, { recursive: true });
@@ -372,11 +374,12 @@ async function main() {
   await write('tools/shock-lab/index.html', P({ title: 'Shock Lab: oil and the rupee', path: '/tools/shock-lab/', description: 'Calculate what an oil or rupee shock does to an importer, the pump and a household.', body: shockLab(tape) }));
   await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub() }));
   await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
+  await write('tools/india-by-state/index.html', P({ title: 'India by State', path: '/tools/india-by-state/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, with sources.', body: statesPage(states, { pageHead }) }));
   await write('404.html', P({ title: 'Page not found', path: '/404', body: notFound() }));
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/tools/shock-lab/', '/tools/budget-x-ray/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_headers', `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
