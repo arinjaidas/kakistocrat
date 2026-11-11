@@ -39,7 +39,7 @@ const TOPICS = {
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
 const TOOLS = [
-  { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Ten rule-based readings, from inflation and rates to the rupee, oil, the Budget and growth.' },
+  { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Rule-based readings, from inflation and rates to the rupee, oil, Hormuz shipping, the Budget and growth.' },
   { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Indices, rates, currencies, commodities, movers, crypto and the data calendar in one dense dark screen, with a command bar that charts any series.' },
   { url: '/hormuz/', kicker: 'Chokepoint watch', title: 'Ships through Hormuz and the shipping lanes', blurb: 'Daily ship counts through Hormuz, Bab el-Mandeb, Suez, the Cape and Malacca, with Brent alongside.' },
   { url: '/tools/pump-price/', kicker: 'Pump price', title: 'What’s in a litre of petrol', blurb: 'The Delhi pump price split into oil company price, excise, dealer commission and VAT, with a calculator.' },
