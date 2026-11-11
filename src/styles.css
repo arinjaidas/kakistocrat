@@ -384,3 +384,72 @@ ul.src a{text-decoration:underline}
 .tc-bar .t{height:22px;background:var(--stone)}.tc-bar .t i{display:block;height:100%}
 .tc-bar .v{font:600 13px var(--mono);text-align:right}
 @media (max-width:900px){.tc-pair,.tc-read{grid-template-columns:1fr}}
+
+/* ---------- ticker marquee ---------- */
+.tape-wrap{display:flex;align-items:stretch;overflow:hidden}
+.tape-viewport{flex:1;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 24px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18px,#000 calc(100% - 24px),transparent 100%)}
+.tape-track{display:flex;width:max-content;animation:tape 70s linear infinite}
+.tape:hover .tape-track,.tape:focus-within .tape-track{animation-play-state:paused}
+.tape-dup{display:flex}.tape-gap{width:24px}
+a.tick{color:var(--ink);text-decoration:none}
+@keyframes tape{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.tape-track{animation:none}.tape-viewport{overflow-x:auto}}
+.tick .d.up,.tick [data-live].up{color:var(--up)}.tick .d.dn,.tick [data-live].dn{color:var(--down)}
+
+/* ---------- markets & commodities ---------- */
+.mk-top{background:linear-gradient(180deg,#F4F2ED 0,#FFFFFF 100%);border-bottom:1px solid var(--rule);padding:22px 0 20px}
+.mk-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.mk-head h1{margin:6px 0 6px;font:500 38px/1.08 var(--serif);letter-spacing:-.015em}
+.mk-head .dek{max-width:760px}
+.mk-clock{display:flex;align-items:center;gap:8px;border:1px solid var(--rule-2);background:#fff;padding:8px 12px;font:500 12px var(--mono)}
+.mk-clock .dot{width:9px;height:9px;border-radius:50%;background:var(--down)}
+.mk-clock.open .dot{background:var(--up);box-shadow:0 0 0 4px rgba(15,107,58,.15);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(15,107,58,0)}}
+.mk-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px;margin-top:18px}
+.mk-card{display:flex;flex-direction:column;gap:2px;background:#fff;border:1px solid var(--rule-2);padding:11px 12px 9px;color:var(--ink);transition:border-color .15s,transform .15s}
+a.mk-card:hover{border-color:var(--ink);transform:translateY(-1px)}
+.mk-card .lbl{font:600 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
+.mk-card .v{font:600 21px/1.15 var(--mono)}
+.mk-card .c{font:500 12px var(--mono);color:var(--mute)}
+.mk-card .c.up,.up{color:var(--up)}.mk-card .c.dn,.dn{color:var(--down)}
+.mk-card .sub{font:400 10.5px var(--mono);color:var(--mute)}
+.spk{width:100%;height:30px;display:block;margin:4px 0 2px}
+.mk-chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.mk-ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mk-ctrl select{height:34px;border:1px solid var(--ink);background:#fff;padding:0 8px;font:500 13px var(--sans);max-width:220px}
+.seg{display:inline-flex;border:1px solid var(--ink)}
+.seg button{border:0;background:#fff;padding:7px 11px;font:600 12px var(--mono);cursor:pointer;border-right:1px solid var(--rule-2)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--ink);color:#fff}
+.chk{font:500 12.5px var(--sans);display:flex;gap:5px;align-items:center}
+.ec{width:100%;border:1px solid var(--rule);background:#fff}
+.mk-two{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.mk-movers{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mk-movers h3{margin:8px 0 6px;font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.mk-movers ol{list-style:none;margin:0;padding:0}
+.mk-movers li{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
+.mk-movers .v{font:500 12.5px var(--mono);color:var(--slate)}.mk-movers .c{font:600 12.5px var(--mono);min-width:64px;text-align:right}
+.mk-breadth{display:flex;height:28px;margin:12px 0 8px}.mk-breadth span{display:block}
+.mk-val{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.mk-val div{border:1px solid var(--rule-2);padding:12px}
+.mk-val .lbl{display:block;font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.mk-val b{display:block;font:600 26px var(--mono);margin:4px 0}.mk-val small{font-size:11.5px;color:var(--mute)}
+.mk-perf td{font-family:var(--mono);font-size:12.5px}
+.mk-perf th[scope=row] a{text-decoration:none}.mk-perf th[scope=row] a:hover{text-decoration:underline}
+.mk-perf th small{display:inline;color:var(--mute);font:500 11px var(--mono)}
+.mk-live{display:flex;flex-direction:column;gap:14px;justify-content:center}
+.mk-live div{border:1px solid var(--rule-2);padding:14px}
+.mk-live .lbl{display:block;font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.mk-live b{display:block;font:600 30px var(--mono)}.mk-live span{font:500 12.5px var(--mono)}
+.cm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:10px}
+.cm-tile{display:flex;flex-direction:column;gap:3px;text-align:left;background:#fff;border:1px solid var(--rule-2);padding:12px;cursor:pointer;font:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.cm-tile:hover{border-color:var(--ink)}
+.cm-tile.on{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.cm-tile .n{font:600 13.5px var(--sans)}
+.cm-tile .v{font:600 22px var(--mono)}.cm-tile .v small{font:500 11px var(--mono);color:var(--mute);margin-left:5px}
+.cm-tile .ch{font:500 11.5px var(--mono);color:var(--mute)}
+.cm-tile .rng{position:relative;height:6px;background:linear-gradient(90deg,#DDEBE2,#F4F2ED,#F4D9D6);margin-top:6px}
+.cm-tile .rng i{position:absolute;top:-4px;width:3px;height:14px;background:var(--ink);margin-left:-1px}
+.cm-tile .rl{display:flex;justify-content:space-between;font:500 10px var(--mono);color:var(--mute)}
+pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1.6 var(--mono);overflow-x:auto}
+@media (max-width:900px){.mk-two,.mk-movers{grid-template-columns:1fr}.mk-head h1{font-size:30px}}
