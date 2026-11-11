@@ -1,0 +1,38 @@
+{
+  "fuel": "Petrol",
+  "city": "Delhi",
+  "effective": "2026-11-01",
+  "checked": "2026-11-12",
+  "rsp": 102.12,
+  "chargedToDealersExVat": 81.06,
+  "excise": 11.9,
+  "dealerCommission": 4.47,
+  "vat": 16.59,
+  "vatRate": 19.4,
+  "exciseHistory": [
+    {
+      "from": "2025-04",
+      "total": 21.9,
+      "note": "Rs 2 a litre increase in April 2025 (absorbed by oil companies)"
+    },
+    {
+      "from": "2026-03-27",
+      "total": 11.9,
+      "note": "Special additional excise duty cut from Rs 13 to Rs 3 a litre (Notification 05/2026-Central Excise)"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Indian Oil, Price build-up of petrol at Delhi effective 1 November 2026",
+      "url": "https://iocl.com/admin/img/UploadedFiles/PriceBuildup/Files/English/33bb8af791c64c60be402e4b264acbc6.pdf"
+    },
+    {
+      "name": "PSU Watch, 27 March 2026: excise on petrol cut by Rs 10 a litre for domestic consumption",
+      "url": "https://psuwatch.com/newsupdates/govt-cuts-excise-duty-on-petrol-diesel-by-rs-10litre-taxes-diesel-atf-exports"
+    },
+    {
+      "name": "ClearTax, petrol and diesel tax in India: central excise on petrol Rs 11.90 a litre; Delhi VAT 19.40%",
+      "url": "https://cleartax.in/s/petrol-and-diesel-tax"
+    }
+  ]
+}
