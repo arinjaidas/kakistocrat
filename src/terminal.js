@@ -46,7 +46,7 @@
 
   /* command bar */
   const q = $('#t-q'), sug = $('#t-sug'); let hits = [], sel = 0;
-  const ALIAS = { usdinr: 'fx-usdinr', inr: 'fx-usdinr', rupee: 'fx-usdinr', nifty: 'nse-nifty-50', banknifty: 'nse-nifty-bank', vix: 'nse-india-vix', brent: 'fred-dcoilbrenteu', wti: 'fred-dcoilwtico', gold: 'wb-gold', silver: 'wb-silver', btc: 'crypto-bitcoin', bitcoin: 'crypto-bitcoin', eth: 'crypto-ethereum', dxy: 'fred-dtwexbgs', ust10: 'fred-dgs10', fedfunds: 'fred-dff', pe: 'nifty50-pe' };
+  const ALIAS = { usdinr: 'fx-usdinr', inr: 'fx-usdinr', rupee: 'fx-usdinr', nifty: 'nse-nifty-50', banknifty: 'nse-nifty-bank', vix: 'nse-india-vix', brent: 'fred-dcoilbrenteu', wti: 'fred-dcoilwtico', gold: 'wb-gold', silver: 'wb-silver', btc: 'crypto-bitcoin', bitcoin: 'crypto-bitcoin', eth: 'crypto-ethereum', dxy: 'fred-dtwexbgs', ust10: 'fred-dgs10', fedfunds: 'fred-dff', pe: 'nifty50-pe', hormuz: 'pw-strait-of-hormuz', suez: 'pw-suez-canal' };
   const search = s => { s = s.trim().toLowerCase(); if (!s) return []; const a = ALIAS[s.replace(/[\s/]/g, '')]; const words = s.split(/\s+/);
     const sc = c => { const h = (c.name + ' ' + c.group + ' ' + c.id).toLowerCase(); if (!words.every(w => h.includes(w))) return -1; return (c.name.toLowerCase().startsWith(words[0]) ? 3 : 0) + (/^(nse|fx|fred|wb)/.test(c.id) ? 1 : 0) + (c.name.includes('India') ? 1 : 0); };
     const r = CAT.map(c => [c, sc(c)]).filter(x => x[1] >= 0).sort((a, b) => b[1] - a[1]).map(x => x[0]).slice(0, 8);

@@ -7,7 +7,7 @@
   const store = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
   wait(async () => {
     const cat = await fetch('/api/catalog.json').then(r => r.json());
-    const pool = cat.filter(c => c.n >= 30 && !/: (Germany|Japan|United Kingdom|Bangladesh|Philippines)$/.test(c.name) && !/^fx-usd(eur|gbp|jpy|sgd)$/.test(c.id)).sort((a, b) => a.id.localeCompare(b.id));
+    const pool = cat.filter(c => c.n >= 30 && !/: (Germany|Japan|United Kingdom|Bangladesh|Philippines)$/.test(c.name) && !/^fx-usd(eur|gbp|jpy|sgd)$/.test(c.id) && !/^pw-/.test(c.id)).sort((a, b) => a.id.localeCompare(b.id));
     const ans = pool[hash('kakistocrat-' + day) % pool.length];
     const s = await fetch(`/api/series/${ans.id}.json`).then(r => r.json());
     const KEY = 'chartle-' + day; let st = store.get(KEY) || { tries: [], done: false, won: false };
