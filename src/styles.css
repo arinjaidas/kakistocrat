@@ -453,3 +453,24 @@ a.mk-card:hover{border-color:var(--ink);transform:translateY(-1px)}
 .cm-tile .rl{display:flex;justify-content:space-between;font:500 10px var(--mono);color:var(--mute)}
 pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1.6 var(--mono);overflow-x:auto}
 @media (max-width:900px){.mk-two,.mk-movers{grid-template-columns:1fr}.mk-head h1{font-size:30px}}
+/* ---------- chart workbench ---------- */
+.wb{display:grid;grid-template-columns:310px minmax(0,1fr);gap:0;border-bottom:1px solid var(--rule);min-height:calc(100vh - 120px)}
+.wb-side{border-right:1px solid var(--rule);background:var(--stone);padding:16px;max-height:calc(100vh - 100px);overflow:auto;position:sticky;top:0}
+.wb-side-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.wb-side-head b{font:600 12px var(--mono)}
+.wb-side input{width:100%;height:38px;border:1px solid var(--ink);padding:0 10px;font:500 13.5px var(--sans);margin-bottom:10px}
+.wb-list details{border-top:1px solid var(--rule-2);padding:6px 0}
+.wb-list summary{cursor:pointer;font:600 12.5px var(--sans);padding:4px 0}.wb-list summary small{font:500 11px var(--mono);color:var(--mute)}
+.wb-list ul{list-style:none;margin:4px 0 6px;padding:0}
+.wb-list button{display:block;width:100%;text-align:left;border:0;background:none;padding:5px 6px;font:500 13px var(--sans);cursor:pointer;color:var(--ink)}
+.wb-list button small{display:block;font:500 10.5px var(--mono);color:var(--mute)}
+.wb-list button:hover{background:#fff}.wb-list button.on{background:var(--ink);color:#fff}.wb-list button.on small{color:#C9CCD1}
+.wb-main{padding:18px 24px 28px;min-width:0}
+.wb-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.wb-top h1{margin:4px 0 0;font:500 32px/1.1 var(--serif)}
+.wb-chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.wb-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--rule-2);padding:6px 8px;background:#fff;font-size:12.5px}
+.wb-chip i{width:12px;height:3px;background:var(--c)}.wb-chip b{font-weight:600}.wb-chip small{font:500 10.5px var(--mono);color:var(--mute)}
+.wb-chip select{border:1px solid var(--rule-2);font:500 12px var(--sans);height:26px}
+.wb-chip button{border:0;background:none;font-size:18px;line-height:1;cursor:pointer;color:var(--mute)}
+.wb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+@media (max-width:900px){.wb{grid-template-columns:1fr}.wb-side{position:static;max-height:360px}}

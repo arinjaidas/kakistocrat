@@ -10,6 +10,7 @@ import { twoChartPage } from './lib/twochart.mjs';
 import { exposurePage } from './lib/exposure.mjs';
 import { loadMarkets } from './lib/marketsdata.mjs';
 import { marketsPage, commoditiesPage } from './lib/markets.mjs';
+import { workbenchPage } from './lib/workbench.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -29,6 +30,7 @@ const TOPICS = {
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
 const TOOLS = [
+  { url: '/charts/', kicker: 'Chart workbench', title: 'Plot anything against anything', blurb: 'A library of Indian and global series: overlay up to six, transform, zoom, share and download.' },
   { url: '/markets/', kicker: 'Markets', title: 'Indices, heatmap, rates and currencies', blurb: 'NSE closes for 28 indices, a Nifty 50 heatmap, valuations, yield curves, currency race charts and live crypto.' },
   { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges, a comparison chart and a year-on-year heat table.' },
   { url: '/data/', kicker: 'India macro tape', title: 'Latest, previous, revised', blurb: 'CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.' },
@@ -176,7 +178,7 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <a class="brand" href="/">The Kakistocrat<small>Economics · Politics · Policy</small></a>
 <button class="menu-btn" aria-expanded="false" aria-controls="nav">Sections</button>
 <nav class="nav" id="nav" aria-label="Topics">${nav}</nav>
-<nav class="toolsnav" aria-label="Tools"><a href="/markets/">Markets</a><a href="/commodities/">Commodities</a><a href="/data/">Data</a><a href="/tools/">Tools</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
+<nav class="toolsnav" aria-label="Tools"><a href="/markets/">Markets</a><a href="/commodities/">Commodities</a><a href="/charts/">Charts</a><a href="/data/">Data</a><a href="/tools/">Tools</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
 </div></header>
 ${tapeHTML(tape)}
 <main id="main">${body}</main>
@@ -394,6 +396,7 @@ async function main() {
   await cp('src/styles.css', join(OUT, 'styles.css'));
   await cp('src/app.js', join(OUT, 'app.js'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
+  await cp('src/workbench.js', join(OUT, 'workbench.js'));
   if (existsSync('static')) await cp('static', OUT, { recursive: true });
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
@@ -407,6 +410,36 @@ async function main() {
   }
   for (const f of ['tape', 'ledger', 'budget', 'states', 'exposure', 'twocharts', 'forecasts']) { await write(`api/${f}.json`, await readFile(`data/${f}.json`, 'utf8')); }
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
+  // ---- series catalogue for the chart workbench
+  const catalog = [];
+  const addSeries = async (id, name, group, unit, freq, source, dates, values) => {
+    const pts = dates.map((d, i) => [d, values[i]]).filter(p => p[1] != null && Number.isFinite(p[1]));
+    if (pts.length < 3) return;
+    catalog.push({ id, name, group, unit, freq, source, first: pts[0][0], last: pts.at(-1)[0], n: pts.length });
+    await write(`api/series/${id}.json`, JSON.stringify({ id, name, unit, freq, source, d: pts.map(p => p[0]), v: pts.map(p => p[1]) }));
+  };
+  const slug = t => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (MK) {
+    for (const n of MK.names) await addSeries('nse-' + slug(n), n, n === 'India VIX' ? 'Indian markets' : /G-Sec/.test(n) ? 'Indian markets' : 'Indian equity indices', n === 'India VIX' ? 'index' : 'index points', 'daily', 'NSE', MK.dates, MK.series[n]);
+    await addSeries('nifty50-pe', 'Nifty 50 price-to-earnings', 'Indian markets', 'ratio', 'daily', 'NSE', MK.dates, MK.pe);
+    await addSeries('nifty50-pb', 'Nifty 50 price-to-book', 'Indian markets', 'ratio', 'daily', 'NSE', MK.dates, MK.pb);
+    await addSeries('nifty50-dy', 'Nifty 50 dividend yield', 'Indian markets', '%', 'daily', 'NSE', MK.dates, MK.dy);
+    for (const [k, sr] of Object.entries(MK.fred)) { const unit = /DGS|DFF|T10YIE/.test(k) ? '%' : k === 'DTWEXBGS' ? 'index' : k === 'DEXINUS' ? '₹ per $' : k === 'DHHNGSP' ? '$/mmbtu' : '$/bbl'; await addSeries('fred-' + k.toLowerCase(), sr.label, /COIL|HHNG/.test(k) ? 'Commodities (daily)' : k === 'DEXINUS' ? 'Currencies' : 'Global rates and dollar', unit, 'daily', 'FRED' + (/COIL|HHNG/.test(k) ? ' (EIA)' : ''), sr.pts.map(p => p[0]), sr.pts.map(p => p[1])); }
+    const fxn = { INR: 'Indian rupee', EUR: 'Euro', GBP: 'British pound', JPY: 'Japanese yen', CNY: 'Chinese yuan', KRW: 'Korean won', IDR: 'Indonesian rupiah', MYR: 'Malaysian ringgit', PHP: 'Philippine peso', THB: 'Thai baht', SGD: 'Singapore dollar', BRL: 'Brazilian real', MXN: 'Mexican peso', ZAR: 'South African rand', TRY: 'Turkish lira' };
+    for (const c of Object.keys(MK.fx.rates)) await addSeries('fx-usd' + c.toLowerCase(), `${fxn[c]} per US dollar`, 'Currencies', `${c} per $`, 'daily', 'ECB via Frankfurter', MK.fx.dates, MK.fx.rates[c]);
+    for (const [id, sr] of Object.entries(MK.wb.series)) await addSeries('wb-' + id, sr.name, 'Commodities (monthly): ' + sr.group, sr.unit, 'monthly', 'World Bank Pink Sheet', MK.wb.months.map(m => m + '-01'), sr.v);
+    for (const [c, pts] of Object.entries(MK.crypto || {})) await addSeries('crypto-' + c, c[0].toUpperCase() + c.slice(1) + ', US$', 'Crypto', '$', 'daily', 'CoinGecko', pts.map(p => p[0]), pts.map(p => p[1]));
+    if (MK.world) {
+      const W = MK.world, thisYear = BUILT.getUTCFullYear();
+      for (const [src, block, tag] of [['IMF World Economic Outlook', W.imf, 'imf'], ['World Bank WDI', W.wdi, 'wdi']]) for (const [code, ind] of Object.entries(block)) for (const [iso, cname] of Object.entries(W.countries)) {
+        const data = ind.data[iso]; if (!data) continue; const ys = Object.keys(data).sort();
+        await addSeries(`${tag}-${slug(code)}-${iso.toLowerCase()}`, `${ind.label}: ${cname}`, iso === 'IND' ? 'India: annual macro' : 'World economy: annual', ind.unit, 'annual', src + (tag === 'imf' ? ` (from ${thisYear}: IMF projections)` : ''), ys.map(y => y + '-12-31'), ys.map(y => data[y]));
+      }
+    }
+  }
+  await write('api/catalog.json', JSON.stringify(catalog));
+  await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
+  api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
 
@@ -436,7 +469,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/markets/', '/commodities/', '/api/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/markets/', '/commodities/', '/charts/', '/api/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);

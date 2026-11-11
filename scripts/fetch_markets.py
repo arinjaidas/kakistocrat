@@ -184,8 +184,36 @@ def crypto():
     save('crypto', out)
     print('Crypto:', {k: v[-1] for k, v in out.items()})
 
+
+# ------------------------------------------------------------------ IMF WEO (annual, with projections) and World Bank WDI
+PEERS = {'IND': 'India', 'CHN': 'China', 'IDN': 'Indonesia', 'VNM': 'Vietnam', 'BRA': 'Brazil', 'MEX': 'Mexico', 'ZAF': 'South Africa', 'TUR': 'Turkey', 'BGD': 'Bangladesh', 'PHL': 'Philippines', 'USA': 'United States', 'DEU': 'Germany', 'JPN': 'Japan', 'GBR': 'United Kingdom'}
+IMF = {'NGDP_RPCH': ('Real GDP growth', '%'), 'PCPIPCH': ('Consumer price inflation, annual average', '%'), 'BCA_NGDPD': ('Current account balance', '% of GDP'),
+       'GGXWDG_NGDP': ('General government gross debt', '% of GDP'), 'GGXCNL_NGDP': ('General government net lending (+) / borrowing (−)', '% of GDP'),
+       'NGDPDPC': ('GDP per person, current prices', 'US$'), 'NGDPD': ('GDP, current prices', 'US$ billion'), 'PPPGDP': ('GDP at purchasing power parity', 'int$ billion')}
+WDI = {'FI.RES.TOTL.MO': ('Reserves in months of imports', 'months'), 'BX.TRF.PWKR.CD.DT': ('Personal remittances received', 'US$'),
+       'BX.KLT.DINV.CD.WD': ('Foreign direct investment, net inflows', 'US$'), 'NE.EXP.GNFS.ZS': ('Exports of goods and services', '% of GDP'),
+       'NE.IMP.GNFS.ZS': ('Imports of goods and services', '% of GDP'), 'NE.GDI.TOTL.ZS': ('Gross capital formation', '% of GDP')}
+def imf_wdi():
+    out = {'imf': {}, 'wdi': {}, 'countries': PEERS}
+    for code, (label, unit) in IMF.items():
+        j = json.loads(get(f'https://www.imf.org/external/datamapper/api/v1/{code}/{"/".join(PEERS)}'))
+        vals = j.get('values', {}).get(code, {})
+        out['imf'][code] = {'label': label, 'unit': unit, 'data': {c: {y: v for y, v in vals.get(c, {}).items() if int(y) >= 1990} for c in PEERS}}
+        time.sleep(0.4)
+    for code, (label, unit) in WDI.items():
+        j = json.loads(get(f'https://api.worldbank.org/v2/country/{";".join(PEERS)}/indicator/{code}?format=json&per_page=2000&date=1990:2030'))
+        data = {}
+        for r in (j[1] if len(j) > 1 and j[1] else []):
+            if r['value'] is not None: data.setdefault(r['countryiso3code'], {})[r['date']] = r['value']
+        out['wdi'][code] = {'label': label, 'unit': unit, 'data': data}
+        time.sleep(0.4)
+    save('macro_world', out)
+    print('IMF/WDI:', len(out['imf']), len(out['wdi']), 'India growth', {k: v for k, v in out['imf']['NGDP_RPCH']['data']['IND'].items() if k in ('2025', '2026')})
+
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi)]
+    if '--only' in sys.argv:
+        only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True
     try:
         h = nse_indices()
