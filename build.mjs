@@ -16,6 +16,7 @@ import { emiPage } from './lib/emi.mjs';
 import { chartlePage } from './lib/chartle.mjs';
 import { todayPage } from './lib/today.mjs';
 import { infographicsPage } from './lib/infographics.mjs';
+import { rupeePage, rupeeData } from './lib/rupee.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -36,6 +37,7 @@ const TOPICS = {
 const TOPIC_ORDER = Object.keys(TOPICS);
 const TOOLS = [
   { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Ten rule-based readings, from inflation and rates to the rupee, oil, the Budget and growth.' },
+  { url: '/rupee/', kicker: 'Rupee & external sector', title: 'The rupee, the rate gap and the external accounts', blurb: 'The rupee against 14 currencies, the India–US rate gap, and the current account, reserves and remittances against peers.' },
   { url: '/charts/', kicker: 'Chart workbench', title: 'Plot anything against anything', blurb: 'A library of Indian and global series: overlay up to six, transform, zoom, share and download.' },
   { url: '/markets/', kicker: 'Markets', title: 'Indices, heatmap, rates and currencies', blurb: 'NSE closes for 28 indices, a Nifty 50 heatmap, valuations, yield curves, currency race charts and live crypto.' },
   { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges, a comparison chart and a year-on-year heat table.' },
@@ -161,7 +163,7 @@ function tapeHTML(tape) {
     const inr = MK.fxOut?.table.find(t => t.c === 'INR');
     const g = MK.comm?.items.find(i => i.id === 'gold');
     mticks = idx('Nifty 50', 'Nifty 50') + idx('Bank Nifty', 'Nifty Bank') + idx('Midcap 100', 'NIFTY Midcap 100') + idx('India VIX', 'India VIX') +
-      (inr ? `<a class="tick" href="/markets/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span></a>` : '') +
+      (inr ? `<a class="tick" href="/rupee/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span></a>` : '') +
       fr('Brent', 'DCOILBRENTEU', '$', 2, '/commodities/') + fr('WTI', 'DCOILWTICO', '$', 2, '/commodities/') +
       (g ? `<a class="tick" href="/commodities/"><span class="k">Gold</span><span class="v">$${Math.round(g.cur).toLocaleString('en-IN')}</span><span class="d ${g.mm > 0 ? 'up' : 'dn'}">${g.mm > 0 ? '+' : '−'}${Math.abs(g.mm).toFixed(1)}% m/m</span></a>` : '') +
       fr('US 10Y', 'DGS10', '%') + fr('US 2Y', 'DGS2', '%') + fr('Dollar idx', 'DTWEXBGS', '', 1) +
@@ -187,7 +189,7 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <a class="brand" href="/">The Kakistocrat<small>Economics · Politics · Policy</small></a>
 <button class="menu-btn" aria-expanded="false" aria-controls="nav">Sections</button>
 <nav class="nav" id="nav" aria-label="Topics">${nav}</nav>
-<nav class="toolsnav" aria-label="Tools"><a href="/today/">Today</a><a href="/markets/">Markets</a><a href="/commodities/">Commodities</a><a href="/charts/">Charts</a><a href="/tools/">Tools</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
+<nav class="toolsnav" aria-label="Tools"><a href="/today/">Today</a><a href="/markets/">Markets</a><a href="/commodities/">Commodities</a><a href="/rupee/">Rupee</a><a href="/charts/">Charts</a><a href="/tools/">Tools</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
 </div></header>
 ${tapeHTML(tape)}
 <main id="main">${body}</main>
@@ -413,6 +415,7 @@ async function main() {
   await cp('src/workbench.js', join(OUT, 'workbench.js'));
   await cp('src/chartle.js', join(OUT, 'chartle.js'));
   await cp('src/infographics.js', join(OUT, 'infographics.js'));
+  await cp('src/rupee.js', join(OUT, 'rupee.js'));
   if (existsSync('static')) await cp('static', OUT, { recursive: true });
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
@@ -456,6 +459,7 @@ async function main() {
   await write('api/catalog.json', JSON.stringify(catalog));
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
   api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
+  if (MK) { await write('api/rupee.json', JSON.stringify(rupeeData(MK, tape))); api['rupee'] = 'Rupee page bundle: 15 currencies per US dollar (daily), US rates and dollar index, India repo and 10-year yield, external-sector indicators for India and 13 peers'; }
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
 
@@ -479,6 +483,7 @@ async function main() {
   if (MK) {
     await write('markets/index.html', P({ title: 'Markets', path: '/markets/', description: 'NSE indices, Nifty 50 heatmap, valuations, yield curves, currencies and live crypto.', body: marketsPage(MK, { pageHead }) }));
     await write('commodities/index.html', P({ title: 'Commodities', path: '/commodities/', description: 'Energy, metals, fertiliser and food prices with five-year ranges and comparison charts.', body: commoditiesPage(MK, { pageHead }) }));
+    await write('rupee/index.html', P({ title: 'Rupee, rates and the external sector', path: '/rupee/', description: 'The rupee against the dollar and 14 currencies, the India–US interest-rate gap, and India’s current account, reserves, remittances and FDI against peers.', body: rupeePage(MK, tape, { pageHead }) }));
   }
   { const rp = tape.indicators.find(i => i.id === 'repo'); const ch = Math.round((rp.latest.value - rp.previous.value) * 100);
     await write('tools/emi/index.html', P({ title: 'EMI shock calculator', path: '/tools/emi/', description: 'What a repo rate change does to your home loan EMI or tenure.', body: emiPage({ pageHead, repo: { value: rp.latest.value.toFixed(2), change: `${ch > 0 ? '+' : ''}${ch} basis point`, date: longDate(rp.latest.released + 'T00:00:00Z') } }) })); }
@@ -490,7 +495,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/charts/', '/api/', '/tools/emi/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/charts/', '/api/', '/tools/emi/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
