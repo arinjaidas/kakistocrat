@@ -9,6 +9,7 @@ CARDS = [
  ('markets', 'Markets', 'NSE indices, heatmap, rates, currencies and crypto', '#0F6B3A'),
  ('commodities', 'Commodities', 'Energy, metals, fertilisers and food prices', '#B45309'),
  ('rupee', 'Rupee & external sector', 'The rupee, the rate gap and India’s external accounts', '#1D4ED8'),
+ ('world', 'India against the world', 'Where India ranks among 197 economies', '#B42318'),
  ('hormuz', 'Chokepoint watch', 'Ships through Hormuz and the world’s shipping lanes', '#B42318'),
  ('charts', 'Chart workbench', 'Plot 300 Indian and global series against each other', '#0F766E'),
  ('infographics', 'India in pictures', 'The Budget rupee, the inflation basket, states as countries', '#7C3AED'),
