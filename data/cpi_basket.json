@@ -1,0 +1,35 @@
+{
+  "month": "September 2026",
+  "status": "Provisional",
+  "headline": 5.54,
+  "checked": "2026-11-12",
+  "note": "Weights are All India Combined, CPI base 2024=100, from the Household Consumption Expenditure Survey 2023-24. Inflation is year on year for the month shown.",
+  "divisions": [
+    { "name": "Food and beverages", "short": "Food & drink", "weight": 36.753, "inflation": 7.36 },
+    { "name": "Housing, water, electricity, gas and other fuels", "short": "Housing & utilities", "weight": 17.665, "inflation": 2.74 },
+    { "name": "Transport", "short": "Transport", "weight": 8.796, "inflation": 5.01 },
+    { "name": "Clothing and footwear", "short": "Clothing", "weight": 6.383, "inflation": 3.93 },
+    { "name": "Health", "short": "Health", "weight": 6.100, "inflation": 1.40 },
+    { "name": "Personal care, social protection and miscellaneous goods and services", "short": "Personal care & misc. (incl. jewellery)", "weight": 5.038, "inflation": 13.75 },
+    { "name": "Furnishings, household equipment and routine household maintenance", "short": "Household goods", "weight": 4.469, "inflation": 3.11 },
+    { "name": "Information and communication", "short": "Phones & internet", "weight": 3.609, "inflation": 2.44 },
+    { "name": "Restaurants and accommodation services", "short": "Eating out & hotels", "weight": 3.348, "inflation": 9.36 },
+    { "name": "Education services", "short": "Education", "weight": 3.333, "inflation": 3.94 },
+    { "name": "Paan, tobacco and intoxicants", "short": "Paan & tobacco", "weight": 2.989, "inflation": 4.80 },
+    { "name": "Recreation, sport and culture", "short": "Recreation", "weight": 1.516, "inflation": 2.16 }
+  ],
+  "items": [
+    { "name": "Onion", "weight": 0.7006, "inflation": 108.09 },
+    { "name": "Ginger", "weight": 0.2556, "inflation": 62.85 },
+    { "name": "Garlic", "weight": 0.3738, "inflation": 54.62 },
+    { "name": "Lemon", "weight": 0.1367, "inflation": 36.41 },
+    { "name": "Potato", "weight": 0.7549, "inflation": -11.50 },
+    { "name": "Tomato", "weight": 0.4961, "inflation": -8.62 },
+    { "name": "Lady's finger", "weight": 0.2488, "inflation": -4.48 },
+    { "name": "Coconut", "weight": 0.1931, "inflation": -3.99 }
+  ],
+  "sources": [
+    { "name": "MoSPI, CPI press release for September 2026 (12 Oct 2026): division and item inflation", "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf" },
+    { "name": "PIB, First press release of CPI on base 2024=100 (12 Feb 2026): division weights", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2227012" }
+  ]
+}

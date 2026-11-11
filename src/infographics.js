@@ -59,3 +59,35 @@
         markLine: { symbol: 'none', silent: true, lineStyle: { color: '#CFCBC2', type: 'dashed' }, label: { fontFamily: MONO, fontSize: 10 }, data: [{ xAxis: 60, name: '60% of GDP' }, { yAxis: -3, name: '−3% deficit' }] } }] });
   });
 })();
+
+/* Inflation basket treemap, contributions and item movers */
+(function () {
+  const el = document.getElementById('ig-cpi'); if (!el) return;
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078';
+  const scale = v => { // diverging: low = teal, ~4% target = sand, high = deep red
+    const stops = [[0, [15, 118, 110]], [2, [94, 160, 150]], [4, [232, 224, 205]], [7, [222, 120, 90]], [10, [180, 35, 24]], [14, [110, 20, 14]]];
+    const x = Math.max(0, Math.min(14, v)); let i = 0; while (i < stops.length - 2 && x > stops[i + 1][0]) i++;
+    const [a, ca] = stops[i], [b, cb] = stops[i + 1], t = (x - a) / (b - a); return `rgb(${ca.map((c, k) => Math.round(c + (cb[k] - c) * t)).join(',')})`; };
+  const txt = v => v > 5.5 || v < 2.5 ? '#fff' : INK;
+  const go = async () => { if (!window.echarts) return setTimeout(go, 60);
+    const B = await fetch('/api/cpi_basket.json').then(r => r.json());
+    const tm = echarts.init(el), cc = echarts.init(document.getElementById('ig-cpic')), ii = echarts.init(document.getElementById('ig-cpii'));
+    addEventListener('resize', () => [tm, cc, ii].forEach(c => c.resize()));
+    document.querySelectorAll('.ig-save[data-for="ig-cpi"]').forEach(b => b.addEventListener('click', () => { const a = document.createElement('a'); a.href = tm.getDataURL({ pixelRatio: 2, backgroundColor: '#fff' }); a.download = 'kakistocrat-inflation-basket.png'; a.click(); }));
+    tm.setOption({ textStyle: { fontFamily: FONT }, tooltip: { formatter: p => `<b>${p.data.full}</b><br>Weight ${p.data.value.toFixed(2)}% of the basket<br>Inflation ${p.data.inf.toFixed(2)}% in ${B.month}` },
+      series: [{ type: 'treemap', roam: false, nodeClick: false, breadcrumb: { show: false }, width: '100%', height: '100%', top: 0, left: 0,
+        itemStyle: { borderColor: '#fff', borderWidth: 3, gapWidth: 3 },
+        label: { show: true, formatter: p => `{n|${p.data.name}}\n{v|${p.data.inf.toFixed(1)}%}\n{w|${p.data.value.toFixed(1)}% of basket}`, rich: { n: { fontFamily: FONT, fontSize: 14, fontWeight: 600, lineHeight: 20 }, v: { fontFamily: MONO, fontSize: 22, fontWeight: 700, lineHeight: 30 }, w: { fontFamily: MONO, fontSize: 11, lineHeight: 16, opacity: 0.85 } } },
+        data: B.divisions.map(d => ({ name: d.short, full: d.name, value: d.weight, inf: d.inflation, itemStyle: { color: scale(d.inflation) }, label: { color: txt(d.inflation) } })) }] });
+    const con = B.divisions.map(d => ({ n: d.short, v: +(d.weight * d.inflation / 100).toFixed(3), inf: d.inflation })).sort((a, b) => a.v - b.v);
+    const axis = { axisLine: { lineStyle: { color: '#E2DFD8' } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } } };
+    cc.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 200, right: 50, top: 6, bottom: 24 }, tooltip: { trigger: 'item', formatter: p => `${p.name}: ${p.value.toFixed(2)} points` },
+      xAxis: { type: 'value', ...axis }, yAxis: { type: 'category', data: con.map(c => c.n), ...axis, axisLabel: { color: INK, fontSize: 11, fontFamily: FONT } },
+      series: [{ type: 'bar', barWidth: '64%', data: con.map(c => ({ value: c.v, itemStyle: { color: scale(c.inf), borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => p.value.toFixed(2) } }] });
+    const it = [...B.items].sort((a, b) => a.inflation - b.inflation);
+    ii.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 110, right: 60, top: 6, bottom: 24 }, tooltip: { trigger: 'item', formatter: p => `${p.name}: ${p.value > 0 ? '+' : ''}${p.value.toFixed(1)}% a year<br>Basket weight ${it[p.dataIndex].weight.toFixed(2)}%` },
+      xAxis: { type: 'value', ...axis, axisLabel: { ...axis.axisLabel, formatter: v => v + '%' } }, yAxis: { type: 'category', data: it.map(x => x.name), ...axis, axisLabel: { color: INK, fontSize: 11, fontFamily: FONT } },
+      series: [{ type: 'bar', barWidth: '64%', data: it.map(x => ({ value: x.inflation, itemStyle: { color: x.inflation >= 0 ? '#B42318' : '#0F766E', borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => (p.value > 0 ? '+' : '') + p.value.toFixed(1) + '%' } }] });
+  };
+  go();
+})();
