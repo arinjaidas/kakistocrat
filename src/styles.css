@@ -490,3 +490,18 @@ pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1
 .ct-end{border-top:3px solid var(--ink);padding-top:14px;margin-top:10px}
 .ct-end h2{margin:0 0 6px;font:500 28px var(--serif)}
 @media (max-width:720px){.ct-clues{grid-template-columns:1fr 1fr}}
+/* ---------- india today ---------- */
+.td-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:18px}
+.td-tile{display:flex;flex-direction:column;gap:3px;background:#fff;border:1px solid var(--rule-2);border-top:4px solid var(--tc);padding:12px 13px;color:var(--ink);transition:transform .15s}
+.td-tile:hover{transform:translateY(-2px);color:var(--ink);border-color:var(--tc)}
+.td-tile .k{font:600 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
+.td-tile .v{font:600 26px/1.1 var(--mono)}
+.td-tile .st{align-self:flex-start;font:600 11.5px var(--sans);color:var(--tc);background:var(--tb);padding:2px 7px;margin:2px 0}
+.td-tile .why{font:400 11.5px/1.45 var(--sans);color:var(--graphite)}
+.td-heat{border-collapse:separate;border-spacing:2px;font:500 12px var(--mono);min-width:880px;width:100%}
+.td-heat th{font:600 10.5px var(--mono);color:var(--slate);text-transform:uppercase;padding:4px;text-align:center}
+.td-heat th[scope=row]{text-align:left;font:600 12.5px var(--sans);color:var(--ink);text-transform:none;white-space:nowrap;padding-right:10px}
+.td-heat td{text-align:center;padding:7px 4px;background:var(--stone)}
+.td-heat td.na{color:var(--mute)}
+@media (max-width:1180px){.td-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:720px){.td-grid{grid-template-columns:1fr 1fr}}
