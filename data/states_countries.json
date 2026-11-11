@@ -1,0 +1,1078 @@
+{
+ "checked": "2026-11-12",
+ "fx": 84.53,
+ "indiaUsd": 3759.8,
+ "states": [
+  {
+   "name": "Maharashtra",
+   "gsdp": 45.32,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 536.1,
+   "country": "Austria",
+   "countryUsd": 534.6
+  },
+  {
+   "name": "Tamil Nadu",
+   "gsdp": 31.19,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 369.0,
+   "country": "Pakistan",
+   "countryUsd": 371.9
+  },
+  {
+   "name": "Uttar Pradesh",
+   "gsdp": 29.78,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 352.3,
+   "country": "Czechia",
+   "countryUsd": 347.6
+  },
+  {
+   "name": "Karnataka",
+   "gsdp": 28.84,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 341.2,
+   "country": "Czechia",
+   "countryUsd": 347.6
+  },
+  {
+   "name": "Gujarat",
+   "gsdp": 22.03,
+   "year": "2022-23",
+   "fx": 80.3,
+   "usd": 274.3,
+   "country": "Finland",
+   "countryUsd": 280.0
+  },
+  {
+   "name": "West Bengal",
+   "gsdp": 18.15,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 214.7,
+   "country": "Qatar",
+   "countryUsd": 218.4
+  },
+  {
+   "name": "Rajasthan",
+   "gsdp": 17.04,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 201.6,
+   "country": "Ethiopia",
+   "countryUsd": 210
+  },
+  {
+   "name": "Telangana",
+   "gsdp": 16.41,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 194.1,
+   "country": "Ukraine",
+   "countryUsd": 190.8
+  },
+  {
+   "name": "Andhra Pradesh",
+   "gsdp": 15.93,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 188.5,
+   "country": "Ukraine",
+   "countryUsd": 190.8
+  },
+  {
+   "name": "Madhya Pradesh",
+   "gsdp": 15.03,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 177.8,
+   "country": "Ukraine",
+   "countryUsd": 190.8
+  },
+  {
+   "name": "Kerala",
+   "gsdp": 12.49,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 147.8,
+   "country": "Slovakia",
+   "countryUsd": 140.9
+  },
+  {
+   "name": "Delhi",
+   "gsdp": 12.15,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 143.7,
+   "country": "Slovakia",
+   "countryUsd": 140.9
+  },
+  {
+   "name": "Haryana",
+   "gsdp": 12.14,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 143.6,
+   "country": "Slovakia",
+   "countryUsd": 140.9
+  },
+  {
+   "name": "Bihar",
+   "gsdp": 9.92,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 117.4,
+   "country": "Kenya",
+   "countryUsd": 119.4
+  },
+  {
+   "name": "Odisha",
+   "gsdp": 8.9,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 105.3,
+   "country": "Venezuela",
+   "countryUsd": 103.7
+  },
+  {
+   "name": "Punjab",
+   "gsdp": 8.39,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 99.3,
+   "country": "Sri Lanka",
+   "countryUsd": 99.6
+  },
+  {
+   "name": "Assam",
+   "gsdp": 6.44,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 76.2,
+   "country": "DR Congo",
+   "countryUsd": 76.7
+  },
+  {
+   "name": "Chhattisgarh",
+   "gsdp": 5.68,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 67.2,
+   "country": "Turkmenistan",
+   "countryUsd": 68.7
+  },
+  {
+   "name": "Jharkhand",
+   "gsdp": 5.16,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 61.0,
+   "country": "Jordan",
+   "countryUsd": 58.7
+  },
+  {
+   "name": "Uttarakhand",
+   "gsdp": 3.78,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 44.7,
+   "country": "Paraguay",
+   "countryUsd": 44.7
+  },
+  {
+   "name": "Jammu & Kashmir",
+   "gsdp": 2.62,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 31.0,
+   "country": "Papua New Guinea",
+   "countryUsd": 30.8
+  },
+  {
+   "name": "Himachal Pradesh",
+   "gsdp": 2.32,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 27.4,
+   "country": "Sudan",
+   "countryUsd": 27.1
+  },
+  {
+   "name": "Goa",
+   "gsdp": 1.07,
+   "year": "2023-24",
+   "fx": 82.78,
+   "usd": 12.9,
+   "country": "Equatorial Guinea",
+   "countryUsd": 12.5
+  },
+  {
+   "name": "Tripura",
+   "gsdp": 0.9,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 10.6,
+   "country": "Togo",
+   "countryUsd": 10.6
+  },
+  {
+   "name": "Meghalaya",
+   "gsdp": 0.6,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 7.1,
+   "country": "Maldives",
+   "countryUsd": 7.1
+  },
+  {
+   "name": "Puducherry",
+   "gsdp": 0.52,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 6.2,
+   "country": "Fiji",
+   "countryUsd": 6.0
+  },
+  {
+   "name": "Sikkim",
+   "gsdp": 0.49,
+   "year": "2023-24",
+   "fx": 82.78,
+   "usd": 5.9,
+   "country": "Fiji",
+   "countryUsd": 5.5
+  },
+  {
+   "name": "Arunachal Pradesh",
+   "gsdp": 0.44,
+   "year": "2024-25",
+   "fx": 84.53,
+   "usd": 5.2,
+   "country": "Eswatini",
+   "countryUsd": 4.9
+  },
+  {
+   "name": "Manipur",
+   "gsdp": 0.43,
+   "year": "2023-24",
+   "fx": 82.78,
+   "usd": 5.2,
+   "country": "Fiji",
+   "countryUsd": 5.5
+  },
+  {
+   "name": "Nagaland",
+   "gsdp": 0.4,
+   "year": "2023-24",
+   "fx": 82.78,
+   "usd": 4.8,
+   "country": "Eswatini",
+   "countryUsd": 4.6
+  },
+  {
+   "name": "Mizoram",
+   "gsdp": 0.33,
+   "year": "2023-24",
+   "fx": 82.78,
+   "usd": 4.0,
+   "country": "Central African Republic",
+   "countryUsd": 3.9
+  }
+ ],
+ "countries": [
+  {
+   "name": "United States",
+   "usd": 29381.0
+  },
+  {
+   "name": "China",
+   "usd": 18929.0
+  },
+  {
+   "name": "Germany",
+   "usd": 4746.9
+  },
+  {
+   "name": "Japan",
+   "usd": 4207.6
+  },
+  {
+   "name": "United Kingdom",
+   "usd": 3713.6
+  },
+  {
+   "name": "France",
+   "usd": 3177.8
+  },
+  {
+   "name": "Italy",
+   "usd": 2382.7
+  },
+  {
+   "name": "Canada",
+   "usd": 2270.1
+  },
+  {
+   "name": "Brazil",
+   "usd": 2185.8
+  },
+  {
+   "name": "Russia",
+   "usd": 2185.8
+  },
+  {
+   "name": "South Korea",
+   "usd": 1880.8
+  },
+  {
+   "name": "Mexico",
+   "usd": 1834.6
+  },
+  {
+   "name": "Australia",
+   "usd": 1799.0
+  },
+  {
+   "name": "Spain",
+   "usd": 1729.8
+  },
+  {
+   "name": "Indonesia",
+   "usd": 1396.3
+  },
+  {
+   "name": "Turkey",
+   "usd": 1361.0
+  },
+  {
+   "name": "Saudi Arabia",
+   "usd": 1254.1
+  },
+  {
+   "name": "Netherlands",
+   "usd": 1206.8
+  },
+  {
+   "name": "Switzerland",
+   "usd": 978.0
+  },
+  {
+   "name": "Poland",
+   "usd": 921.7
+  },
+  {
+   "name": "Taiwan",
+   "usd": 801.5
+  },
+  {
+   "name": "Belgium",
+   "usd": 670.8
+  },
+  {
+   "name": "Argentina",
+   "usd": 637.7
+  },
+  {
+   "name": "Sweden",
+   "usd": 609.7
+  },
+  {
+   "name": "Ireland",
+   "usd": 608.0
+  },
+  {
+   "name": "United Arab Emirates",
+   "usd": 581.0
+  },
+  {
+   "name": "Singapore",
+   "usd": 572.9
+  },
+  {
+   "name": "Israel",
+   "usd": 542.3
+  },
+  {
+   "name": "Austria",
+   "usd": 534.6
+  },
+  {
+   "name": "Thailand",
+   "usd": 529.4
+  },
+  {
+   "name": "Norway",
+   "usd": 500.9
+  },
+  {
+   "name": "Philippines",
+   "usd": 461.7
+  },
+  {
+   "name": "Vietnam",
+   "usd": 459.4
+  },
+  {
+   "name": "Bangladesh",
+   "usd": 450.5
+  },
+  {
+   "name": "Denmark",
+   "usd": 433.0
+  },
+  {
+   "name": "Malaysia",
+   "usd": 422.4
+  },
+  {
+   "name": "Colombia",
+   "usd": 420.5
+  },
+  {
+   "name": "Iran",
+   "usd": 416.7
+  },
+  {
+   "name": "Hong Kong",
+   "usd": 408.3
+  },
+  {
+   "name": "South Africa",
+   "usd": 401.1
+  },
+  {
+   "name": "Egypt",
+   "usd": 383.1
+  },
+  {
+   "name": "Romania",
+   "usd": 382.6
+  },
+  {
+   "name": "Pakistan",
+   "usd": 371.9
+  },
+  {
+   "name": "Czechia",
+   "usd": 347.6
+  },
+  {
+   "name": "Chile",
+   "usd": 329.2
+  },
+  {
+   "name": "Portugal",
+   "usd": 313.6
+  },
+  {
+   "name": "Finland",
+   "usd": 298.8
+  },
+  {
+   "name": "Peru",
+   "usd": 295.3
+  },
+  {
+   "name": "Kazakhstan",
+   "usd": 291.5
+  },
+  {
+   "name": "Iraq",
+   "usd": 283.7
+  },
+  {
+   "name": "Algeria",
+   "usd": 269.1
+  },
+  {
+   "name": "New Zealand",
+   "usd": 259.1
+  },
+  {
+   "name": "Greece",
+   "usd": 256.2
+  },
+  {
+   "name": "Nigeria",
+   "usd": 252.1
+  },
+  {
+   "name": "Hungary",
+   "usd": 223.0
+  },
+  {
+   "name": "Qatar",
+   "usd": 218.4
+  },
+  {
+   "name": "Ethiopia",
+   "usd": 210
+  },
+  {
+   "name": "Ukraine",
+   "usd": 190.8
+  },
+  {
+   "name": "Morocco",
+   "usd": 162.4
+  },
+  {
+   "name": "Kuwait",
+   "usd": 160.9
+  },
+  {
+   "name": "Slovakia",
+   "usd": 140.9
+  },
+  {
+   "name": "Puerto Rico",
+   "usd": 126.0
+  },
+  {
+   "name": "Dominican Republic",
+   "usd": 124.6
+  },
+  {
+   "name": "Ecuador",
+   "usd": 123.8
+  },
+  {
+   "name": "Uzbekistan",
+   "usd": 121.4
+  },
+  {
+   "name": "Angola",
+   "usd": 119.6
+  },
+  {
+   "name": "Kenya",
+   "usd": 119.4
+  },
+  {
+   "name": "Bulgaria",
+   "usd": 113.4
+  },
+  {
+   "name": "Guatemala",
+   "usd": 113.2
+  },
+  {
+   "name": "Oman",
+   "usd": 107.1
+  },
+  {
+   "name": "Venezuela",
+   "usd": 103.7
+  },
+  {
+   "name": "Sri Lanka",
+   "usd": 99.6
+  },
+  {
+   "name": "Costa Rica",
+   "usd": 96.7
+  },
+  {
+   "name": "Luxembourg",
+   "usd": 93.3
+  },
+  {
+   "name": "Croatia",
+   "usd": 93.0
+  },
+  {
+   "name": "Serbia",
+   "usd": 90.1
+  },
+  {
+   "name": "Côte d'Ivoire",
+   "usd": 87.1
+  },
+  {
+   "name": "Panama",
+   "usd": 86.5
+  },
+  {
+   "name": "Lithuania",
+   "usd": 85.5
+  },
+  {
+   "name": "Ghana",
+   "usd": 83.3
+  },
+  {
+   "name": "Uruguay",
+   "usd": 82.3
+  },
+  {
+   "name": "Tanzania",
+   "usd": 79.2
+  },
+  {
+   "name": "Belarus",
+   "usd": 78.8
+  },
+  {
+   "name": "DR Congo",
+   "usd": 76.7
+  },
+  {
+   "name": "Myanmar",
+   "usd": 76.7
+  },
+  {
+   "name": "Azerbaijan",
+   "usd": 74.4
+  },
+  {
+   "name": "Slovenia",
+   "usd": 73.0
+  },
+  {
+   "name": "Turkmenistan",
+   "usd": 68.7
+  },
+  {
+   "name": "Jordan",
+   "usd": 58.7
+  },
+  {
+   "name": "Uganda",
+   "usd": 57
+  },
+  {
+   "name": "Bolivia",
+   "usd": 55.3
+  },
+  {
+   "name": "Cameroon",
+   "usd": 53.3
+  },
+  {
+   "name": "Tunisia",
+   "usd": 51.4
+  },
+  {
+   "name": "Macao",
+   "usd": 49.5
+  },
+  {
+   "name": "Libya",
+   "usd": 49.3
+  },
+  {
+   "name": "Zimbabwe",
+   "usd": 49.3
+  },
+  {
+   "name": "Bahrain",
+   "usd": 47.2
+  },
+  {
+   "name": "Cambodia",
+   "usd": 46.1
+  },
+  {
+   "name": "Paraguay",
+   "usd": 44.7
+  },
+  {
+   "name": "Latvia",
+   "usd": 44.0
+  },
+  {
+   "name": "Nepal",
+   "usd": 43.3
+  },
+  {
+   "name": "Estonia",
+   "usd": 43.2
+  },
+  {
+   "name": "Guinea",
+   "usd": 38.3
+  },
+  {
+   "name": "Cyprus",
+   "usd": 37.6
+  },
+  {
+   "name": "Honduras",
+   "usd": 37.0
+  },
+  {
+   "name": "El Salvador",
+   "usd": 34.9
+  },
+  {
+   "name": "Georgia",
+   "usd": 34.2
+  },
+  {
+   "name": "Iceland",
+   "usd": 33.2
+  },
+  {
+   "name": "Senegal",
+   "usd": 32.2
+  },
+  {
+   "name": "Papua New Guinea",
+   "usd": 30.8
+  },
+  {
+   "name": "Lebanon",
+   "usd": 30.5
+  },
+  {
+   "name": "Bosnia and Herzegovina",
+   "usd": 29.7
+  },
+  {
+   "name": "Sudan",
+   "usd": 27.1
+  },
+  {
+   "name": "Albania",
+   "usd": 27.1
+  },
+  {
+   "name": "Mali",
+   "usd": 26.8
+  },
+  {
+   "name": "Armenia",
+   "usd": 26.1
+  },
+  {
+   "name": "Trinidad and Tobago",
+   "usd": 25.9
+  },
+  {
+   "name": "Haiti",
+   "usd": 25.3
+  },
+  {
+   "name": "Zambia",
+   "usd": 25.3
+  },
+  {
+   "name": "Malta",
+   "usd": 25.0
+  },
+  {
+   "name": "Guyana",
+   "usd": 24.7
+  },
+  {
+   "name": "Mongolia",
+   "usd": 23.8
+  },
+  {
+   "name": "Burkina Faso",
+   "usd": 23.1
+  },
+  {
+   "name": "Mozambique",
+   "usd": 22.8
+  },
+  {
+   "name": "Jamaica",
+   "usd": 21.9
+  },
+  {
+   "name": "Benin",
+   "usd": 21.5
+  },
+  {
+   "name": "Gabon",
+   "usd": 20.9
+  },
+  {
+   "name": "Chad",
+   "usd": 20.7
+  },
+  {
+   "name": "Nicaragua",
+   "usd": 19.7
+  },
+  {
+   "name": "Niger",
+   "usd": 19.7
+  },
+  {
+   "name": "Botswana",
+   "usd": 19.4
+  },
+  {
+   "name": "Kyrgyzstan",
+   "usd": 18.2
+  },
+  {
+   "name": "Moldova",
+   "usd": 18.2
+  },
+  {
+   "name": "Afghanistan",
+   "usd": 17.8
+  },
+  {
+   "name": "Madagascar",
+   "usd": 17.6
+  },
+  {
+   "name": "North Macedonia ",
+   "usd": 17.0
+  },
+  {
+   "name": "The Bahamas",
+   "usd": 16.0
+  },
+  {
+   "name": "West Bank and Gaza",
+   "usd": 16.0
+  },
+  {
+   "name": "Brunei Darussalam",
+   "usd": 15.3
+  },
+  {
+   "name": "Republic of the Congo",
+   "usd": 15.2
+  },
+  {
+   "name": "Laos",
+   "usd": 15.1
+  },
+  {
+   "name": "Rwanda",
+   "usd": 15.1
+  },
+  {
+   "name": "Mauritius",
+   "usd": 14.9
+  },
+  {
+   "name": "Tajikistan",
+   "usd": 14.4
+  },
+  {
+   "name": "Namibia",
+   "usd": 13.6
+  },
+  {
+   "name": "Equatorial Guinea",
+   "usd": 13.3
+  },
+  {
+   "name": "Somalia",
+   "usd": 12.3
+  },
+  {
+   "name": "Malawi",
+   "usd": 11.8
+  },
+  {
+   "name": "Kosovo",
+   "usd": 11.2
+  },
+  {
+   "name": "Mauritania",
+   "usd": 10.9
+  },
+  {
+   "name": "Togo",
+   "usd": 10.6
+  },
+  {
+   "name": "Liechtenstein",
+   "usd": 8.5
+  },
+  {
+   "name": "Montenegro",
+   "usd": 8.3
+  },
+  {
+   "name": "Yemen",
+   "usd": 8.1
+  },
+  {
+   "name": "Barbados",
+   "usd": 7.6
+  },
+  {
+   "name": "Maldives",
+   "usd": 7.1
+  },
+  {
+   "name": "Sierra Leone",
+   "usd": 7.0
+  },
+  {
+   "name": "Fiji",
+   "usd": 6.0
+  },
+  {
+   "name": "Eswatini",
+   "usd": 4.9
+  },
+  {
+   "name": "Burundi",
+   "usd": 4.8
+  },
+  {
+   "name": "Liberia",
+   "usd": 4.8
+  },
+  {
+   "name": "South Sudan",
+   "usd": 4.6
+  },
+  {
+   "name": "Suriname",
+   "usd": 4.3
+  },
+  {
+   "name": "Djibouti",
+   "usd": 4.2
+  },
+  {
+   "name": "Aruba",
+   "usd": 4.1
+  },
+  {
+   "name": "Central African Republic",
+   "usd": 4.1
+  },
+  {
+   "name": "Andorra",
+   "usd": 4.0
+  },
+  {
+   "name": "Belize",
+   "usd": 3.2
+  },
+  {
+   "name": "Bhutan",
+   "usd": 3.1
+  },
+  {
+   "name": "Cabo Verde",
+   "usd": 2.7
+  },
+  {
+   "name": "Saint Lucia",
+   "usd": 2.6
+  },
+  {
+   "name": "Lesotho",
+   "usd": 2.5
+  },
+  {
+   "name": "The Gambia",
+   "usd": 2.5
+  },
+  {
+   "name": "Antigua and Barbuda",
+   "usd": 2.2
+  },
+  {
+   "name": "Guinea-Bissau",
+   "usd": 2.2
+  },
+  {
+   "name": "Seychelles",
+   "usd": 2.2
+  },
+  {
+   "name": "San Marino",
+   "usd": 2.1
+  },
+  {
+   "name": "Timor-Leste",
+   "usd": 1.9
+  },
+  {
+   "name": "Solomon Islands",
+   "usd": 1.6
+  },
+  {
+   "name": "Comoros",
+   "usd": 1.4
+  },
+  {
+   "name": "Grenada",
+   "usd": 1.4
+  },
+  {
+   "name": "Vanuatu",
+   "usd": 1.3
+  },
+  {
+   "name": "Samoa",
+   "usd": 1.2
+  },
+  {
+   "name": "Saint Kitts and Nevis",
+   "usd": 1.1
+  },
+  {
+   "name": "Saint Vincent and the Grenadines",
+   "usd": 1.1
+  },
+  {
+   "name": "São Tomé and Príncipe",
+   "usd": 0.8
+  },
+  {
+   "name": "Dominica",
+   "usd": 0.7
+  },
+  {
+   "name": "Tonga",
+   "usd": 0.6
+  },
+  {
+   "name": "Micronesia",
+   "usd": 0.5
+  },
+  {
+   "name": "Kiribati",
+   "usd": 0.3
+  },
+  {
+   "name": "Marshall Islands",
+   "usd": 0.3
+  },
+  {
+   "name": "Palau",
+   "usd": 0.3
+  },
+  {
+   "name": "Naoero",
+   "usd": 0.2
+  },
+  {
+   "name": "Tuvalu",
+   "usd": 0.1
+  }
+ ],
+ "sources": [
+  {
+   "name": "RBI, Handbook of Statistics on Indian States 2024-25, Table 21: Gross State Domestic Product (current prices)",
+   "url": "https://website.rbi.org.in/kn/web/rbi/-/publications/handbook-of-statistics-on-indian-states-2025"
+  },
+  {
+   "name": "IMF World Economic Outlook, GDP in current US dollars (NGDPD), 2024",
+   "url": "https://www.imf.org/external/datamapper/NGDPD@WEO"
+  },
+  {
+   "name": "Federal Reserve H.10 rupee–dollar rate, financial-year averages, via FRED",
+   "url": "https://fred.stlouisfed.org/series/DEXINUS"
+  }
+ ]
+}
