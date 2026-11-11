@@ -3,7 +3,7 @@
 // merges them with the data files in /data, and writes a static site to /dist.
 import { mkdir, writeFile, readFile, cp, rm } from 'node:fs/promises';
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { budgetPage } from './lib/budget.mjs';
 import { statesPage } from './lib/states.mjs';
@@ -184,7 +184,7 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
   return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(full)}</title><meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(canonical || BASE_URL + path)}">
-<meta property="og:title" content="${esc(title || 'The Kakistocrat')}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="${type}"><meta property="og:url" content="${esc(BASE_URL + path)}"><meta name="twitter:card" content="summary">
+<meta property="og:title" content="${esc(title || 'The Kakistocrat')}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="${type}"><meta property="og:url" content="${esc(BASE_URL + path)}"><meta property="og:image" content="${BASE_URL}/og/${ogSlug(path)}.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${BASE_URL}/og/${ogSlug(path)}.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css?v=${BUILT.getTime()}"><link rel="alternate" type="application/rss+xml" title="The Kakistocrat" href="https://${SITE}/feed/">
@@ -217,6 +217,8 @@ const metaLine = a => `<div class="meta">${esc(shortDate(a.date))} · ${a.minute
 const card = (a, size = 'h-3', dek = true) => `<a class="story" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h3 class="${size}">${esc(a.title)}</h3>${dek ? `<p class="dek sm">${esc(a.excerpt)}</p>` : ''}${metaLine(a)}</a>`;
 const stagesDone = item => Object.values(item.stage).filter(Boolean).length;
 const pips = item => `<div class="pips" aria-label="${stagesDone(item)} of 5 stages reached">${['Announced','Notified','Funded','Implemented','Measured'].map(s => `<i class="${item.stage[s] ? 'on' : ''}"></i>`).join('')}</div>`;
+const OG = new Set(existsSync('static/og') ? readdirSync('static/og').filter(f => f.endsWith('.png')).map(f => f.slice(0, -4)) : []);
+const ogSlug = path => { const seg = (path || '/').split('/').filter(Boolean).pop() || 'default'; return OG.has(seg) ? seg : 'default'; };
 const pageHead = (kick, title, p) => `<div class="wrap"><header class="page-head"><span class="kicker">${kick}</span><h1>${esc(title)}</h1>${p ? `<p>${p}</p>` : ''}</header></div>`;
 
 // ---------------------------------------------------------------- pages
