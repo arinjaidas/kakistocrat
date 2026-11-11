@@ -572,3 +572,9 @@ pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1
 @media (max-width:720px){#ex-tabs{flex-wrap:wrap}.mk-ctrl{flex-wrap:wrap;max-width:100%}}
 .sc-t{min-width:0;overflow:hidden}.sc-t span{overflow-wrap:anywhere}
 @media (max-width:600px){.sc-grid{gap:2px}.sc-t{padding:3px}.sc-t b{font-size:11px}.sc-t span{font-size:8.5px}.sc-t small{font-size:9px}}
+/* world rankings */
+.wd-card{text-align:left;cursor:pointer;font:inherit}
+.wd-two{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start}
+.wd-rank b{display:block;font:700 64px/1 "Newsreader",Georgia,serif;color:#B42318}.wd-rank span{font:500 13px "IBM Plex Mono",monospace;color:#3A3E44}
+.wd-nb{margin:18px 0 0;padding:0 0 0 34px;font-size:14px}.wd-nb li{padding:4px 0;border-bottom:1px solid #EEECE7}.wd-nb li span{display:inline-block;width:150px}.wd-nb li b{font:600 13px "IBM Plex Mono",monospace;float:right}.wd-nb li.me{color:#B42318;font-weight:700}
+@media (max-width:820px){.wd-two{grid-template-columns:1fr}}

@@ -211,6 +211,24 @@ def imf_wdi():
     print('IMF/WDI:', len(out['imf']), len(out['wdi']), 'India growth', {k: v for k, v in out['imf']['NGDP_RPCH']['data']['IND'].items() if k in ('2025', '2026')})
 
 
+# ------------------------------------------------------------------ IMF WEO for every country (India vs the world rankings)
+WORLD_IND = {'NGDPD': ('GDP', 'US$ billion'), 'PPPGDP': ('GDP at purchasing power parity', 'int$ billion'), 'NGDPDPC': ('GDP per person', 'US$'),
+             'PPPPC': ('GDP per person at purchasing power parity', 'int$'), 'NGDP_RPCH': ('Real GDP growth', '%'), 'PCPIPCH': ('Inflation, average consumer prices', '%'),
+             'LP': ('Population', 'million'), 'GGXWDG_NGDP': ('Government gross debt', '% of GDP'), 'GGXCNL_NGDP': ('Government net lending/borrowing', '% of GDP'),
+             'BCA_NGDPD': ('Current account balance', '% of GDP')}
+def imf_world():
+    cj = json.loads(get('https://www.imf.org/external/datamapper/api/v1/countries'))['countries']
+    data = {}
+    for ind in WORLD_IND:
+        j = json.loads(get(f'https://www.imf.org/external/datamapper/api/v1/{ind}', timeout=60))['values'][ind]
+        data[ind] = {iso: {y: (round(v, 3) if abs(v) < 1000 else round(v, 1)) for y, v in ser.items() if v is not None and 1990 <= int(y) <= 2031} for iso, ser in j.items() if iso in cj}
+        time.sleep(1)
+    out = {'source': 'IMF World Economic Outlook via the DataMapper API', 'indicators': {k: {'label': a, 'unit': b} for k, (a, b) in WORLD_IND.items()},
+           'countries': {iso: v['label'] for iso, v in cj.items() if any(iso in data[i] for i in data)}, 'data': data}
+    save('imf_world', out)
+    print('IMF world:', len(out['countries']), 'countries')
+
+
 # ------------------------------------------------------------------ IMF PortWatch: daily transit calls through maritime chokepoints (AIS-based)
 PW = 'https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query'
 CHOKE = ['Strait of Hormuz', 'Bab el-Mandeb Strait', 'Suez Canal', 'Cape of Good Hope', 'Malacca Strait']
@@ -231,7 +249,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world)]
     if '--only' in sys.argv:
         only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True
