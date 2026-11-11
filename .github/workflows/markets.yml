@@ -1,0 +1,29 @@
+name: Refresh market and commodity data
+on:
+  schedule:
+    - cron: '35 12 * * 1-5'   # 18:05 IST, after NSE publishes closing files
+    - cron: '35 15 * * 1-5'   # 21:05 IST, catch late files
+    - cron: '20 3 * * 0'      # Sunday: weekly refresh for monthly series
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency: { group: markets, cancel-in-progress: false }
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install openpyxl
+      - run: python scripts/fetch_markets.py --years 3
+      - name: Commit if data changed
+        run: |
+          git add data/markets
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git config user.name "kakistocrat-data"
+          git config user.email "actions@users.noreply.github.com"
+          git commit -m "Refresh market data"
+          git pull --rebase origin main
+          git push
