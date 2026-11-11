@@ -1,160 +1,378 @@
 {
-  "updated": "2026-11-11",
-  "note": "Each figure is the latest value verified against the cited source on the 'checked' date. Market figures are closing levels, not live quotes.",
-  "indicators": [
+ "updated": "2026-11-12",
+ "note": "Each figure is the latest value verified against the cited source on the 'checked' date. Market figures are closing levels, not live quotes.",
+ "indicators": [
+  {
+   "id": "cpi",
+   "label": "CPI inflation",
+   "short": "CPI",
+   "unit": "%",
+   "decimals": 2,
+   "latest": {
+    "value": 5.54,
+    "period": "Sep 2026",
+    "released": "2026-10-12",
+    "status": "Provisional"
+   },
+   "previous": {
+    "value": 4.83,
+    "period": "Aug 2026",
+    "status": "Final"
+   },
+   "revisions": [
     {
-      "id": "cpi",
-      "label": "CPI inflation",
-      "short": "CPI",
-      "unit": "%",
-      "decimals": 2,
-      "latest": { "value": 5.54, "period": "Sep 2026", "released": "2026-10-12", "status": "Provisional" },
-      "previous": { "value": 4.83, "period": "Aug 2026", "status": "Final" },
-      "revisions": [
-        { "period": "Aug 2026", "first": 4.82, "firstDate": "2026-09-14", "revised": 4.83, "revisedDate": "2026-10-12" }
-      ],
-      "next": { "date": "2026-11-12", "what": "October 2026 CPI" },
-      "history": [
-        { "t": "Jun 2026", "v": 4.38 },
-        { "t": "Jul 2026", "v": 4.45 },
-        { "t": "Aug 2026", "v": 4.83 },
-        { "t": "Sep 2026", "v": 5.54 }
-      ],
-      "definition": "Year-on-year change in the all-India Consumer Price Index (combined, base 2024=100) published by MoSPI's National Statistics Office.",
-      "context": "September's jump was led by food: the Consumer Food Price Index rose 7.74 per cent, up from 5.97 per cent in August. Rural inflation was 6.08 per cent against 4.88 per cent in cities.",
-      "sources": [
-        { "name": "MoSPI CPI press release, September 2026", "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf" },
-        { "name": "MoSPI CPI press release, July 2026 (June final, July provisional)", "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc2026812951801.pdf" }
-      ],
-      "checked": "2026-11-11",
-      "related": ["india-july-2026-inflation-gap", "india-new-inflation-basket", "rbi-october-hike"]
-    },
-    {
-      "id": "repo",
-      "label": "RBI repo rate",
-      "short": "Repo",
-      "unit": "%",
-      "decimals": 2,
-      "latest": { "value": 5.50, "period": "Since 7 Oct 2026", "released": "2026-10-07", "status": "Policy rate" },
-      "previous": { "value": 5.25, "period": "Before 7 Oct 2026", "status": "Policy rate" },
-      "revisions": [],
-      "next": { "date": "2026-12-02", "what": "MPC meeting, 2–4 December 2026" },
-      "history": [
-        { "t": "Oct 2025", "v": 5.50 },
-        { "t": "Jun 2026", "v": 5.25 },
-        { "t": "Aug 2026", "v": 5.25 },
-        { "t": "Oct 2026", "v": 5.50 }
-      ],
-      "definition": "The rate at which the RBI lends to banks overnight under the liquidity adjustment facility. The standing deposit facility rate sits 25 basis points below it and the marginal standing facility rate 25 basis points above.",
-      "context": "The MPC raised the repo rate by 25 basis points on 7 October 2026 and changed its stance to calibrated tightening. The SDF rate is now 5.25 per cent and the MSF rate 5.75 per cent.",
-      "sources": [
-        { "name": "RBI, Monetary Policy Statement, 5–7 October 2026", "url": "https://rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63742" },
-        { "name": "RBI, MPC resolution, 3–5 August 2026 (hold at 5.25%)", "url": "https://worldtradescanner.com/RBI%20Keeps%20Repo%20Rate%20Unchanged%20at%205.25pc%20Retains%20Neutral%20Policy%20Stance.pdf" }
-      ],
-      "checked": "2026-11-11",
-      "related": ["rbi-october-hike", "rbi-june-pause", "rbi-dollar-window"]
-    },
-    {
-      "id": "inr",
-      "label": "Rupee per US dollar",
-      "short": "₹/$",
-      "unit": "",
-      "decimals": 2,
-      "latest": { "value": 93.93, "period": "Close, 9 Nov 2026", "released": "2026-11-09", "status": "Provisional close" },
-      "previous": { "value": 93.98, "period": "Close, 6 Nov 2026", "status": "Close" },
-      "revisions": [],
-      "next": { "date": "2026-11-12", "what": "Next trading session" },
-      "history": [
-        { "t": "2 Nov", "v": 95.25 },
-        { "t": "4 Nov", "v": 94.58 },
-        { "t": "6 Nov", "v": 93.98 },
-        { "t": "9 Nov", "v": 93.93 }
-      ],
-      "definition": "Interbank closing rate, rupees per US dollar. A higher number means a weaker rupee.",
-      "context": "The rupee had its strongest week of 2026 in the week to 6 November as foreign portfolio inflows and a fall in crude prices supported it. The 2 November figure is the level near which it opened that week.",
-      "sources": [
-        { "name": "PTI via HDFC Sky, rupee close 9 November 2026", "url": "https://hdfcsky.com/news/rupee-rises-5-paise-to-close-at-93-93-against-us-dollar" },
-        { "name": "PTI via HDFC Sky, rupee close 4 November 2026", "url": "https://hdfcsky.com/news/rupee-gains-17-paise-to-settle-at-94-58-against-us-dollar" },
-        { "name": "HDFC Sky weekly rupee review, 7 November 2026", "url": "https://hdfcsky.com/news/rupee-surges-1-2percent-to-93-91-as-3-billion-fpi-flood-and-16percent-crude-crash-break-six-month-barrier" }
-      ],
-      "checked": "2026-11-11",
-      "related": ["rbi-dollar-window", "current-account-deficit-q1"]
-    },
-    {
-      "id": "g10",
-      "label": "10-year G-Sec yield",
-      "short": "10Y",
-      "unit": "%",
-      "decimals": 2,
-      "latest": { "value": 7.37, "period": "Mid-Oct 2026", "released": "2026-10-13", "status": "Latest verified" },
-      "previous": { "value": 7.38, "period": "12 Oct 2026, three-year high", "status": "Intraday" },
-      "revisions": [],
-      "next": { "date": "2026-11-12", "what": "Next trading session" },
-      "history": [
-        { "t": "Jan 2026", "v": 6.60 },
-        { "t": "Mar 2026", "v": 6.87 },
-        { "t": "Sep 2026", "v": 6.94 },
-        { "t": "Oct 2026", "v": 7.37 }
-      ],
-      "definition": "Yield on the benchmark 10-year Government of India bond.",
-      "context": "Yields rose to a three-year high after the October rate hike and RBI liquidity tightening. Bank of Baroda Research expects a 7.25–7.35 per cent range in November, with risks tilted up. This is the oldest figure on the tape and is due for a refresh.",
-      "sources": [
-        { "name": "Trading Economics, India 10-year yield news stream", "url": "https://tradingeconomics.com/india/government-bond-yield/news/591095" },
-        { "name": "Bank of Baroda Research outlook, via Devdiscourse", "url": "https://www.devdiscourse.com/article/business/4001350-indias-10-year-bond-yield-may-remain-elevated-at-725-735-in-november-report" }
-      ],
-      "checked": "2026-11-11",
-      "related": ["rbi-october-hike"]
-    },
-    {
-      "id": "brent",
-      "label": "Brent crude",
-      "short": "Brent",
-      "unit": "$",
-      "decimals": 1,
-      "prefix": "$",
-      "latest": { "value": 98.0, "period": "Around, 9 Nov 2026", "released": "2026-11-09", "status": "Approximate" },
-      "previous": { "value": 93.22, "period": "Low, 5 Nov 2026", "status": "Futures" },
-      "revisions": [],
-      "next": { "date": "2026-11-29", "what": "OPEC+ ministerial meeting" },
-      "history": [
-        { "t": "30 Oct", "v": 113.41 },
-        { "t": "2 Nov", "v": 104.43 },
-        { "t": "5 Nov", "v": 93.22 },
-        { "t": "9 Nov", "v": 98.0 }
-      ],
-      "definition": "Front-month Brent crude futures, US dollars per barrel.",
-      "context": "Brent fell almost 18 per cent between 30 October and 5 November on hopes of a US–Iran settlement, its steepest weekly fall since 2020, before recovering to around $98.",
-      "sources": [
-        { "name": "HDFC Sky weekly crude review, 7 November 2026", "url": "https://hdfcsky.com/news/brent-crude-plunges-15percent-to-99-on-us-iran-peace-hopes-petrol-and-diesel-prices-unchanged-across-india" },
-        { "name": "Ventura Securities market close, 9 November 2026", "url": "https://www.venturasecurities.com/?p=67057" }
-      ],
-      "checked": "2026-11-11",
-      "related": ["oil-emergency-cushion", "fuel-tax-cut", "iea-lpg"]
-    },
-    {
-      "id": "nifty",
-      "label": "Nifty 50",
-      "short": "Nifty",
-      "unit": "",
-      "decimals": 2,
-      "latest": { "value": 25044.65, "period": "Close, 9 Nov 2026", "released": "2026-11-09", "status": "Close" },
-      "previous": { "value": 24986.40, "period": "Previous close", "status": "Close" },
-      "revisions": [],
-      "next": { "date": "2026-11-12", "what": "Next trading session" },
-      "history": [
-        { "t": "3 Nov", "v": 23810.85 },
-        { "t": "4 Nov", "v": 23960.60 },
-        { "t": "9 Nov", "v": 25044.65 }
-      ],
-      "definition": "NSE's index of 50 large listed Indian companies.",
-      "context": "The 9 November close was the index's highest since 27 February 2026, after a rally driven by falling oil prices and foreign buying. The previous close is derived from the reported 58.25-point gain.",
-      "sources": [
-        { "name": "Business Recorder (Reuters), Indian shares close, 9 November 2026", "url": "https://www.brecorder.com/news/amp/40448119" },
-        { "name": "DSIJ closing bell, 4 November 2026", "url": "https://insights.dsij.in/appmindshare/closing-bell-nifty-50-rises-nearly-150-points-above-23950-extending-gains-for-5th-day-60311" },
-        { "name": "Ventura Securities, 3 November 2026", "url": "https://www.venturasecurities.com/?p=66566" }
-      ],
-      "checked": "2026-11-11",
-      "related": []
+     "period": "Aug 2026",
+     "first": 4.82,
+     "firstDate": "2026-09-14",
+     "revised": 4.83,
+     "revisedDate": "2026-10-12"
     }
-  ]
+   ],
+   "next": {
+    "date": "2026-11-12",
+    "what": "October 2026 CPI"
+   },
+   "history": [
+    {
+     "t": "Jun 2026",
+     "v": 4.38
+    },
+    {
+     "t": "Jul 2026",
+     "v": 4.45
+    },
+    {
+     "t": "Aug 2026",
+     "v": 4.83
+    },
+    {
+     "t": "Sep 2026",
+     "v": 5.54
+    }
+   ],
+   "definition": "Year-on-year change in the all-India Consumer Price Index (combined, base 2024=100) published by MoSPI's National Statistics Office.",
+   "context": "September's jump was led by food: the Consumer Food Price Index rose 7.74 per cent, up from 5.97 per cent in August. Rural inflation was 6.08 per cent against 4.88 per cent in cities.",
+   "sources": [
+    {
+     "name": "MoSPI CPI press release, September 2026",
+     "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf"
+    },
+    {
+     "name": "MoSPI CPI press release, July 2026 (June final, July provisional)",
+     "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc2026812951801.pdf"
+    }
+   ],
+   "checked": "2026-11-11",
+   "related": [
+    "india-july-2026-inflation-gap",
+    "india-new-inflation-basket",
+    "rbi-october-hike"
+   ]
+  },
+  {
+   "id": "repo",
+   "label": "RBI repo rate",
+   "short": "Repo",
+   "unit": "%",
+   "decimals": 2,
+   "latest": {
+    "value": 5.5,
+    "period": "Since 7 Oct 2026",
+    "released": "2026-10-07",
+    "status": "Policy rate"
+   },
+   "previous": {
+    "value": 5.25,
+    "period": "Before 7 Oct 2026",
+    "status": "Policy rate"
+   },
+   "revisions": [],
+   "next": {
+    "date": "2026-12-02",
+    "what": "MPC meeting, 2–4 December 2026"
+   },
+   "history": [
+    {
+     "t": "Oct 2025",
+     "v": 5.5
+    },
+    {
+     "t": "Jun 2026",
+     "v": 5.25
+    },
+    {
+     "t": "Aug 2026",
+     "v": 5.25
+    },
+    {
+     "t": "Oct 2026",
+     "v": 5.5
+    }
+   ],
+   "definition": "The rate at which the RBI lends to banks overnight under the liquidity adjustment facility. The standing deposit facility rate sits 25 basis points below it and the marginal standing facility rate 25 basis points above.",
+   "context": "The MPC raised the repo rate by 25 basis points on 7 October 2026 and changed its stance to calibrated tightening. The SDF rate is now 5.25 per cent and the MSF rate 5.75 per cent.",
+   "sources": [
+    {
+     "name": "RBI, Monetary Policy Statement, 5–7 October 2026",
+     "url": "https://rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63742"
+    },
+    {
+     "name": "RBI, MPC resolution, 3–5 August 2026 (hold at 5.25%)",
+     "url": "https://worldtradescanner.com/RBI%20Keeps%20Repo%20Rate%20Unchanged%20at%205.25pc%20Retains%20Neutral%20Policy%20Stance.pdf"
+    }
+   ],
+   "checked": "2026-11-11",
+   "related": [
+    "rbi-october-hike",
+    "rbi-june-pause",
+    "rbi-dollar-window"
+   ]
+  },
+  {
+   "id": "inr",
+   "label": "Rupee per US dollar",
+   "short": "₹/$",
+   "unit": "",
+   "decimals": 2,
+   "latest": {
+    "value": 93.93,
+    "period": "Close, 9 Nov 2026",
+    "released": "2026-11-09",
+    "status": "Provisional close"
+   },
+   "previous": {
+    "value": 93.98,
+    "period": "Close, 6 Nov 2026",
+    "status": "Close"
+   },
+   "revisions": [],
+   "next": {
+    "date": "2026-11-12",
+    "what": "Next trading session"
+   },
+   "history": [
+    {
+     "t": "2 Nov",
+     "v": 95.25
+    },
+    {
+     "t": "4 Nov",
+     "v": 94.58
+    },
+    {
+     "t": "6 Nov",
+     "v": 93.98
+    },
+    {
+     "t": "9 Nov",
+     "v": 93.93
+    }
+   ],
+   "definition": "Interbank closing rate, rupees per US dollar. A higher number means a weaker rupee.",
+   "context": "The rupee had its strongest week of 2026 in the week to 6 November as foreign portfolio inflows and a fall in crude prices supported it. The 2 November figure is the level near which it opened that week.",
+   "sources": [
+    {
+     "name": "PTI via HDFC Sky, rupee close 9 November 2026",
+     "url": "https://hdfcsky.com/news/rupee-rises-5-paise-to-close-at-93-93-against-us-dollar"
+    },
+    {
+     "name": "PTI via HDFC Sky, rupee close 4 November 2026",
+     "url": "https://hdfcsky.com/news/rupee-gains-17-paise-to-settle-at-94-58-against-us-dollar"
+    },
+    {
+     "name": "HDFC Sky weekly rupee review, 7 November 2026",
+     "url": "https://hdfcsky.com/news/rupee-surges-1-2percent-to-93-91-as-3-billion-fpi-flood-and-16percent-crude-crash-break-six-month-barrier"
+    }
+   ],
+   "checked": "2026-11-11",
+   "related": [
+    "rbi-dollar-window",
+    "current-account-deficit-q1"
+   ]
+  },
+  {
+   "id": "g10",
+   "label": "10-year G-Sec yield",
+   "short": "10Y",
+   "unit": "%",
+   "decimals": 2,
+   "latest": {
+    "value": 7.2,
+    "period": "Close, 11 Nov 2026",
+    "released": "2026-11-11",
+    "status": "Market close"
+   },
+   "previous": {
+    "value": 7.18,
+    "period": "Previous session",
+    "status": "Market close"
+   },
+   "revisions": [],
+   "next": {
+    "date": "2026-11-12",
+    "what": "Next trading session; October CPI is released the same day"
+   },
+   "history": [
+    {
+     "t": "Jan 2026",
+     "v": 6.6
+    },
+    {
+     "t": "Mar 2026",
+     "v": 6.87
+    },
+    {
+     "t": "Sep 2026",
+     "v": 6.94
+    },
+    {
+     "t": "Mid-Oct",
+     "v": 7.37
+    },
+    {
+     "t": "30 Oct",
+     "v": 7.41
+    },
+    {
+     "t": "11 Nov",
+     "v": 7.2
+    }
+   ],
+   "definition": "Yield on the benchmark 10-year Government of India bond.",
+   "context": "The yield rose to a three-year high near 7.5 per cent in late October after the RBI's October hike to 5.50 per cent and tighter banking liquidity, then fell about 30 basis points in early November as crude eased and US Treasury yields softened. Bank of Baroda Research expected a 7.25–7.35 per cent range for November, with risks tilted up; the market is now trading below that range. Market closed on 10 November for a holiday.",
+   "sources": [
+    {
+     "name": "Trading Economics, India 10-year yield (11 Nov 2026 close)",
+     "url": "https://tradingeconomics.com/india/government-bond-yield"
+    },
+    {
+     "name": "Investing.com, India 10-year historical data (Oct–Nov 2026)",
+     "url": "https://www.investing.com/rates-bonds/india-10-year-bond-yield-historical-data"
+    },
+    {
+     "name": "Bank of Baroda Research outlook, via ANI",
+     "url": "https://aninews.in/news/business/indias-10-year-bond-yield-may-remain-elevated-at-725-735-in-november-report20261104110946/"
+    }
+   ],
+   "checked": "2026-11-12",
+   "related": [
+    "rbi-october-hike"
+   ]
+  },
+  {
+   "id": "brent",
+   "label": "Brent crude",
+   "short": "Brent",
+   "unit": "$",
+   "decimals": 1,
+   "prefix": "$",
+   "latest": {
+    "value": 98.0,
+    "period": "Around, 9 Nov 2026",
+    "released": "2026-11-09",
+    "status": "Approximate"
+   },
+   "previous": {
+    "value": 93.22,
+    "period": "Low, 5 Nov 2026",
+    "status": "Futures"
+   },
+   "revisions": [],
+   "next": {
+    "date": "2026-11-29",
+    "what": "OPEC+ ministerial meeting"
+   },
+   "history": [
+    {
+     "t": "30 Oct",
+     "v": 113.41
+    },
+    {
+     "t": "2 Nov",
+     "v": 104.43
+    },
+    {
+     "t": "5 Nov",
+     "v": 93.22
+    },
+    {
+     "t": "9 Nov",
+     "v": 98.0
+    }
+   ],
+   "definition": "Front-month Brent crude futures, US dollars per barrel.",
+   "context": "Brent fell almost 18 per cent between 30 October and 5 November on hopes of a US–Iran settlement, its steepest weekly fall since 2020, before recovering to around $98.",
+   "sources": [
+    {
+     "name": "HDFC Sky weekly crude review, 7 November 2026",
+     "url": "https://hdfcsky.com/news/brent-crude-plunges-15percent-to-99-on-us-iran-peace-hopes-petrol-and-diesel-prices-unchanged-across-india"
+    },
+    {
+     "name": "Ventura Securities market close, 9 November 2026",
+     "url": "https://www.venturasecurities.com/?p=67057"
+    }
+   ],
+   "checked": "2026-11-11",
+   "related": [
+    "oil-emergency-cushion",
+    "fuel-tax-cut",
+    "iea-lpg"
+   ]
+  },
+  {
+   "id": "nifty",
+   "label": "Nifty 50",
+   "short": "Nifty",
+   "unit": "",
+   "decimals": 2,
+   "latest": {
+    "value": 25044.65,
+    "period": "Close, 9 Nov 2026",
+    "released": "2026-11-09",
+    "status": "Close"
+   },
+   "previous": {
+    "value": 24986.4,
+    "period": "Previous close",
+    "status": "Close"
+   },
+   "revisions": [],
+   "next": {
+    "date": "2026-11-12",
+    "what": "Next trading session"
+   },
+   "history": [
+    {
+     "t": "3 Nov",
+     "v": 23810.85
+    },
+    {
+     "t": "4 Nov",
+     "v": 23960.6
+    },
+    {
+     "t": "9 Nov",
+     "v": 25044.65
+    }
+   ],
+   "definition": "NSE's index of 50 large listed Indian companies.",
+   "context": "The 9 November close was the index's highest since 27 February 2026, after a rally driven by falling oil prices and foreign buying. The previous close is derived from the reported 58.25-point gain.",
+   "sources": [
+    {
+     "name": "Business Recorder (Reuters), Indian shares close, 9 November 2026",
+     "url": "https://www.brecorder.com/news/amp/40448119"
+    },
+    {
+     "name": "DSIJ closing bell, 4 November 2026",
+     "url": "https://insights.dsij.in/appmindshare/closing-bell-nifty-50-rises-nearly-150-points-above-23950-extending-gains-for-5th-day-60311"
+    },
+    {
+     "name": "Ventura Securities, 3 November 2026",
+     "url": "https://www.venturasecurities.com/?p=66566"
+    }
+   ],
+   "checked": "2026-11-11",
+   "related": []
+  }
+ ]
 }
