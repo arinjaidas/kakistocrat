@@ -184,6 +184,18 @@ const single = () => dyn('template-part', { slug: 'header', theme: 'pub/twentytw
           dyn('post-author-name', { style: { typography: { fontSize: '13px', fontWeight: '600' } }, fontFamily: 'ibm-plex-sans' }) + date('j F Y') +
           dyn('post-terms', { term: 'post_tag', separator: ' · ', style: { typography: { fontSize: '11.5px', letterSpacing: '0.02em' }, elements: linkAccent }, fontFamily: 'ibm-plex-mono' }))) +
       dyn('post-content', { style: { typography: { fontSize: '18.5px', lineHeight: '1.65' }, spacing: { margin: { top: '26px' } }, elements: { link: { color: { text: C.ink }, typography: { textDecoration: 'underline' } } } }, fontFamily: 'newsreader', layout: { type: 'constrained', contentSize: '720px', justifyContent: 'left' } }) +
+      group({ style: { border: { top: { color: C.rule, width: '1px', style: 'solid' } }, spacing: { padding: { top: '14px' }, margin: { top: '32px' }, blockGap: '10px' } }, layout: { type: 'flex', flexWrap: 'wrap', verticalAlignment: 'center' } },
+        monoLabel('Share', C.slate, '11px') +
+        dynWrap('jetpack/sharing-buttons', { styleType: 'icon-text', size: 'has-small-icon-size', style: { spacing: { blockGap: { left: '8px' } } } }, ['whatsapp', 'x', 'linkedin', 'facebook', 'mail', 'share'].map(svc => dyn('jetpack/sharing-button', { service: svc, label: { whatsapp: 'WhatsApp', x: 'X', linkedin: 'LinkedIn', facebook: 'Facebook', mail: 'Email', share: 'Share' }[svc] })).join(''))) +
+      group({ style: { spacing: { margin: { top: '32px' } } }, layout: { type: 'default' } }, monoLabel('Read next', C.accent, '11px') + dyn('jetpack/related-posts', { displayDate: true, displayThumbnails: false, displayContext: false, postLayout: 'grid', postsToShow: 3, displayHeadline: false })) +
+      group({ anchor: 'comments', style: { border: { top: { color: C.ink, width: '2px', style: 'solid' } }, spacing: { padding: { top: '14px' }, margin: { top: '40px' } } }, fontFamily: 'ibm-plex-sans', layout: { type: 'constrained', contentSize: '720px', justifyContent: 'left' } },
+        dynWrap('comments', { style: { typography: { fontSize: '15px' } } },
+          dyn('comments-title', { showPostTitle: false, level: 2, style: { typography: { fontSize: '13px', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase' } }, fontFamily: 'ibm-plex-sans' }) +
+          dynWrap('comment-template', {}, group({ style: { border: { bottom: { color: C.rule, width: '1px', style: 'solid' } }, spacing: { padding: { top: '12px', bottom: '12px' }, blockGap: '4px' } }, layout: { type: 'flex', orientation: 'vertical' } },
+            hstack('8px', dyn('comment-author-name', { style: { typography: { fontSize: '14px', fontWeight: '600' } } }) + dyn('comment-date', { format: 'j M Y', style: { typography: { fontSize: '11.5px' }, color: { text: C.mute } }, fontFamily: 'ibm-plex-mono' })) +
+            dyn('comment-content', { style: { typography: { fontSize: '16px', lineHeight: '1.55' } }, fontFamily: 'newsreader' }) + dyn('comment-reply-link', { style: { typography: { fontSize: '12px', fontWeight: '600' } } }))) +
+          dynWrap('comments-pagination', {}, dyn('comments-pagination-previous') + dyn('comments-pagination-numbers') + dyn('comments-pagination-next')) +
+          dyn('post-comments-form', { style: { typography: { fontSize: '14px' } } }))) +
       group({ style: { border: { top: { color: C.ink, width: '2px', style: 'solid' } }, spacing: { padding: { top: '16px' }, margin: { top: '40px' } } }, layout: { type: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' } },
         dyn('post-navigation-link', { type: 'previous', label: '← Previous', showTitle: true, style: { typography: { fontSize: '16px', lineHeight: '1.3' } }, fontFamily: 'newsreader' }) +
         dyn('post-navigation-link', { label: 'Next →', showTitle: true, style: { typography: { fontSize: '16px', lineHeight: '1.3' } }, fontFamily: 'newsreader' }))) +
@@ -215,8 +227,33 @@ const p404 = () => dyn('template-part', { slug: 'header', theme: 'pub/twentytwen
     monoLabel('404', C.accent) + h(1, bigTitle, 'Page not found') + p({ style: { typography: { fontSize: '18px' } }, fontFamily: 'newsreader' }, `It may have moved. Search below, or browse the <a href="${PD}/archive/">full archive</a>.`) + dyn('search', { label: 'Search', showLabel: false, placeholder: 'Search the archive', buttonText: 'Search', style: { border: { radius: '0px' } } })), { tag: 'main' }) + '\n' +
   dyn('template-part', { slug: 'footer', theme: 'pub/twentytwentyfive', tagName: 'footer' });
 
-const files = { header: header(), footer: footer(), home: home(), single: single(), archive: archive(), index: index(), search: search(), page: page(), '404': p404() };
+const category = () => listing(p({ style: { typography: { fontSize: '11.5px', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase' }, color: { text: '__COLOR__' }, spacing: { margin: { top: '0', bottom: '0' } } }, fontFamily: 'ibm-plex-mono' }, 'Topic') + dyn('query-title', { type: 'archive', showPrefix: false, ...bigTitle }) + dyn('term-description', { style: { typography: { fontSize: '17px', lineHeight: '1.5' }, color: { text: C.graphite } }, fontFamily: 'newsreader' }), {}).replaceAll(C.accent, '__COLOR__').replace(/"color":\{"text":"#15171A","width":"2px"/, '"color":{"text":"#15171A","width":"2px"');
+const seriesT = () => dyn('template-part', { slug: 'header', theme: 'pub/twentytwentyfive', tagName: 'header' }) + '\n' +
+  wrap(group({ style: { border: { bottom: { color: C.ink, width: '2px', style: 'solid' } }, spacing: { padding: { top: '28px', bottom: '18px' }, blockGap: '8px' } }, layout: { type: 'flex', orientation: 'vertical' } },
+      monoLabel('Series', C.accent) + dyn('query-title', { type: 'archive', showPrefix: false, ...bigTitle }) + dyn('term-description', { style: { typography: { fontSize: '17px', lineHeight: '1.5' }, color: { text: C.graphite } }, fontFamily: 'newsreader' }) + p({ style: { typography: { fontSize: '12px' }, color: { text: C.mute } }, fontFamily: 'ibm-plex-mono' }, 'Read in order, from the first part to the latest.')) +
+    columns({ style: { spacing: { blockGap: { left: '48px' }, padding: { top: '8px' } } } },
+      column({ width: '70%' }, `<!-- wp:query ${J({ queryId: 90, query: { perPage: 50, pages: 0, offset: 0, postType: 'post', order: 'asc', orderBy: 'date', author: '', search: '', exclude: [], sticky: '', inherit: false, taxQuery: { post_tag: ['__TAGID__'] } } })} -->\n<div class="wp-block-query">` + postTemplate({ style: { spacing: { blockGap: '0' } } }, listRow()) + `</div>\n<!-- /wp:query -->`) +
+      column({ width: '30%' }, rail())), { tag: 'main', style: { color: { text: C.ink } }, attrs: { fontFamily: 'ibm-plex-sans' } }) + '\n' +
+  dyn('template-part', { slug: 'footer', theme: 'pub/twentytwentyfive', tagName: 'footer' });
+
+const patterns = () => JSON.stringify([
+  { title: 'Kakistocrat: article skeleton', content:
+    p({ style: { typography: { fontSize: '19px', lineHeight: '1.6' } }, fontFamily: 'newsreader' }, '[Opening: the judgement in two or three sentences. What is happening, and what you conclude.]') +
+    h(2, { style: { typography: { fontSize: '24px', fontWeight: '600' } }, fontFamily: 'ibm-plex-sans' }, 'The evidence') + p({ fontFamily: 'newsreader' }, '[The numbers, with a source linked after each one.]') +
+    h(2, { style: { typography: { fontSize: '24px', fontWeight: '600' } }, fontFamily: 'ibm-plex-sans' }, 'The other side') + p({ fontFamily: 'newsreader' }, '[The strongest case against your judgement.]') +
+    h(2, { style: { typography: { fontSize: '24px', fontWeight: '600' } }, fontFamily: 'ibm-plex-sans' }, 'What would change my mind') + p({ fontFamily: 'newsreader' }, '[The specific data or event that would make you revise the judgement, and when it is due.]') +
+    h(2, { style: { typography: { fontSize: '24px', fontWeight: '600' } }, fontFamily: 'ibm-plex-sans' }, 'Sources') + p({ style: { typography: { fontSize: '14px' } }, fontFamily: 'ibm-plex-sans' }, '[Source name, publisher, date, link]') },
+  { title: 'Kakistocrat: explore the data (dark card)', content: darkBox('Live data', 'See the numbers behind this piece', 'Charts, sources and the latest figures, updated every weekday.', 'Open the data', `${PD}/today/`) },
+  { title: 'Kakistocrat: live figures box', content: group({ style: { color: { background: C.stone }, border: { top: { color: C.ink, width: '2px', style: 'solid' } }, spacing: { padding: { top: '14px', bottom: '14px', left: '18px', right: '18px' }, blockGap: '6px' } }, layout: { type: 'flex', orientation: 'vertical' } },
+    monoLabel('Live figures', C.accent, '11px') + [['CPI inflation', '/data/cpi/'], ['RBI repo rate', '/data/repo/'], ['Rupee per dollar', '/data/inr/'], ['10-year bond yield', '/data/g10/'], ['Brent crude', '/commodities/'], ['Nifty 50', '/markets/']].map(([t, u]) => p({ style: { typography: { fontSize: '14.5px' }, elements: linkInk, spacing: { margin: { top: '0', bottom: '0' } } }, fontFamily: 'ibm-plex-sans' }, `<a href="${PD}${u}">${t} →</a>`)).join('')) },
+  { title: 'Kakistocrat: key takeaways', content: group({ style: { border: { left: { color: C.accent, width: '4px', style: 'solid' } }, spacing: { padding: { top: '6px', bottom: '6px', left: '18px' }, blockGap: '6px' } }, layout: { type: 'flex', orientation: 'vertical' } },
+    monoLabel('Key takeaways', C.accent, '11px') + `<!-- wp:list {"fontFamily":"ibm-plex-sans","style":{"typography":{"fontSize":"15.5px"}}} -->\n<ul class="wp-block-list has-ibm-plex-sans-font-family" style="font-size:15.5px"><!-- wp:list-item -->\n<li>[First point]</li>\n<!-- /wp:list-item --><!-- wp:list-item -->\n<li>[Second point]</li>\n<!-- /wp:list-item --><!-- wp:list-item -->\n<li>[Third point]</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->`) },
+  { title: 'Kakistocrat: chart source line', content: p({ style: { typography: { fontSize: '12px', letterSpacing: '0.02em' }, color: { text: C.mute } }, fontFamily: 'ibm-plex-mono' }, 'Source: [publisher, release name, date]. Chart: The Kakistocrat.') },
+]);
+
+const files = { category: category(), series: seriesT(), header: header(), footer: footer(), home: home(), single: single(), archive: archive(), index: index(), search: search(), page: page(), '404': p404() };
 await mkdir('static/wp-kit', { recursive: true });
 for (const [k, v] of Object.entries(files)) await writeFile(`static/wp-kit/${k}.html`, v);
+await writeFile('static/wp-kit/patterns.json', patterns());
 await writeFile('static/wp-kit/manifest.json', JSON.stringify({ built: new Date().toISOString(), files: Object.keys(files) }));
 console.log(Object.entries(files).map(([k, v]) => `${k}: ${v.length}`).join(', '));
