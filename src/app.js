@@ -221,4 +221,36 @@
     };
     ids.forEach(i => $('#' + i).addEventListener('input', run)); $('#ex-sup').addEventListener('change', run); run();
   }
+  /* ---------- EMI shock ---------- */
+  const emi = $('#emi');
+  if (emi) {
+    const F = ['e-p', 'e-n', 'e-r', 'e-d']; let mode = 'emi';
+    const g = id => parseFloat($('#' + id).value);
+    const p0 = new URLSearchParams(location.hash.slice(1)); F.forEach(k => { if (p0.has(k)) $('#' + k).value = p0.get(k); }); if (p0.get('m')) mode = p0.get('m');
+    const E = (P, ra, n) => { const r = ra / 1200; return r === 0 ? P / n : P * r * (1 + r) ** n / ((1 + r) ** n - 1); };
+    const N = (P, ra, e) => { const r = ra / 1200; if (P * r >= e) return Infinity; return -Math.log(1 - P * r / e) / Math.log(1 + r); };
+    const rs = v => '₹' + Math.round(v).toLocaleString('en-IN');
+    const yrs = m => m === Infinity ? 'never repaid' : `${Math.floor(m / 12)} yr ${Math.round(m % 12)} mo`;
+    const run = () => {
+      $('output[for=e-p]').textContent = '₹' + g('e-p') + ' lakh'; $('output[for=e-n]').textContent = g('e-n') + ' yr'; $('output[for=e-r]').textContent = g('e-r').toFixed(2) + '%'; $('output[for=e-d]').textContent = (g('e-d') > 0 ? '+' : '') + g('e-d') + ' bp';
+      $$('#e-mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.r === mode));
+      const P = g('e-p') * 1e5, n = g('e-n') * 12, r0 = g('e-r'), r1 = r0 + g('e-d') / 100, e0 = E(P, r0, n), e1 = E(P, r1, n), tot0 = e0 * n - P;
+      if (mode === 'emi') {
+        $('#e-emi').textContent = rs(e1); $('#e-emi-sub').textContent = `from ${rs(e0)} at ${r0.toFixed(2)}%`;
+        $('#e-k2').textContent = 'Change per month'; $('#e-d2').textContent = (e1 >= e0 ? '+' : '−') + rs(Math.abs(e1 - e0)).replace('₹', '₹'); $('#e-d2-sub').textContent = `${(e1 / e0 * 100 - 100).toFixed(1)}% · ${rs(Math.abs(e1 - e0) * 12)} a year`;
+        const d = (e1 * n - P) - tot0; $('#e-int').textContent = (d >= 0 ? '+' : '−') + rs(Math.abs(d)); $('#e-int-sub').textContent = `total interest ${rs(e1 * n - P)} instead of ${rs(tot0)}`;
+      } else {
+        const n1 = N(P, r1, e0);
+        $('#e-emi').textContent = rs(e0); $('#e-emi-sub').textContent = 'unchanged';
+        $('#e-k2').textContent = 'New time left to pay'; $('#e-d2').textContent = yrs(n1); $('#e-d2-sub').textContent = n1 === Infinity ? 'the EMI no longer covers the interest' : `${n1 >= n ? '+' : '−'}${Math.round(Math.abs(n1 - n))} months versus ${yrs(n)}`;
+        const d = n1 === Infinity ? Infinity : (e0 * n1 - P) - tot0; $('#e-int').textContent = d === Infinity ? '—' : (d >= 0 ? '+' : '−') + rs(Math.abs(d)); $('#e-int-sub').textContent = d === Infinity ? '' : `total interest ${rs(e0 * n1 - P)} instead of ${rs(tot0)}`;
+      }
+      const rows = [-100, -50, -25, 25, 50, 75, 100, 150].map(bp => { const r = r0 + bp / 100, e = E(P, r, n), m = N(P, r, e0); return `<tr><th scope="row">${bp > 0 ? '+' : ''}${bp} bp → ${r.toFixed(2)}%</th><td>${rs(e)}</td><td class="${e > e0 ? 'neg' : ''}">${e >= e0 ? '+' : '−'}${rs(Math.abs(e - e0))}</td><td>${yrs(m)}</td></tr>`; }).join('');
+      $('#e-tbl').innerHTML = `<thead><tr><th>Rate change</th><th>New EMI</th><th>Change a month</th><th>Tenure if EMI held</th></tr></thead><tbody>${rows}</tbody>`;
+    };
+    F.forEach(k => $('#' + k).addEventListener('input', run));
+    $$('#e-mode button').forEach(b => b.addEventListener('click', () => { mode = b.dataset.r; run(); }));
+    $('#share').addEventListener('click', () => { const q = new URLSearchParams(); F.forEach(k => q.set(k, $('#' + k).value)); q.set('m', mode); history.replaceState(null, '', '#' + q); const u = location.href; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => { $('#share').textContent = 'Link copied'; setTimeout(() => $('#share').textContent = 'Copy link to this scenario', 1600); }).catch(() => prompt('Copy this link', u)); });
+    run();
+  }
 })();

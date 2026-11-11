@@ -11,6 +11,8 @@ import { exposurePage } from './lib/exposure.mjs';
 import { loadMarkets } from './lib/marketsdata.mjs';
 import { marketsPage, commoditiesPage } from './lib/markets.mjs';
 import { workbenchPage } from './lib/workbench.mjs';
+import { emiPage } from './lib/emi.mjs';
+import { chartlePage } from './lib/chartle.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -36,6 +38,8 @@ const TOOLS = [
   { url: '/data/', kicker: 'India macro tape', title: 'Latest, previous, revised', blurb: 'CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.' },
   { url: '/tools/budget-x-ray/', kicker: 'Budget X-Ray', title: 'Halfway through the Budget', blurb: 'Receipts, spending and the deficit against the full-year plan, with a year-end calculator.' },
   { url: '/tools/india-by-state/', kicker: 'India by State', title: 'Thirty-one states compared', blurb: 'Income, growth, inflation and state debt on a tile map, with any two measures plotted against each other.' },
+  { url: '/chartle/', kicker: 'Chartle', title: 'The daily mystery chart', blurb: 'Guess the series behind today’s chart in six tries, then share your score.' },
+  { url: '/tools/emi/', kicker: 'EMI shock', title: 'What a rate hike does to your EMI', blurb: 'Enter your home loan and see the new instalment, or how much longer you pay if the EMI is held.' },
   { url: '/tools/exposure/', kicker: 'Exposure Map', title: 'Where India is exposed', blurb: 'Crude suppliers, the Hormuz chokepoint, fertiliser and China-sourced goods, with a supplier-disruption calculator.' },
   { url: '/tools/two-chart-test/', kicker: 'Two-Chart Test', title: 'Claims against data', blurb: 'Common claims about the economy, each tested by putting two charts side by side.' },
   { url: '/tools/shock-lab/', kicker: 'Shock Lab', title: 'Oil and the rupee', blurb: 'Change crude and the exchange rate. See who pays: importer, pump or household.' },
@@ -397,6 +401,7 @@ async function main() {
   await cp('src/app.js', join(OUT, 'app.js'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
   await cp('src/workbench.js', join(OUT, 'workbench.js'));
+  await cp('src/chartle.js', join(OUT, 'chartle.js'));
   if (existsSync('static')) await cp('static', OUT, { recursive: true });
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
@@ -464,12 +469,15 @@ async function main() {
     await write('markets/index.html', P({ title: 'Markets', path: '/markets/', description: 'NSE indices, Nifty 50 heatmap, valuations, yield curves, currencies and live crypto.', body: marketsPage(MK, { pageHead }) }));
     await write('commodities/index.html', P({ title: 'Commodities', path: '/commodities/', description: 'Energy, metals, fertiliser and food prices with five-year ranges and comparison charts.', body: commoditiesPage(MK, { pageHead }) }));
   }
+  { const rp = tape.indicators.find(i => i.id === 'repo'); const ch = Math.round((rp.latest.value - rp.previous.value) * 100);
+    await write('tools/emi/index.html', P({ title: 'EMI shock calculator', path: '/tools/emi/', description: 'What a repo rate change does to your home loan EMI or tenure.', body: emiPage({ pageHead, repo: { value: rp.latest.value.toFixed(2), change: `${ch > 0 ? '+' : ''}${ch} basis point`, date: longDate(rp.latest.released + 'T00:00:00Z') } }) })); }
+  await write('chartle/index.html', P({ title: 'Chartle: the daily mystery chart', path: '/chartle/', description: 'Guess the economic series behind today’s chart in six tries.', body: chartlePage({ pageHead }) }));
   await write('api/index.html', P({ title: 'Data API', path: '/api/', description: 'Free JSON endpoints for every dataset on the site.', body: apiPage(api) }));
   await write('404.html', P({ title: 'Page not found', path: '/404', body: notFound() }));
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/markets/', '/commodities/', '/charts/', '/api/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/markets/', '/commodities/', '/charts/', '/api/', '/tools/emi/', '/chartle/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
