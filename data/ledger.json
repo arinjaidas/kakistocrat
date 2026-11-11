@@ -1,0 +1,85 @@
+{
+  "stages": ["Announced", "Notified", "Funded", "Implemented", "Measured"],
+  "items": [
+    {
+      "id": "nbs-rabi-2026",
+      "title": "Nutrient Based Subsidy rates, rabi 2026–27",
+      "topic": "rural-economy-welfare",
+      "promise": "Keep phosphatic and potassic fertilisers affordable for the rabi season, with DAP held at ₹1,350 a 50 kg bag, at an estimated cost of ₹62,370.02 crore.",
+      "documents": [
+        { "name": "Cabinet decision, 11 November 2026", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2334972" }
+      ],
+      "stage": { "Announced": "2026-11-11", "Notified": null, "Funded": "2026-11-11", "Implemented": "2026-10-01", "Measured": null },
+      "stageNotes": { "Funded": "Cabinet approved the outlay. Together with kharif 2026, P&K support of about ₹1.04 lakh crore is roughly 92 per cent above the Budget estimate.", "Implemented": "Rates apply retrospectively from 1 October 2026." },
+      "tracking": "Whether complex (NP/NPK) fertiliser output and sales recover towards target, and whether DAP's share of phosphate sales falls back.",
+      "nextCheck": "2027-01-15",
+      "nextCheckWhat": "Department of Fertilizers production and sales data for November–December 2026",
+      "status": "Watching",
+      "article": "india-rabi-2026-fertiliser-subsidy-nbs-dap-price-cap"
+    },
+    {
+      "id": "black-mass-ban",
+      "title": "Prohibition on exporting lithium-ion battery black mass",
+      "topic": "world-geopolitics",
+      "promise": "Keep black mass in India so that domestic recycling and refining plants get feedstock and recover more lithium, cobalt and nickel.",
+      "documents": [
+        { "name": "DGFT Notification 49/2026-27, 10 November 2026 (via commerce ministry release)", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2335019" }
+      ],
+      "stage": { "Announced": "2026-11-11", "Notified": "2026-11-10", "Funded": null, "Implemented": "2026-11-10", "Measured": null },
+      "stageNotes": { "Funded": "A regulatory measure; no outlay. It complements the ₹1,500 crore recycling incentive scheme.", "Implemented": "In force with immediate effect, until further orders." },
+      "tracking": "Domestic black mass payables against export parity, formally collected battery tonnage, and utilisation of domestic refining capacity.",
+      "nextCheck": "2027-05-10",
+      "nextCheckWhat": "Six months of payables and collection data",
+      "status": "Watching",
+      "article": "india-black-mass-export-ban-indonesia-nickel-eu-comparison"
+    },
+    {
+      "id": "mineral-processing-capex",
+      "title": "Capex Support Scheme to Promote Critical Mineral Processing",
+      "topic": "growth-jobs-industry",
+      "promise": "Capital support of 30 per cent of eligible investment for two lithium plants (at least 30 kt each) and two nickel plants (at least 50 kt each), capped at ₹500 crore and ₹900 crore per beneficiary, within an outlay of ₹2,814 crore over FY2026–27 to FY2030–31.",
+      "documents": [
+        { "name": "Cabinet decision, 4 November 2026", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2332476" }
+      ],
+      "stage": { "Announced": "2026-11-04", "Notified": null, "Funded": "2026-11-04", "Implemented": null, "Measured": null },
+      "stageNotes": { "Notified": "Scheme guidelines and the bidding process are still to come.", "Implemented": "Beneficiaries are to be chosen in two stages: technical qualification, then lowest capital support sought." },
+      "tracking": "Selection of beneficiaries, commissioning dates, qualified output and repeat sales to battery-grade buyers.",
+      "nextCheck": "2027-03-31",
+      "nextCheckWhat": "Publication of guidelines and call for bids",
+      "status": "Early",
+      "article": "india-critical-minerals-lithium-nickel-processing-capex-supply-risk"
+    },
+    {
+      "id": "recycling-incentive",
+      "title": "₹1,500 crore incentive scheme for critical mineral recycling",
+      "topic": "growth-jobs-industry",
+      "promise": "Develop capacity to separate and produce critical minerals from secondary sources such as battery waste and e-waste, under the National Critical Mineral Mission.",
+      "documents": [
+        { "name": "Referenced in the commerce ministry release of 11 November 2026", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2335019" }
+      ],
+      "stage": { "Announced": "2025-09", "Notified": null, "Funded": "2025-09", "Implemented": null, "Measured": null },
+      "stageNotes": { "Announced": "Approved by the Union Cabinet in September 2025.", "Implemented": "The government says domestic recycling capacity is under-used for lack of feedstock." },
+      "tracking": "Recycling capacity created under the scheme and its utilisation once the black mass export ban applies.",
+      "nextCheck": "2027-03-31",
+      "nextCheckWhat": "Beneficiary list and capacity commissioned",
+      "status": "Watching",
+      "article": "india-black-mass-export-ban-indonesia-nickel-eu-comparison"
+    },
+    {
+      "id": "uk-cetas-whisky",
+      "title": "India–UK trade agreement: whisky tariff concession",
+      "topic": "trade-external-sector",
+      "promise": "Cut India's duty on UK whisky from 150 per cent to 75 per cent on entry into force, falling to 40 per cent by the tenth year.",
+      "documents": [
+        { "name": "Reporting on the tariff schedule and classification dispute (Vinetur, citing Reuters and The Financial Express)", "url": "https://www.vinetur.com/en/20261105110437/india-s-customs-dispute-threatens-scotch-tariff-cuts-under-uk-trade-pact.html" }
+      ],
+      "stage": { "Announced": "2025-07-24", "Notified": "2026-07-15", "Funded": null, "Implemented": "2026-07-15", "Measured": null },
+      "stageNotes": { "Funded": "A tariff concession; the cost is forgone customs revenue.", "Implemented": "In force from 15 July 2026, but customs is examining whether bulk Scotch qualifies." },
+      "tracking": "Whether bulk Scotch, about four-fifths of volumes, clears at the preferential rate, and whether CBIC issues a classification instruction.",
+      "nextCheck": "2026-12-31",
+      "nextCheckWhat": "A CBIC instruction or ruling on heading 2208.30 versus 2106",
+      "status": "Disputed",
+      "article": "trade-deal-tariff-cuts-classification-origin-valuation-explained"
+    }
+  ]
+}

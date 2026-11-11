@@ -1,0 +1,23 @@
+name: Sync articles from WordPress
+on:
+  schedule:
+    - cron: '17 */3 * * *'   # every 3 hours
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node build.mjs
+      - name: Commit if articles changed
+        run: |
+          if git diff --quiet data/wp-cache.json; then echo "No new articles"; exit 0; fi
+          git config user.name "kakistocrat-sync"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/wp-cache.json
+          git commit -m "Sync articles from WordPress"
+          git push
