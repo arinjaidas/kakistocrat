@@ -1,0 +1,9 @@
+{
+  "rupee": {
+    "year": "2026-27 (Budget Estimates)",
+    "source": { "name": "Budget at a Glance 2026-27, Ministry of Finance", "url": "https://doe.gov.in/files/whats_new_documents/budget_at_a_glance.pdf" },
+    "from": [["Borrowings and other liabilities", 24], ["Income tax", 21], ["Corporation tax", 18], ["GST and other taxes", 15], ["Non-tax revenue", 10], ["Union excise duties", 6], ["Customs", 4], ["Non-debt capital receipts", 2]],
+    "to": [["States' share of taxes", 22], ["Interest payments", 20], ["Central sector schemes", 17], ["Defence", 11], ["Centrally sponsored schemes", 8], ["Finance Commission and other transfers", 7], ["Other expenditure", 7], ["Major subsidies", 6], ["Civil pensions", 2]],
+    "notes": "Income tax includes securities transaction tax. Central sector schemes exclude capital outlay on defence and major subsidies."
+  }
+}

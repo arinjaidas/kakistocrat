@@ -505,3 +505,6 @@ pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1
 .td-heat td.na{color:var(--mute)}
 @media (max-width:1180px){.td-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:720px){.td-grid{grid-template-columns:1fr 1fr}}
+.ig-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.ig-head h2{margin:4px 0 4px;font:500 30px/1.12 var(--serif);letter-spacing:-.01em}
+.ig{border-top:3px solid var(--ink);padding-top:14px}
