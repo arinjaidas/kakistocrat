@@ -364,3 +364,23 @@ ul.src a{text-decoration:underline}
 .st-table thead th small{display:block;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mute)}
 @media (max-width:1080px){.st-grid{grid-template-columns:1fr}}
 @media (max-width:720px){.tile b{font-size:11px}.tile span{display:none}.st-rank li{grid-template-columns:110px minmax(0,1fr) 78px}}
+
+/* ---------- two-chart test ---------- */
+.tc-toc{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 6px}
+.tc-toc a{border:1px solid var(--rule-2);padding:8px 12px;font:600 13px var(--sans);background:#fff}
+.tc-toc .n{font:600 12px var(--mono);color:var(--accent);margin-right:8px}
+.tc{border-top:3px solid var(--ink);margin-top:30px;padding-top:14px}
+.tc header{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.tc h2{margin:0;font:500 28px/1.2 var(--serif);flex:1;min-width:280px}
+.tc-verdict{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--ink);color:#fff}
+.tc-pair{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px}
+.tc-pair figure{margin:0;border:1px solid var(--rule);padding:12px;background:#fff}
+.tc-pair figcaption{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--slate);margin-bottom:6px}
+.tc-read{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:14px 0 8px}
+.tc-read h3{margin:0 0 4px;font:600 14px var(--sans)}
+.tc-read p{margin:0;font:400 16px/1.55 var(--serif);color:var(--graphite)}
+.tc-bars{display:flex;flex-direction:column;gap:10px;padding:10px 0}
+.tc-bar{display:grid;grid-template-columns:140px 1fr 54px;gap:10px;align-items:center;font-size:13px}
+.tc-bar .t{height:22px;background:var(--stone)}.tc-bar .t i{display:block;height:100%}
+.tc-bar .v{font:600 13px var(--mono);text-align:right}
+@media (max-width:900px){.tc-pair,.tc-read{grid-template-columns:1fr}}

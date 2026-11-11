@@ -1,0 +1,157 @@
+{
+ "checked": "2026-11-12",
+ "crude": {
+  "title": "Crude oil: where India's barrels came from",
+  "period": "2024-25",
+  "shares": [
+   {
+    "c": "Russia",
+    "v": 36
+   },
+   {
+    "c": "Iraq",
+    "v": 20
+   },
+   {
+    "c": "Saudi Arabia",
+    "v": 13
+   },
+   {
+    "c": "UAE",
+    "v": 9
+   },
+   {
+    "c": "USA",
+    "v": 4
+   },
+   {
+    "c": "Kuwait",
+    "v": 3
+   },
+   {
+    "c": "Others",
+    "v": 15
+   }
+  ],
+  "hormuz": "45–50",
+  "hormuzGas": "about 60",
+  "volume": 4.84,
+  "volumeNote": "India imported 4.84 million barrels a day of oil in calendar 2024 (Kpler data, via Business Standard).",
+  "note": "Russia's share rose from almost nothing before 2022. It reached about half of India's crude intake in some months of 2026, when Gulf supplies were disrupted.",
+  "sources": [
+   {
+    "name": "ICRA, Indian Oil and Gas Industry, June 2025 (supplier shares and Strait of Hormuz exposure)",
+    "url": "https://www.icra.in/Rating/DownloadResearchSpecialCommentReport?id=6374"
+   },
+   {
+    "name": "Business Standard, oil imports coverage (2024 volume, Kpler)",
+    "url": "https://www.business-standard.com/topic/oil-imports/page-3"
+   },
+   {
+    "name": "EBC Financial Group, Russia's share of India's crude in the March 2026 Hormuz disruption",
+    "url": "https://www.ebc.com/forex/russia-america-and-the-gulf-are-all-bidding-for-indias-52b-oil"
+   }
+  ]
+ },
+ "dap": {
+  "title": "DAP fertiliser: how fast China's share fell",
+  "rows": [
+   {
+    "period": "2023-24",
+    "total": 55.67,
+    "china": 22.28
+   },
+   {
+    "period": "Apr 2024–Feb 2025",
+    "total": 44.19,
+    "china": 8.47
+   }
+  ],
+  "note": "More than half of India's DAP use is met by finished imports; much of the rest is made at home from imported rock phosphate and phosphoric acid. As Chinese supply dried up, India signed long-term supply deals with Saudi Arabia and Morocco in July 2025.",
+  "sources": [
+   {
+    "name": "Government data via PTI/Outlook Business, DAP imports from China (Mar 2025)",
+    "url": "https://www.outlookbusiness.com/economy-and-policy/india-imports-847-lakh-tons-of-dap-fertiliser-from-china-by-feb"
+   },
+   {
+    "name": "Rural Voice, DAP import prices and sourcing (2025)",
+    "url": "https://eng.ruralvoice.in/dap-import-price-reaches-810-dollar-per-tonne-opening-stock-9-lakh-tonnes-less-than-last-year"
+   },
+   {
+    "name": "Argus, India signs phosphate agreements with Saudi Arabia and Morocco (Jul 2025)",
+    "url": "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2709908-india-signs-phos-agreements-with-saudi-arabia-morocco"
+   }
+  ]
+ },
+ "china": {
+  "title": "Products where China supplies most of what India imports",
+  "items": [
+   {
+    "p": "Viscose yarn",
+    "v": 98.9,
+    "g": "Textiles"
+   },
+   {
+    "p": "Silicon wafers",
+    "v": 96.8,
+    "g": "Electronics"
+   },
+   {
+    "p": "Embroidery machinery",
+    "v": 91.4,
+    "g": "Machinery"
+   },
+   {
+    "p": "Antibiotics",
+    "v": 88.1,
+    "g": "Pharmaceuticals"
+   },
+   {
+    "p": "Flat-panel display modules",
+    "v": 86.0,
+    "g": "Electronics"
+   },
+   {
+    "p": "Solar cells",
+    "v": 82.7,
+    "g": "Clean energy"
+   },
+   {
+    "p": "Laptops and tablets",
+    "v": 80.5,
+    "g": "Electronics"
+   },
+   {
+    "p": "Lithium-ion batteries",
+    "v": 75.2,
+    "g": "Clean energy"
+   },
+   {
+    "p": "Computer monitors",
+    "v": 66.8,
+    "g": "Electronics"
+   },
+   {
+    "p": "Smartphones",
+    "v": 58.8,
+    "g": "Electronics"
+   },
+   {
+    "p": "Smartphone parts",
+    "v": 55.4,
+    "g": "Electronics"
+   }
+  ],
+  "note": "Shares are China's portion of India's total imports of each product, as reported by the Global Trade Research Initiative in August 2025. A high import share is not the same as dependence: for some products imports are a small part of what India uses. The risk is greatest where China's share is high and domestic production is thin, as with solar cells, lithium-ion cells and antibiotic ingredients.",
+  "sources": [
+   {
+    "name": "GTRI, via Business Standard (20 Aug 2025)",
+    "url": "https://www.business-standard.com/economy/news/export-curbs-ease-positive-india-must-cut-reliance-amid-100-bn-gap-gtri-125082000326_1.html"
+   },
+   {
+    "name": "GTRI, India's trade deficit with China (via Business Standard, 19 Dec 2025)",
+    "url": "https://www.business-standard.com/economy/news/india-s-trade-deficit-with-china-may-reach-106-billion-in-2025-gtri-125121900348_1.html"
+   }
+  ]
+ }
+}

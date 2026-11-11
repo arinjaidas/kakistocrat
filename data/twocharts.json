@@ -1,0 +1,51 @@
+{
+  "checked": "2026-11-12",
+  "intro": "A claim that sounds right often survives only until two charts are put side by side. Each test below states a common claim, shows the two series that should move together if it were true, and says what the charts do and do not settle.",
+  "tests": [
+    {
+      "id": "oil-rupee",
+      "claim": "Costlier oil is what is driving the rupee down",
+      "short": "Oil and the rupee",
+      "a": { "title": "Brent crude, $ a barrel", "unit": "", "decimals": 0, "labels": ["28 Sep", "1 Oct", "5 Oct", "8 Oct", "12 Oct", "15 Oct", "19 Oct", "22 Oct", "23 Oct"], "values": [99.78, 102.31, 100.32, 104.28, 106.65, 105.92, 106.07, 108.66, 111.70], "color": "#B42318" },
+      "b": { "title": "Rupees per dollar (higher = weaker rupee)", "unit": "", "decimals": 1, "labels": ["28 Sep", "1 Oct", "5 Oct", "8 Oct", "12 Oct", "15 Oct", "19 Oct", "22 Oct", "23 Oct"], "values": [95.99, 96.33, 96.30, 96.80, 95.78, 95.06, 94.93, 94.82, 94.95], "color": "#1D4ED8" },
+      "verdict": "Not on this evidence",
+      "shows": "Between 28 September and 23 October, Brent rose about 12 per cent, from roughly $100 to $112. Over the same days the rupee strengthened by about 1 per cent, from 96.0 to 94.9 per dollar. The two moved in opposite directions.",
+      "cannot": "Four weeks is short, and the RBI stepped in heavily during this window: it sold dollars and in mid-October restricted non-residents' access to offshore forwards. Without those measures the rupee might well have fallen with oil. Over longer periods, higher oil prices do widen India's import bill and weigh on the currency. The charts show that policy can override oil for a time, not that oil does not matter.",
+      "sources": [
+        { "name": "Investing.com, Brent historical data (daily closes)", "url": "https://www.investing.com/commodities/brent-oil-historical-data" },
+        { "name": "Investing.com, USD/INR historical data (daily closes)", "url": "https://www.investing.com/currencies/usd-inr-historical-data" },
+        { "name": "Political.org, on RBI's October measures and the rupee's six-month high (8 Nov 2026)", "url": "https://political.org/2026/11/08/indian-rupee-climbs-to-six-month-high-putting-rbis-dollar-buying-level-in-focus/" }
+      ]
+    },
+    {
+      "id": "food-inflation",
+      "claim": "This year's rise in inflation is mostly a food story",
+      "short": "Food and headline inflation",
+      "a": { "title": "Food inflation (CFPI), % a year", "unit": "%", "decimals": 1, "labels": ["Jun", "Jul", "Aug", "Sep"], "values": [5.32, 5.52, 5.97, 7.74], "color": "#3F6212" },
+      "b": { "title": "Headline CPI inflation, % a year", "unit": "%", "decimals": 1, "labels": ["Jun", "Jul", "Aug", "Sep"], "values": [4.38, 4.45, 4.83, 5.54], "color": "#15171A" },
+      "verdict": "Largely, yes",
+      "shows": "From June to September 2026, food inflation rose by 2.4 percentage points, from 5.32 to 7.74 per cent. Headline inflation rose by 1.2 points, from 4.38 to 5.54 per cent. Food prices are rising faster than everything else, and the steepest step in both series came in September, when onion prices jumped.",
+      "cannot": "Food is part of the headline index, so the two series are not independent. Headline rising half as fast as food is consistent with food doing most of the work, but proving it needs the food weight in the new 2024-based index and a split of non-food items such as fuel and transport, which also rose. One month of a spike is not yet a trend.",
+      "sources": [
+        { "name": "MoSPI, CPI press release for September 2026 (12 Oct 2026)", "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf" },
+        { "name": "MoSPI, CPI press release for August 2026", "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1789382372004-Press%20Release%20of%20CPI%20for%20August%202026.pdf" },
+        { "name": "PIB, CPI press release for July 2026", "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc2026812951801.pdf" }
+      ]
+    },
+    {
+      "id": "deficit-cause",
+      "claim": "The Centre's deficit is running hot because revenue has collapsed",
+      "short": "Why the deficit widened",
+      "kind": "bars",
+      "a": { "title": "Growth in the first half of 2026-27, % year on year", "unit": "%", "decimals": 0, "labels": ["Total receipts", "Net tax revenue", "Gross tax revenue"], "values": [6, 4, 6], "color": "#0F766E" },
+      "b": { "title": "Growth in the first half of 2026-27, % year on year", "unit": "%", "decimals": 0, "labels": ["Total spending", "Revenue spending", "Capital spending"], "values": [11, 10, 13], "color": "#B42318" },
+      "verdict": "No: spending did more of it",
+      "shows": "In April–September 2026, receipts still grew about 6 per cent on a year earlier. Spending grew about 11 per cent. The fiscal deficit rose about 25 per cent, to ₹7.14 lakh crore, because spending outran receipts rather than because receipts fell.",
+      "cannot": "Receipts were propped up by the RBI's record surplus transfer, so underlying tax growth (about 4 per cent net) is weaker than the total suggests, and excise duty fell sharply after the fuel tax cut. Some spending is front-loaded and may slow later in the year. The comparison says what happened in one half-year, not what the full year will look like.",
+      "sources": [
+        { "name": "Business Standard, H1 FY27 fiscal deficit at 42% of target (30 Oct 2026)", "url": "https://www.business-standard.com/amp/economy/news/centre-s-fiscal-deficit-widens-to-42-of-fy27-target-in-first-half-cga-126103001658_1.html" },
+        { "name": "Ministry of Finance, Monthly review of accounts up to September 2026 (PIB)", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2330455" }
+      ]
+    }
+  ]
+}

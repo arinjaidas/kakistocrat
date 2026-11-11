@@ -206,4 +206,19 @@
     }));
     scatter();
   }
+  /* ---------- exposure: supplier disruption ---------- */
+  const ex = $('#disrupt');
+  if (ex && window.__EXPO) {
+    const ids = ['ex-sup', 'ex-lost', 'ex-prem', 'ex-vol'];
+    const run = () => {
+      const share = parseFloat($('#ex-sup').value) / 100, lost = parseFloat($('#ex-lost').value) / 100, prem = parseFloat($('#ex-prem').value), vol = parseFloat($('#ex-vol').value);
+      $('output[for=ex-lost]').textContent = Math.round(lost * 100) + '%'; $('output[for=ex-prem]').textContent = '$' + prem.toFixed(1); $('output[for=ex-vol]').textContent = vol.toFixed(2);
+      const bpd = vol * 1e6 * share * lost, usd = bpd * prem * 365;
+      $('#ex-b').textContent = (bpd / 1e6).toFixed(2) + ' mn';
+      $('#ex-usd').textContent = '$' + (usd / 1e9).toFixed(2) + ' bn';
+      $('#ex-usd-sub').textContent = 'a year';
+      $('#ex-inr').textContent = '₹' + Math.round(usd * window.__EXPO.inr / 1e7).toLocaleString('en-IN') + ' cr';
+    };
+    ids.forEach(i => $('#' + i).addEventListener('input', run)); $('#ex-sup').addEventListener('change', run); run();
+  }
 })();
