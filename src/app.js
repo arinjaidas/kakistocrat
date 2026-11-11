@@ -126,4 +126,28 @@
     $('#reset').addEventListener('click', () => { history.replaceState(null, '', location.pathname); location.reload(); });
     calc();
   }
+  /* ---------- budget x-ray: year-end calculator ---------- */
+  const ye = $('#yearend');
+  if (ye && window.__BUDGET) {
+    const B = window.__BUDGET, F = ['h2tax', 'h2nontax', 'h2exp', 'gdp'];
+    const v = id => parseFloat($('#' + id).value);
+    const p0 = new URLSearchParams(location.hash.slice(1)); F.forEach(k => { if (p0.has(k)) $('#' + k).value = p0.get(k); });
+    const lk = x => (x / 1e5).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const run = () => {
+      F.forEach(k => { const o = $(`output[for=${k}]`); if (o) o.textContent = (k === 'h2tax' || k === 'h2exp') ? (v(k) >= 0 ? '+' : '') + v(k).toFixed(1) + '%' : '₹' + v(k).toFixed(k === 'gdp' ? 1 : 2); });
+      const tax = B.h1tax * (2 + v('h2tax') / 100), exp = B.h1exp * (2 + v('h2exp') / 100), other = B.h1other + v('h2nontax') * 1e5;
+      const fd = exp - tax - other, gdp = v('gdp') * 1e5, slip = fd - B.beFD;
+      $('#y-fd').textContent = '₹' + lk(fd) + ' lakh cr';
+      $('#y-fd-sub').textContent = `Budget Estimate: ₹${lk(B.beFD)} lakh crore`;
+      $('#y-gdp').textContent = (fd / gdp * 100).toFixed(2) + '%';
+      $('#y-gdp-sub').textContent = `Budget target: 4.3% of GDP (on ₹${lk(B.beGDP)} lakh crore GDP)`;
+      const tiny = Math.abs(slip) < 1000; $('#y-slip').textContent = tiny ? 'On target' : (slip >= 0 ? '+₹' : '−₹') + lk(Math.abs(slip)) + ' lakh cr';
+      $('#y-slip-sub').textContent = tiny ? 'This scenario reproduces the Budget Estimate.' : `${slip >= 0 ? 'more' : 'less'} borrowing than budgeted, about ${(Math.abs(slip) / gdp * 100).toFixed(2)}% of GDP`;
+      $('#y-slip').style.color = slip > 5000 ? 'var(--down)' : slip < -5000 ? 'var(--up)' : '';
+    };
+    F.forEach(k => $('#' + k).addEventListener('input', run));
+    $('#share').addEventListener('click', () => { const q = new URLSearchParams(); F.forEach(k => q.set(k, $('#' + k).value)); history.replaceState(null, '', '#' + q); const u = location.href; (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(() => { $('#share').textContent = 'Link copied'; setTimeout(() => $('#share').textContent = 'Copy link to this scenario', 1800); }).catch(() => prompt('Copy this link', u)); });
+    $('#reset').addEventListener('click', () => { history.replaceState(null, '', location.pathname); location.reload(); });
+    run();
+  }
 })();

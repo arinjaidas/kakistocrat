@@ -1,0 +1,37 @@
+{
+  "title": "Union Budget 2026-27",
+  "through": "September 2026",
+  "monthsElapsed": 6,
+  "checked": "2026-11-12",
+  "gdpBE": 39300393,
+  "note": "All figures in ₹ crore. Actuals are the Controller General of Accounts' unaudited provisional figures for April–September 2026. Budget Estimates are from Budget at a Glance 2026-27.",
+  "items": [
+    { "id": "receipts", "label": "Total receipts (non-debt)", "group": "receipts", "be": 3651547, "actual": 1835422, "prevPct": 49.5, "lead": true },
+    { "id": "nettax", "label": "Net tax revenue (Centre)", "group": "receipts", "be": 2866922, "actual": 1276088, "note": "Gross tax collections grew about 6% year on year. Excise duty fell about 22% after the cut on petrol and diesel; income tax grew about 7%." },
+    { "id": "nontax", "label": "Non-tax revenue", "group": "receipts", "be": 666228, "actual": 480732, "note": "Front-loaded by the RBI's record ₹2.87 lakh crore surplus transfer in May." },
+    { "id": "ndcr", "label": "Non-debt capital receipts", "group": "receipts", "be": 118397, "actual": 78602, "note": "Mainly loan recoveries and disinvestment." },
+    { "id": "expenditure", "label": "Total expenditure", "group": "spending", "be": 5347315, "actual": 2549835, "prevPct": 45.5, "lead": true },
+    { "id": "revexp", "label": "Revenue expenditure", "group": "spending", "be": 4125494, "actual": 1895288, "note": "Up about 10% year on year, led by subsidies." },
+    { "id": "interest", "label": "Interest payments", "group": "spending", "be": 1403972, "actual": 646010 },
+    { "id": "capex", "label": "Capital expenditure", "group": "spending", "be": 1221821, "actual": 654547, "note": "Up about 13% year on year in the first half, but September alone fell about 3%." },
+    { "id": "fd", "label": "Fiscal deficit", "group": "deficit", "be": 1695768, "actual": 714413, "prevPct": 36.5, "lead": true, "note": "Total expenditure minus non-debt receipts." }
+  ],
+  "extra": [
+    { "label": "Major subsidies", "actual": 222905, "note": "Urea at about 73% and nutrient-based fertiliser subsidy at about 62% of their budgets by September." },
+    { "label": "Tax devolution to states", "actual": 699409, "note": "₹67,658 crore more than in April–September 2025." }
+  ],
+  "fdPath": {
+    "months": ["Apr", "May", "Jun", "Jul", "Aug", "Sep"],
+    "fy27": [21.4, 9.6, 18.2, 26.8, 41.9, 42.1],
+    "fy27amt": [362303, 162354, 307833, 455144, 710249, 714413],
+    "fy26": [11.9, 0.8, 17.9, 29.9, 38.1, 36.5]
+  },
+  "sources": [
+    { "name": "Ministry of Finance, Monthly review of accounts up to September 2026 (PIB, 30 Oct 2026)", "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2330455" },
+    { "name": "Budget at a Glance 2026-27, Department of Expenditure", "url": "https://doe.gov.in/files/whats_new_documents/budget_at_a_glance.pdf" },
+    { "name": "PRS Legislative Research, Union Budget 2026-27 Analysis", "url": "https://prsindia.org/files/budget/budget_parliament/2026/Union_Budget_Analysis-2026-27.pdf" },
+    { "name": "RBI Bulletin, Central government finances, April–May 2026", "url": "https://rbi.org.in/ScriptS/BS_ViewBulletin.aspx?Id=24333" },
+    { "name": "Business Standard, H1 FY27 fiscal deficit at 42% of target (30 Oct 2026)", "url": "https://www.business-standard.com/amp/economy/news/centre-s-fiscal-deficit-widens-to-42-of-fy27-target-in-first-half-cga-126103001658_1.html" },
+    { "name": "Monthly fiscal deficit releases (CGA via IANS, PTI, Deccan Herald), Apr–Aug 2026", "url": "https://ianslive.in/indias-fiscal-deficit-in-april-may-at-96-per-cent-of-full-year-target--20260630165703" }
+  ]
+}

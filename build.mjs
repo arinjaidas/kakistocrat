@@ -4,6 +4,7 @@
 import { mkdir, writeFile, readFile, cp, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { budgetPage } from './lib/budget.mjs';
 
 const SITE = 'thekakisto.wordpress.com';
 const API = `https://public-api.wordpress.com/wp/v2/sites/${SITE}`;
@@ -21,6 +22,13 @@ const TOPICS = {
   'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#334155', blurb: 'Economies, conflicts and export controls beyond India.' },
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
+const TOOLS = [
+  { url: '/data/', kicker: 'India macro tape', title: 'Latest, previous, revised', blurb: 'CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.' },
+  { url: '/tools/budget-x-ray/', kicker: 'Budget X-Ray', title: 'Halfway through the Budget', blurb: 'Receipts, spending and the deficit against the full-year plan, with a year-end calculator.' },
+  { url: '/tools/shock-lab/', kicker: 'Shock Lab', title: 'Oil and the rupee', blurb: 'Change crude and the exchange rate. See who pays: importer, pump or household.' },
+  { url: '/ledger/', kicker: 'Policy Ledger', title: 'Announced to measured', blurb: 'Every scheme we cover, tracked from promise to outcome, with the date we check again.' },
+  { url: '/forecasts/', kicker: 'Forecast Book', title: 'Calls on the record', blurb: 'Testable calls with probabilities, revisions and results, dated when made.' },
+];
 
 // ---------------------------------------------------------------- helpers
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -142,7 +150,7 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <a class="brand" href="/">The Kakistocrat<small>Economics · Politics · Policy</small></a>
 <button class="menu-btn" aria-expanded="false" aria-controls="nav">Sections</button>
 <nav class="nav" id="nav" aria-label="Topics">${nav}</nav>
-<nav class="toolsnav" aria-label="Tools"><a href="/data/">Data</a><a href="/tools/shock-lab/">Shock Lab</a><a href="/ledger/">Ledger</a><a href="/forecasts/">Forecasts</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
+<nav class="toolsnav" aria-label="Tools"><a href="/data/">Data</a><a href="/tools/">Tools</a><a href="/ledger/">Ledger</a><a href="/forecasts/">Forecasts</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
 </div></header>
 ${tapeHTML(tape)}
 <main id="main">${body}</main>
@@ -150,7 +158,7 @@ ${tapeHTML(tape)}
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(BUILT.toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
 <div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/explainers/">Explainers</a></li><li><a href="/archive/">Archive &amp; search</a></li><li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
-<div><h4>Tools</h4><ul><li><a href="/data/">India macro data</a></li><li><a href="/tools/shock-lab/">Shock Lab</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/forecasts/">Forecast Book</a></li><li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
+<div><h4>Tools</h4><ul>${TOOLS.map(t => `<li><a href="${t.url}">${esc(t.kicker)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
 <script src="/app.js?v=${BUILT.getTime()}" defer></script>
@@ -192,12 +200,7 @@ ${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
 ${TOPIC_ORDER.slice(2).map(deskBlock).join('')}
 ${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/explainers/">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
 </div>
-<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">Tools</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Test the numbers yourself</h2><div class="tools-grid">
-<a class="tool-card" href="/data/"><span class="kicker">India macro tape</span><h3>Latest, previous, revised</h3><p>CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.</p></a>
-<a class="tool-card" href="/tools/shock-lab/"><span class="kicker">Shock Lab</span><h3>Oil and the rupee</h3><p>Change crude and the exchange rate. See who pays: importer, pump or Budget.</p></a>
-<a class="tool-card" href="/ledger/"><span class="kicker">Policy Ledger</span><h3>Announced to measured</h3><p>Every scheme we cover, tracked from promise to outcome, with the date we check again.</p></a>
-<a class="tool-card" href="/forecasts/"><span class="kicker">Forecast Book</span><h3>Calls on the record</h3><p>Testable calls with probabilities, revisions and results, dated when made.</p></a>
-</div></div></section>`;
+<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">Tools</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Test the numbers yourself</h2><div class="tools-grid">${TOOLS.slice(0, 4).map(t => `<a class="tool-card" href="${t.url}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p></a>`).join('')}</div><p style="margin:16px 0 0"><a href="/tools/" style="color:#fff;text-decoration:underline;font-weight:600">All tools →</a></p></div></section>`;
 }
 
 function articlePage(a, m) {
@@ -337,11 +340,15 @@ function shockLab(tape) {
   </div></div>`;
 }
 
+function toolsHub() {
+  return pageHead('Tools', 'Tools and data', 'Interactive tools built on official data. Every figure links to its source and carries the date it was checked.') + `<div class="wrap"><div class="hub">${TOOLS.map(t => `<a href="${t.url}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p><span class="meta">Open →</span></a>`).join('')}</div></div>`;
+}
+
 function notFound() { return pageHead('404', 'Page not found', 'It may have moved. Try the <a href="/archive/" style="text-decoration:underline">archive search</a> or the <a href="/" style="text-decoration:underline">homepage</a>.'); }
 
 // ---------------------------------------------------------------- main
 async function main() {
-  const [wp, tape, ledger, fc] = await Promise.all([loadWordPress(), readFile('data/tape.json', 'utf8').then(JSON.parse), readFile('data/ledger.json', 'utf8').then(JSON.parse), readFile('data/forecasts.json', 'utf8').then(JSON.parse)]);
+  const [wp, tape, ledger, fc, budget] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
   __tapeRef = tape;
   const m = model(wp);
   if (existsSync(OUT)) await rm(OUT, { recursive: true });
@@ -363,11 +370,13 @@ async function main() {
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
   await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: forecastsPage(fc) }));
   await write('tools/shock-lab/index.html', P({ title: 'Shock Lab: oil and the rupee', path: '/tools/shock-lab/', description: 'Calculate what an oil or rupee shock does to an importer, the pump and a household.', body: shockLab(tape) }));
+  await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub() }));
+  await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
   await write('404.html', P({ title: 'Page not found', path: '/404', body: notFound() }));
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/shock-lab/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/tools/shock-lab/', '/tools/budget-x-ray/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_headers', `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
