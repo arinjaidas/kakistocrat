@@ -2,6 +2,7 @@
 // Pulls articles from the WordPress.com public API (thekakisto.wordpress.com),
 // merges them with the data files in /data, and writes a static site to /dist.
 import { mkdir, writeFile, readFile, cp, rm } from 'node:fs/promises';
+import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { budgetPage } from './lib/budget.mjs';
@@ -396,6 +397,11 @@ function notFound() { return pageHead('404', 'Page not found', 'It may have move
 
 // ---------------------------------------------------------------- main
 async function main() {
+  // On Cloudflare Pages, refresh market data before building (incremental; falls back to the committed cache on any failure).
+  if (process.env.CF_PAGES && !process.env.SKIP_FETCH) {
+    try { execSync('python3 -m pip install --quiet --user openpyxl', { stdio: 'inherit', timeout: 180000 }); execSync('python3 scripts/fetch_markets.py --years 3', { stdio: 'inherit', timeout: 900000 }); }
+    catch (e) { console.warn('Market data refresh skipped:', e.message); }
+  }
   const [wp, tape, ledger, fc, budget, states, twocharts, exposure] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states', 'twocharts', 'exposure'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
   __tapeRef = tape;
   const m = model(wp);
