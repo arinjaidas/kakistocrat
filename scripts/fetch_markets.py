@@ -11,7 +11,7 @@ Sources (all free, no keys):
 Incremental: index history is cached and only missing trading days are fetched.
 Usage: python3 scripts/fetch_markets.py [--years N]
 """
-import csv, io, json, os, sys, time, zipfile, datetime as dt, urllib.request, urllib.error
+import csv, io, json, os, sys, time, zipfile, datetime as dt, urllib.request, urllib.error, urllib.parse
 
 OUT = 'data/markets'
 UA = {'User-Agent': 'Mozilla/5.0 (compatible; kakistocrat-data/1.0; +https://kakistocrat.pages.dev)', 'Accept': '*/*'}
@@ -210,8 +210,28 @@ def imf_wdi():
     save('macro_world', out)
     print('IMF/WDI:', len(out['imf']), len(out['wdi']), 'India growth', {k: v for k, v in out['imf']['NGDP_RPCH']['data']['IND'].items() if k in ('2025', '2026')})
 
+
+# ------------------------------------------------------------------ IMF PortWatch: daily transit calls through maritime chokepoints (AIS-based)
+PW = 'https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query'
+CHOKE = ['Strait of Hormuz', 'Bab el-Mandeb Strait', 'Suez Canal', 'Cape of Good Hope', 'Malacca Strait']
+def portwatch():
+    out = {}
+    for name in CHOKE:
+        rows, off = [], 0
+        while True:
+            q = urllib.parse.urlencode({'where': f"portname='{name}' AND date >= DATE '2023-01-01'", 'outFields': 'date,n_total,n_tanker,n_container,n_dry_bulk,capacity,capacity_tanker',
+                                        'orderByFields': 'date', 'resultOffset': off, 'resultRecordCount': 1000, 'f': 'json'})
+            j = json.loads(get(f'{PW}?{q}', timeout=60)); feats = [f['attributes'] for f in j.get('features', [])]
+            rows += feats; off += len(feats)
+            if not j.get('exceededTransferLimit') or not feats: break
+        if not rows: continue
+        out[name] = {k: [r.get(src) for r in rows] for k, src in [('d', 'date'), ('total', 'n_total'), ('tanker', 'n_tanker'), ('container', 'n_container'), ('bulk', 'n_dry_bulk'), ('cap', 'capacity'), ('capT', 'capacity_tanker')]}
+        time.sleep(1)
+    if out: save('portwatch', {'source': 'IMF PortWatch, Daily Chokepoint Transit Calls and Trade Volume Estimates', 'chokepoints': out})
+    print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
+
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch)]
     if '--only' in sys.argv:
         only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True
