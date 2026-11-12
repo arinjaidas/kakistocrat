@@ -23,7 +23,7 @@ import { hormuzPage } from './lib/hormuz.mjs';
 import { worldPage } from './lib/world.mjs';
 import { mapsPage, mapPosters } from './lib/maps.mjs';
 import { scenarioPage } from './lib/scenario.mjs';
-import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML } from './lib/entities.mjs';
+import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -61,11 +61,7 @@ const TOOLS = [
   { url: '/infographics/', kicker: 'Infographics', title: 'India in pictures', blurb: 'The Budget rupee as a flow diagram, the inflation basket, a GDP race from 1990, and India against its peers.' },
   { url: '/chartle/', kicker: 'Chartle', title: 'The daily mystery chart', blurb: 'Guess the series behind today’s chart in six tries, then share your score.' },
   { url: '/tools/emi/', kicker: 'EMI shock', title: 'What a rate hike does to your EMI', blurb: 'Enter your home loan and see the new instalment, or how much longer you pay if the EMI is held.' },
-  { url: '/tools/exposure/', kicker: 'Exposure Map', title: 'Where India is exposed', blurb: 'Crude suppliers, the Hormuz chokepoint, fertiliser and China-sourced goods, with a supplier-disruption calculator.' },
-  { url: '/tools/two-chart-test/', kicker: 'Two-Chart Test', title: 'Claims against data', blurb: 'Common claims about the economy, each tested by putting two charts side by side.' },
   
-  { url: '/ledger/', kicker: 'Policy Ledger', title: 'Announced to measured', blurb: 'Every scheme we cover, tracked from promise to outcome, with the date we check again.' },
-  { url: '/forecasts/', kicker: 'Forecast Book', title: 'Calls on the record', blurb: 'Testable calls with probabilities, revisions and results, dated when made.' },
 ];
 
 // ---------------------------------------------------------------- helpers
@@ -212,7 +208,7 @@ ${MARKET_PATHS.some(x => path.startsWith(x)) || path.startsWith('/s/') ? `<nav c
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/explainers/">Explainers</a></li><li><a href="/archive/">Archive &amp; search</a></li><li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/explainers/">Explainers</a></li><li><a href="/archive/">Archive &amp; search</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/forecasts/">Forecast Book</a></li><li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
 <div><h4>Tools</h4><ul>${TOOLS.map(t => `<li><a href="${t.url}">${esc(t.kicker)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
@@ -247,7 +243,7 @@ function home(m, tape, ledger) {
  <div class="col"><h2 class="col-title">Latest</h2><div class="latest-list">${latest.map(a => `<a class="story" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h3 class="h-4">${esc(a.title)}</h3><div class="meta">${esc(shortDate(a.date))}</div></a>`).join('')}</div><p style="margin-top:12px"><a href="/archive/" class="meta" style="color:var(--accent)">Full archive →</a></p></div>
  <div class="col rail-col">
   <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock, every consequence: the pump, the import bill, the current account and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open the calculator</a></div>
-  <div class="module"><span class="kicker">Policy Ledger</span><h3>From promise to proof</h3><ul class="mini-ledger">${ledger.items.slice(0, 4).map(i => `<li><a href="/ledger/#${i.id}"><b style="font:500 14.5px/1.3 var(--serif)">${esc(i.title)}</b></a>${pips(i)}<div class="meta" style="margin-top:4px">${stagesDone(i)}/5 · next check ${esc(isoOrMonth(i.nextCheck))}</div></li>`).join('')}</ul><p style="margin:8px 0 0"><a href="/ledger/" class="meta" style="color:var(--accent)">All tracked policies →</a></p></div>
+  ${MK?.unusual?.length ? `<div class="module"><span class="kicker">Unusual moves</span><h3>What just moved more than usual</h3><ul class="mini-moves">${MK.unusual.slice(0, 6).map(u => `<li><a href="/s/${u.id}/">${esc(u.name)}</a><span class="${u.ch > 0 ? 'up' : 'dn'}">${u.ch > 0 ? '+' : '−'}${Math.abs(u.ch).toFixed(u.rate ? 2 : 1)}${u.rate ? ' pts' : '%'}</span></li>`).join('')}</ul><a class="more" href="/explore/">Explore everything →</a></div>` : ''}
   <div class="module"><span class="kicker">Data</span><h3>India at a glance</h3>${tape.indicators.slice(0, 4).map(i => `<a href="/s/${TAPE_S[i.id]}/" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--rule);font:500 13px var(--mono)"><span>${esc(i.label)}</span><b>${esc(tapeVal(i, i.latest.value))}</b></a>`).join('')}<p style="margin:8px 0 0"><a href="/data/" class="meta" style="color:var(--accent)">Data hub →</a></p></div>
  </div>
 </div>
@@ -269,12 +265,18 @@ function articlePage(a, m) {
  <header class="art-head"><a href="/topic/${a.topic}/" class="kicker desk" style="--desk:${t.color}">${esc(t.name)}</a>${fmtBadge(a)}
  <h1>${esc(a.title)}</h1><p class="dek">${esc(a.excerpt)}</p>
  <div class="byline"><span>By <b>Arinjai Das</b></span><span>${esc(longDate(a.date))}</span><span>${a.minutes} min read</span><a href="${esc(a.wpLink)}">Comment or subscribe on WordPress →</a></div></header>
- <div class="prose">${a.html}</div>
+ <div class="prose">${a.linkedHtml || a.html}</div>
+ ${a.dataCards || (a.places || []).length ? `<section class="story-space"><div class="ss-head"><span class="kicker">The data behind this story</span><a href="/explore/">Explore everything →</a></div>
+  ${a.dataCards ? `<div class="sd-cards">${a.dataCards}</div>` : ''}
+  ${(a.places || []).length ? `<div class="ss-places"><span>Places in this story</span><div class="en-chips">${a.places.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
+  ${a.whatIf ? `<a class="ss-whatif" href="/tools/shock-lab/"><b>What if?</b> Push oil, the rupee or the repo rate further and see the pump price, the import bill and your EMI move →</a>` : ''}
+ </section>` : ''}
  ${seriesBoxes}
  <p class="origin-note">First published on <a href="${esc(a.wpLink)}" style="text-decoration:underline">thekakisto.wordpress.com</a>. Figures are as cited at the time of publication; check the linked sources for later revisions.</p>
 </div>
 <aside class="rail"><div class="sticky">
- ${(m.storyData?.[a.id] || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${m.storyData[a.id].map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
+ ${(a.connected || []).length ? `<div class="module"><span class="kicker">Connected stories</span><p class="meta" style="margin:4px 0 6px">Other pieces about the same things.</p><div class="rule-list">${a.connected.map(c => `<a class="story" href="${c.b.url}"><h3 class="h-4">${esc(c.b.title)}</h3><div class="meta">${esc(c.shared.join(' · '))}</div></a>`).join('')}</div></div>` : ''}
+ ${(a.storyItems || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${a.storyItems.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
  <div class="module"><span class="kicker desk" style="--desk:${t.color}">More in ${esc(t.short)}</span><div class="rule-list" style="margin-top:8px">${sameTopic.map(x => `<a class="story" href="${x.url}"><h3 class="h-4">${esc(x.title)}</h3><div class="meta">${esc(shortDate(x.date))}</div></a>`).join('')}</div></div>
  <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open</a></div>
 </div></aside>
@@ -286,7 +288,10 @@ function listPage(items) { return items.map(a => `<a class="row-story story" hre
 function topicPage(slug, m) {
   const t = TOPICS[slug], items = m.articles.filter(a => a.topic === slug);
   const series = m.series.filter(s => s.items.some(a => a.topic === slug));
+  const TD = m.topicData?.[slug];
   return pageHead(`<span style="color:${t.color}">Topic</span>`, t.name, esc(m.topicDesc[slug] || t.blurb)) +
+  (TD ? `<div class="wrap"><section class="topic-space" style="--desk:${t.color}"><div class="ss-head"><span class="kicker" style="color:${t.color}">The numbers behind ${esc(t.short.toLowerCase())}</span><span>${TD.tools.map(([u, n]) => `<a href="${u}">${esc(n)} →</a>`).join(' ')}</span></div><div class="sd-cards tp">${TD.cards}</div>
+   ${TD.subjects.length ? `<div class="ss-places"><span>Most discussed here</span><div class="en-chips">${TD.subjects.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)} <small>${x.n}</small></a>`).join('')}</div></div>` : ''}</section></div>` : '') +
   `<div class="wrap listing"><div><p class="meta">${items.length} pieces</p>${listPage(items)}</div>
   <aside class="rail">${series.length ? `<div class="module"><span class="kicker">Series in this topic</span><div class="rule-list" style="margin-top:8px">${series.map(s => `<a class="story" href="/series/${s.slug}/"><h3 class="h-4">${esc(s.name)}</h3><div class="meta">${s.items.length} parts</div></a>`).join('')}</div></div>` : ''}
   <div class="module"><span class="kicker">Other topics</span><div class="rule-list" style="margin-top:8px">${TOPIC_ORDER.filter(x => x !== slug).map(x => `<a class="story" href="/topic/${x}/"><span class="h-4" style="font:500 15px var(--serif)">${esc(TOPICS[x].name)}</span></a>`).join('')}</div></div></aside></div>`;
@@ -398,8 +403,16 @@ function shockLab(tape) {
   </div></div>`;
 }
 
-function toolsHub() {
-  return pageHead('Tools', 'Tools and data', 'Interactive tools built on official data. Every figure links to its source and carries the date it was checked.') + `<div class="wrap"><div class="hub">${TOOLS.map(t => `<a href="${t.url}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p><span class="meta">Open →</span></a>`).join('')}</div></div>`;
+function toolsHub(stats) {
+  const by = Object.fromEntries(TOOLS.map(t => [t.url, t]));
+  const G = [['Watch', 'What is happening now', ['/today/', '/terminal/', '/markets/', '/commodities/', '/rupee/', '/hormuz/']],
+    ['Ask', 'What would happen if', ['/tools/shock-lab/', '/tools/emi/', '/tools/pump-price/', '/tools/budget-x-ray/']],
+    ['See', 'India in pictures', ['/maps/', '/infographics/', '/world/', '/tools/india-by-state/']],
+    ['Dig', 'Everything, connected', ['/explore/', '/charts/', '/api/', '/chartle/']]];
+  const extra = { '/explore/': { kicker: 'Explore', title: 'Everything, connected', blurb: 'Every series, state, country and article with its own page, linked by what moves together and what the articles discuss.' }, '/api/': { kicker: 'Data API', title: 'Download it all', blurb: 'Every dataset as JSON, free to use, with cross-origin access.' } };
+  return pageHead('The data space', 'One connected data space', `${stats.series} data series, ${stats.states} states, ${stats.countries} countries and ${stats.articles} articles, joined by ${stats.links.toLocaleString('en-IN')} links. Every name on every page opens the page for that thing; every page leads back to the tools and stories that use it. Press / anywhere to search.`) +
+  `<div class="wrap">${G.map(([h, sub, urls]) => `<section class="hub-g"><div class="hub-h"><h2>${h}</h2><span>${sub}</span></div><div class="hub">${urls.map(u => [u, by[u] || extra[u]]).filter(x => x[1]).map(([u, t]) => `<a href="${u}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p></a>`).join('')}</div></section>`).join('')}
+  <p class="meta" style="margin:10px 0 40px">Also: the <a href="/ledger/" style="text-decoration:underline">Policy Ledger</a> and the <a href="/forecasts/" style="text-decoration:underline">Forecast Book</a>.</p></div>`;
 }
 
 function apiPage(api) {
@@ -516,6 +529,38 @@ async function main() {
   m.storyData = {};
   for (const [k, hits] of Object.entries(ment)) for (const h of hits || []) (m.storyData[h.a.id] ||= []).push({ k, u: entUrl(k), t: entName(k), n: h.n, type: k.startsWith('state:') ? 'state' : k.startsWith('country:') ? 'country' : 'series' });
   for (const id in m.storyData) m.storyData[id] = [...new Map(m.storyData[id].map(x => [x.u, x])).values()].sort((a, b) => b.n - a.n).slice(0, 12);
+  // articles join the data space: inline links to data pages, live cards for the series they discuss, and stories connected by shared subjects
+  const REOF = Object.fromEntries(ents.map(e => [e.key, e.re]));
+  const ALIASK = { 'india-cpi': 'imf-pcpipch-ind', 'fred-dexinus': 'fx-usdinr', 'wb-brent': 'fred-dcoilbrenteu' };
+  for (const a of m.articles) {
+    const indiaN = ((a.title + ' ' + a.html).match(/\bIndia(?:n|’s|'s)?\b/g) || []).length;
+    const items = (m.storyData[a.id] || []).filter(x => !ALIASK[x.k] && (!/^imf-|^india-/.test(x.k) || indiaN >= 4));
+    a.storyItems = items;
+    a.linkedHtml = autolink(a.html, items.filter(x => !/^imf-/.test(x.k)).map(x => x.k), REOF, entUrl);
+    a.dataCards = storyCards(items, SD, byId);
+    a.places = items.filter(x => x.type !== 'series');
+    const mine = new Set(items.map(x => x.k));
+    a.connected = m.articles.filter(b => b.id !== a.id).map(b => [b, (m.storyData[b.id] || []).filter(x => mine.has(x.k))]).filter(([, sh]) => sh.length >= 2)
+      .sort((x, y) => y[1].length - x[1].length || y[0].date.localeCompare(x[0].date)).slice(0, 5).map(([b, sh]) => ({ b, shared: sh.slice(0, 3).map(x => x.t) }));
+    a.whatIf = items.some(x => /^(fred-dcoilbrenteu|fx-usdinr|india-repo|wb-dubai|wb-wti)$/.test(x.k));
+  }
+  const TOPIC_SERIES = {
+    'money-finance': ['india-cpi', 'india-repo', 'fx-usdinr', 'nse-nifty-10-yr-benchmark-g-sec', 'nse-nifty-bank', 'fred-dff'],
+    'trade-external-sector': ['fx-usdinr', 'imf-bca-ngdpd-ind', 'fred-dcoilbrenteu', 'pw-strait-of-hormuz', 'fx-usdcny', 'fred-dtwexbgs'],
+    'public-finance': ['imf-ggxcnl-ngdp-ind', 'imf-ggxwdg-ngdp-ind', 'nse-nifty-10-yr-benchmark-g-sec', 'wb-urea', 'india-repo', 'fred-dcoilbrenteu'],
+    'growth-jobs-industry': ['imf-ngdp-rpch-ind', 'nse-nifty-50', 'nse-nifty-infrastructure', 'wb-copper', 'wb-ironore', 'imf-ngdpdpc-ind'],
+    'rural-economy-welfare': ['india-cpi', 'wb-urea', 'wb-dap', 'wb-rice', 'wb-wheat', 'wb-palm'],
+    'energy-climate': ['fred-dcoilbrenteu', 'fred-dhhngsp', 'wb-coal', 'pw-strait-of-hormuz', 'wb-ngeu', 'nse-nifty-energy'],
+    'world-geopolitics': ['pw-strait-of-hormuz', 'fred-dtwexbgs', 'fx-usdcny', 'wb-gold', 'fred-dgs10', 'pw-bab-el-mandeb-strait'],
+  };
+  const TOPIC_TOOLS = { 'money-finance': [['/rupee/', 'Rupee & rates'], ['/tools/emi/', 'EMI shock']], 'trade-external-sector': [['/rupee/', 'External sector'], ['/hormuz/', 'Shipping']], 'public-finance': [['/tools/budget-x-ray/', 'Budget X-Ray'], ['/maps/#debt', 'State debt map']],
+    'growth-jobs-industry': [['/world/', 'World rankings'], ['/maps/#growth', 'Growth map']], 'rural-economy-welfare': [['/commodities/', 'Fertiliser & food prices'], ['/maps/#inflation', 'Inflation map']], 'energy-climate': [['/tools/pump-price/', 'Pump price'], ['/tools/shock-lab/', 'What if?']], 'world-geopolitics': [['/world/', 'World rankings'], ['/hormuz/', 'Chokepoints']] };
+  m.topicData = {};
+  for (const t of TOPIC_ORDER) {
+    const ids = (TOPIC_SERIES[t] || []).filter(id => SD[id]);
+    const cnt = {}; for (const a of m.articles.filter(a => a.topic === t)) for (const x of a.storyItems || []) { (cnt[x.k] ||= { ...x, n: 0 }).n++; }
+    m.topicData[t] = { cards: storyCards(ids.map(k => ({ k, type: 'series' })), SD, byId, 6), tools: TOPIC_TOOLS[t] || [], subjects: Object.values(cnt).filter(x => x.n >= 2).sort((a, b) => b.n - a.n).slice(0, 16) };
+  }
   // network of co-mentions
   const nodeKeys = Object.entries(ment).filter(([k, h]) => h && h.length >= 2 && !/^(fred-dexinus|wb-brent|india-cpi)$/.test(k)).map(([k]) => k);
   const pair = {};
@@ -541,6 +586,7 @@ async function main() {
     ...TOPIC_ORDER.map(t => ['p', TOPICS[t].name, `/topic/${t}/`, 'Topic']), ['p', 'Explore everything', '/explore/', 'Directory and network'], ['p', 'Data API', '/api/', 'Download'],
   ];
   await write('api/search.json', JSON.stringify(searchIdx));
+  const HUBSTATS = { series: catalog.length, states: states.states.length, countries: W ? Object.keys(W.countries).length : 0, articles: m.articles.length, links: Object.values(corr).reduce((a, b) => a + b.length, 0) / 2 + Object.values(ment).reduce((a, b) => a + (b ? b.length : 0), 0) + net.links.length };
   api['search'] = 'Site-wide search index: [type, name, url, detail]';
   await write('api/graph.json', JSON.stringify({ correlations: corr, network: net }));
   api['graph'] = 'How the site connects: correlation of monthly changes between every pair of series, and the network of subjects the articles discuss together';
@@ -563,11 +609,11 @@ async function main() {
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
   await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: forecastsPage(fc) }));
   await write('tools/shock-lab/index.html', P({ title: 'Scenario engine: what if?', path: '/tools/shock-lab/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
-  await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub() }));
+  await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub(HUBSTATS) }));
   await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
   await write('tools/india-by-state/index.html', P({ title: 'India by State', path: '/tools/india-by-state/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, with sources.', body: statesPage(states, { pageHead }) }));
-  await write('tools/two-chart-test/index.html', P({ title: 'The Two-Chart Test', path: '/tools/two-chart-test/', description: 'Common claims about India’s economy tested against two charts side by side.', body: twoChartPage(twocharts, { pageHead }) }));
-  await write('tools/exposure/index.html', P({ title: 'Geoeconomics Exposure Map', path: '/tools/exposure/', description: 'India’s dependence on foreign suppliers for oil, fertiliser and China-sourced electronics, with a disruption calculator.', body: exposurePage(exposure, { pageHead, inrRate: tape.indicators.find(i => i.id === 'inr').latest.value }) }));
+  if (false) await write('tools/two-chart-test/index.html', P({ title: 'The Two-Chart Test', path: '/tools/two-chart-test/', description: 'Common claims about India’s economy tested against two charts side by side.', body: twoChartPage(twocharts, { pageHead }) }));
+  if (false) await write('tools/exposure/index.html', P({ title: 'Geoeconomics Exposure Map', path: '/tools/exposure/', description: 'India’s dependence on foreign suppliers for oil, fertiliser and China-sourced electronics, with a disruption calculator.', body: exposurePage(exposure, { pageHead, inrRate: tape.indicators.find(i => i.id === 'inr').latest.value }) }));
   if (MK) {
     await write('markets/index.html', P({ title: 'Markets', path: '/markets/', description: 'NSE indices, Nifty 50 heatmap, valuations, yield curves, currencies and live crypto.', body: marketsPage(MK, { pageHead }) }));
     await write('commodities/index.html', P({ title: 'Commodities', path: '/commodities/', description: 'Energy, metals, fertiliser and food prices with five-year ranges and comparison charts.', body: commoditiesPage(MK, { pageHead }) }));
@@ -589,10 +635,10 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
-  await write('_redirects', ['/data/ /today/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
+  await write('_redirects', ['/data/ /today/ 301', '/tools/two-chart-test/ /charts/ 301', '/tools/two-chart-test /charts/ 301', '/tools/exposure/ /tools/shock-lab/ 301', '/tools/exposure /tools/shock-lab/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
   console.log(`Built ${m.articles.length} articles, ${m.series.length} series → ${OUT}/`);
 }
