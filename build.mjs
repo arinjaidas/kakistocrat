@@ -433,7 +433,7 @@ function notFound() { return pageHead('404', 'Page not found', 'It may have move
 async function main() {
   // On Cloudflare Pages, refresh market data before building (incremental; falls back to the committed cache on any failure).
   if (process.env.CF_PAGES && !process.env.SKIP_FETCH) {
-    try { execSync('python3 -m pip install --quiet --user openpyxl', { stdio: 'inherit', timeout: 180000 }); execSync('python3 scripts/fetch_markets.py --years 3', { stdio: 'inherit', timeout: 900000 }); }
+    try { execSync('python3 -m pip install --quiet --user openpyxl matplotlib', { stdio: 'inherit', timeout: 180000 }); execSync('python3 scripts/fetch_markets.py --years 3', { stdio: 'inherit', timeout: 900000 }); }
     catch (e) { console.warn('Market data refresh skipped:', e.message); }
   }
   const [wp, tape, ledger, fc, budget, states, twocharts, exposure] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states', 'twocharts', 'exposure'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
@@ -591,6 +591,8 @@ async function main() {
   await write('api/graph.json', JSON.stringify({ built: BUILT.toISOString(), nodes: { series: catalog.map(c => ({ id: c.id, name: c.name, group: c.group, url: `/s/${c.id}/` })), states: states.states.map(st => ({ name: st.name, url: `/state/${slugify(st.name)}/` })), countries: W ? Object.entries(W.countries).map(([iso, n]) => ({ iso, name: cleanCountry(n), url: `/country/${slugify(cleanCountry(n))}/` })) : [] }, articles: m.articles.map(a => ({ url: a.url, title: a.title, date: a.date.slice(0, 10), topic: a.topic, subjects: (a.storyItems || []).map(x => x.k), connected: (a.connected || []).map(c => c.b.url) })), correlations: corr, network: net }));
   api['graph'] = 'The whole data space as one graph: every series, state, country and article; which subjects each article discusses; correlations between all series; and the network of subjects discussed together';
   await write('api/catalog.json', JSON.stringify(catalog));
+  // chart images at fixed URLs for embedding in WordPress posts (redrawn on every build)
+  if (!process.env.SKIP_IMG) { try { execSync(`python3 scripts/render_charts.py ${OUT}`, { stdio: 'inherit', timeout: 900000 }); } catch (e) { console.warn('Chart images skipped:', e.message); } }
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
   api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
   if (MK) { await write('api/rupee.json', JSON.stringify(rupeeData(MK, tape))); api['rupee'] = 'Rupee page bundle: 15 currencies per US dollar (daily), US rates and dollar index, India repo and 10-year yield, external-sector indicators for India and 13 peers'; }
