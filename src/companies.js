@@ -8,7 +8,10 @@
     t.tHead.addEventListener('click', e => { const th = e.target.closest('th'); if (!th) return; const k = +th.dataset.k; dir[k] = -(dir[k] || (k > 1 ? 1 : -1));
       const rows = [...tb.rows].sort((a, b) => { const A = a.cells[k], B = b.cells[k]; const x = A.dataset.v != null ? +A.dataset.v : A.textContent, y = B.dataset.v != null ? +B.dataset.v : B.textContent; return (x > y ? 1 : x < y ? -1 : 0) * dir[k]; });
       rows.forEach(r => tb.appendChild(r)); });
-    const q = document.getElementById('cm-q'); q && q.addEventListener('input', () => { const v = q.value.trim().toLowerCase(); for (const r of tb.rows) r.hidden = v && !(r.dataset.n.includes(v) || r.dataset.i.toLowerCase().includes(v)); }); }
+    const q = document.getElementById('cm-q');
+    const byHash = () => { const a = location.hash && document.querySelector(`[data-ind][href="${location.hash}"]`); if (a && q) { q.value = a.dataset.ind; q.dispatchEvent(new Event('input')); document.getElementById('list').scrollIntoView(); } };
+    addEventListener('hashchange', byHash); setTimeout(byHash, 50);
+    q && q.addEventListener('input', () => { const v = q.value.trim().toLowerCase(); for (const r of tb.rows) r.hidden = v && !(r.dataset.n.includes(v) || r.dataset.i.toLowerCase().includes(v)); }); }
   const go = () => { if (!window.echarts) return setTimeout(go, 60);
     const C = window.__CO;
     if (C) { const el = document.getElementById('co-chart'), ch = echarts.init(el); addEventListener('resize', () => ch.resize());

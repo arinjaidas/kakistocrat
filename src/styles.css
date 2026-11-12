@@ -740,3 +740,4 @@ a.mk-card{color:inherit;text-decoration:none}a.mk-card:hover{border-color:#15171
 .series-box li.here span{font-weight:600}.series-box li.here small{color:#6B7078}
 .ex-sec small span[data-href]{cursor:pointer;text-decoration:underline;text-decoration-color:#C9C5BC;text-underline-offset:3px}.ex-sec small span[data-href]:hover{color:#15171A}
 #st-map a.tile{text-decoration:none}
+.t-go{color:#F59E0B;text-decoration:none;font-size:11px;margin-right:2px}

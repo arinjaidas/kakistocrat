@@ -21,7 +21,7 @@
           data: Object.keys(D.districts).filter(c => !st || D.districts[c].st === st).map(c => ({ name: c, value: I.values[c] ?? NaN })) }] }, true);
       $('ds-src').textContent = `${I.label}, ${I.unit}. Source: ${I.source}. Grey: no data. Darker = ${BAD.has(K) ? 'worse' : 'higher'}. Scroll to zoom, drag to pan.`;
       const ranked = Object.entries(I.values).filter(([c]) => !st || D.districts[c]?.st === st).sort((a, b) => b[1] - a[1]);
-      const li = ([c, v]) => `<li><a href="#d=${c}" data-c="${c}">${D.districts[c].n}</a><small>${st ? '' : D.districts[c].st}</small><b>${fmt(K, v)}</b></li>`;
+      const li = ([c, v]) => `<li><a href="#d=${c}" data-c="${c}">${D.districts[c].n}</a><small>${st ? '' : `<a href="/state/${slug(D.districts[c].st)}/" style="color:inherit">${D.districts[c].st}</a>`}</small><b>${fmt(K, v)}</b></li>`;
       $('ds-top').innerHTML = ranked.slice(0, 8).map(li).join(''); $('ds-bot').innerHTML = ranked.slice(-8).reverse().map(li).join('');
       history.replaceState(null, '', `#m=${K}${st ? '&s=' + encodeURIComponent(st) : ''}`); };
     const card = c => { const d = D.districts[c]; if (!d) return;
