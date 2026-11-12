@@ -23,6 +23,7 @@ import { hormuzPage } from './lib/hormuz.mjs';
 import { worldPage } from './lib/world.mjs';
 import { mapsPage, mapPosters } from './lib/maps.mjs';
 import { scenarioPage } from './lib/scenario.mjs';
+import { rupeeStress, rupeeStressPath } from './lib/rupee-stress.mjs';
 import { externalPage } from './lib/external.mjs';
 import { tradePage, tradeBlock } from './lib/trade.mjs';
 import { economyPage, IIP_ORDER, iipId } from './lib/economy.mjs';
@@ -50,6 +51,7 @@ const TOPICS = {
   'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#334155', blurb: 'Economies, conflicts and export controls beyond India.' },
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
+const FEATURED_SERIES = ['the-2026-oil-shock', 'the-politics-of-public-money', 'americas-tariff-reset'];
 let HAS_CALLS = false, DESK = null;
 export const TAPE_S = { cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' };
 const TOOLS = [
@@ -179,28 +181,31 @@ function findRelated(articles, keys, n = 3) {
 
 // ---------------------------------------------------------------- layout
 const tapeVal = (ind, v) => `${ind.prefix || ''}${Number(v).toLocaleString('en-IN', { minimumFractionDigits: ind.decimals, maximumFractionDigits: ind.decimals })}${ind.unit === '%' ? '%' : ''}`;
+const tickPeriod = (iso, label = '') => `<span class="p">${esc(isoOrMonth(iso))}${label ? ' · ' + esc(label) : ''}</span>`;
 function tapeHTML(tape) {
   const MACRO = ['cpi', 'repo', 'g10'];
   const ticks = tape.indicators.filter(i => !MK || MACRO.includes(i.id)).map(i => {
     const d = i.latest.value - i.previous.value;
     const cls = Math.abs(d) < 1e-9 ? 'flat' : d > 0 ? 'up' : 'dn';
     const dTxt = i.unit === '%' ? `${d > 0 ? '+' : d < 0 ? '−' : ''}${Math.abs(d * 100).toFixed(0)}bp` : `${d > 0 ? '+' : d < 0 ? '−' : ''}${Math.abs(d / i.previous.value * 100).toFixed(1)}%`;
-    return `<button class="tick" data-id="${i.id}" aria-expanded="false" aria-label="${esc(i.label)}: ${esc(tapeVal(i, i.latest.value))}, ${esc(i.latest.period)}"><span class="k">${esc(i.short)}</span><span class="v">${esc(tapeVal(i, i.latest.value))}</span><span class="d ${cls}">${dTxt}</span><span class="p">${esc(i.latest.period.replace(/^(Close|Around|Since), /, ''))}</span></button>`;
+    const period = [i.latest.period, i.latest.status].filter(Boolean).join(' · ');
+    return `<button class="tick" data-id="${i.id}" aria-expanded="false" aria-label="${esc(i.label)}: ${esc(tapeVal(i, i.latest.value))}, ${esc(period)}"><span class="k">${esc(i.short)}</span><span class="v">${esc(tapeVal(i, i.latest.value))}</span><span class="d ${cls}">${dTxt}</span><span class="p">${esc(period)}</span></button>`;
   }).join('');
   let mticks = '';
   if (MK) {
     const L = MK.dates.length - 1;
     const nseS = n => '/s/nse-' + n.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '/';
-    const idx = (k, n, href = nseS(n)) => { const a = MK.series[n]; if (!a) return ''; const v = a[L], p = a[L - 1], c = p ? (v / p - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${v.toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
-    const fr = (k, id, unit, dec = 2, href = `/s/fred-${id.toLowerCase()}/`) => { const x = MK.fredLast?.[id]; if (!x) return ''; const c = x.prev ? (x.last[1] / x.prev[1] - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${unit === '$' ? '$' : ''}${x.last[1].toFixed(dec)}${unit === '%' ? '%' : ''}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
+    const idx = (k, n, href = nseS(n)) => { const a = MK.series[n]; if (a?.[L] == null) return ''; const v = a[L], p = a[L - 1], c = p ? (v / p - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${v.toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span>${tickPeriod(MK.dates[L], 'Close')}</a>`; };
+    const fr = (k, id, unit, dec = 2, href = `/s/fred-${id.toLowerCase()}/`) => { const x = MK.fredLast?.[id]; if (!x) return ''; const c = x.prev ? unit === '%' ? (x.last[1] - x.prev[1]) * 100 : (x.last[1] / x.prev[1] - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${unit === '$' ? '$' : ''}${x.last[1].toFixed(dec)}${unit === '%' ? '%' : ''}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(unit === '%' ? 0 : 2)}${unit === '%' ? 'bp' : '%'}</span>${tickPeriod(x.last[0])}</a>`; };
     const inr = MK.fxOut?.table.find(t => t.c === 'INR');
     const g = MK.comm?.items.find(i => i.id === 'gold');
+    const btc = MK.crypto?.bitcoin?.at(-1);
     mticks = idx('Nifty 50', 'Nifty 50') + idx('Bank Nifty', 'Nifty Bank') + idx('Midcap 100', 'NIFTY Midcap 100') + idx('India VIX', 'India VIX') +
-      (inr ? `<a class="tick" href="/s/fx-usdinr/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span></a>` : '') +
+      (inr?.last != null ? `<a class="tick" href="/s/fx-usdinr/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span>${tickPeriod(MK.fxOut.date, 'Reference')}</a>` : '') +
       fr('Brent', 'DCOILBRENTEU', '$', 2) + fr('WTI', 'DCOILWTICO', '$', 2) +
-      (g ? `<a class="tick" href="/s/wb-gold/"><span class="k">Gold</span><span class="v">$${Math.round(g.cur).toLocaleString('en-IN')}</span><span class="d ${g.mm > 0 ? 'up' : 'dn'}">${g.mm > 0 ? '+' : '−'}${Math.abs(g.mm).toFixed(1)}% m/m</span></a>` : '') +
+      (g?.cur != null ? `<a class="tick" href="/s/wb-gold/"><span class="k">Gold</span><span class="v">$${Math.round(g.cur).toLocaleString('en-IN')}</span><span class="d ${g.mm > 0 ? 'up' : 'dn'}">${g.mm > 0 ? '+' : '−'}${Math.abs(g.mm).toFixed(1)}% m/m</span>${tickPeriod(MK.comm.month, 'Monthly average')}</a>` : '') +
       fr('US 10Y', 'DGS10', '%') + fr('US 2Y', 'DGS2', '%') + fr('Dollar idx', 'DTWEXBGS', '', 1) +
-      `<a class="tick" href="/s/crypto-bitcoin/"><span class="k">BTC</span><span class="v" data-live="btc">${(MK.crypto?.bitcoin?.at(-1)?.[1] || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span><span class="d" data-live="btc-c">live</span></a>`;
+      (btc ? `<a class="tick" href="/s/crypto-bitcoin/"><span class="k">BTC</span><span class="v">$${btc[1].toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>${tickPeriod(btc[0], 'Daily snapshot')}</a>` : '');
   }
   return `<div class="tape" role="region" aria-label="India markets and macro tape"><div class="wrap tape-wrap"><span class="tape-label">India tape</span><div class="tape-viewport"><div class="tape-track">${ticks}${mticks}<span class="tape-gap"></span><span class="tape-dup" aria-hidden="true" inert>${ticks}${mticks}</span><span class="tape-gap"></span></div></div><a class="tape-more" href="/markets/">Markets →</a></div></div>`;
 }
@@ -261,7 +266,8 @@ function home(m, tape, ledger) {
   const used = new Set([lead, ...sub, ...latest].map(a => a.id));
   const deskBlock = t => { const items = byTopic[t].filter(a => !used.has(a.id)).slice(0, 5); if (!items.length) return ''; return `<section><div class="sec-head" style="--desk:${TOPICS[t].color}"><h2><span class="dot"></span>${esc(TOPICS[t].name)}</h2><a href="/topic/${t}/">More →</a></div><div class="desk-grid">${items.map((a, i) => i === 0 ? `<div class="first">${card(a, 'h-2', true)}</div>` : `<div>${card(a, 'h-4', i < 3)}</div>`).join('')}</div></section>`; };
   const explainers = A.filter(a => a.format === 'Explainer' && !used.has(a.id) && !A.slice(0, 11).includes(a)).slice(0, 4);
-  return `<div class="wrap">
+  const featured = FEATURED_SERIES.map(slug => m.series.find(s => s.slug === slug)).filter(Boolean);
+  return pageHead('The Kakistocrat', 'India’s economy, in data', 'Track the releases behind the headlines, compare series and test what a change in oil, the rupee or interest rates could mean.') + `<div class="wrap">
 <div class="front">
  <div class="col">
   <a class="story" href="${lead.url}">${kicker(lead)}${fmtBadge(lead)}<h2 class="h-lead">${esc(lead.title)}</h2><p class="dek">${esc(lead.excerpt)}</p><div class="meta" style="margin-top:10px">Arinjai Das · ${esc(longDate(lead.date))} · ${lead.minutes} min read</div></a>
@@ -275,7 +281,7 @@ function home(m, tape, ledger) {
 </div>
 ${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
 <div class="sec-head"><h2>Series</h2><a href="/series/">All series →</a></div>
-<div class="series-strip">${m.series.slice(0, 4).map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · latest ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div>
+<div class="series-strip">${featured.map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · latest ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div>
 ${TOPIC_ORDER.slice(2).map(deskBlock).join('')}
 ${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/archive/#explainers">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
 </div>
@@ -496,11 +502,11 @@ async function main() {
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
   // ---- series catalogue for the chart workbench
   const catalog = [], SD = {};
-  const addSeries = async (id, name, group, unit, freq, source, dates, values) => {
+  const addSeries = async (id, name, group, unit, freq, source, dates, values, extra = {}) => {
     const pts = dates.map((d, i) => [d, values[i]]).filter(p => p[1] != null && Number.isFinite(p[1]));
     if (pts.length < 3) return;
-    catalog.push({ id, name, group, unit, freq, source, first: pts[0][0], last: pts.at(-1)[0], n: pts.length }); SD[id] = { d: pts.map(p => p[0]), v: pts.map(p => p[1]) };
-    await write(`api/series/${id}.json`, JSON.stringify({ id, name, unit, freq, source, d: pts.map(p => p[0]), v: pts.map(p => p[1]) }));
+    catalog.push({ id, name, group, unit, freq, source, first: pts[0][0], last: pts.at(-1)[0], n: pts.length, ...extra }); SD[id] = { d: pts.map(p => p[0]), v: pts.map(p => p[1]) };
+    await write(`api/series/${id}.json`, JSON.stringify({ id, name, unit, freq, source, ...extra, ...SD[id] }));
   };
   const slug = t => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   if (MK) {
@@ -531,10 +537,10 @@ async function main() {
       await addSeries('pw-' + sl + '-tankers', `Tankers through the ${n}, a day`, 'Shipping chokepoints', 'tankers a day', 'daily', 'IMF PortWatch', c.d, c.tanker); }
     for (const [c, pts] of Object.entries(MK.crypto || {})) await addSeries('crypto-' + c, c[0].toUpperCase() + c.slice(1) + ', US$', 'Crypto', '$', 'daily', 'CoinGecko', pts.map(p => p[0]), pts.map(p => p[1]));
     if (MK.world) {
-      const W = MK.world, thisYear = BUILT.getUTCFullYear();
+      const W = MK.world, projectionFrom = String(W.imfVintageYear ?? 2026);
       for (const [src, block, tag] of [['IMF World Economic Outlook', W.imf, 'imf'], ['World Bank WDI', W.wdi, 'wdi']]) for (const [code, ind] of Object.entries(block)) for (const [iso, cname] of Object.entries(W.countries)) {
         const data = ind.data[iso]; if (!data) continue; const ys = Object.keys(data).sort();
-        await addSeries(`${tag}-${slug(code)}-${iso.toLowerCase()}`, `${ind.label}: ${cname}`, iso === 'IND' ? 'India: annual macro' : 'World economy: annual', ind.unit, 'annual', src + (tag === 'imf' ? ` (from ${thisYear}: IMF projections)` : ''), ys.map(y => y + '-12-31'), ys.map(y => data[y]));
+        await addSeries(`${tag}-${slug(code)}-${iso.toLowerCase()}`, `${ind.label}: ${cname}`, iso === 'IND' ? 'India: annual macro' : 'World economy: annual', ind.unit, 'annual', src + (tag === 'imf' ? ` (from ${projectionFrom}: IMF projections)` : ''), ys.map(y => y + '-12-31'), ys.map(y => data[y]), tag === 'imf' ? { projectionFrom } : {});
       }
     }
   }
@@ -548,7 +554,7 @@ async function main() {
     const i = tape.indicators.find(x => x.id === tid); if (!i) continue;
     const pts = [...(i.history || []), { t: i.latest.period, v: i.latest.value }].map(h => { const [mo, y] = h.t.split(' '); return MON[mo] ? [`${y}-${MON[mo]}`, h.v] : null; }).filter(Boolean);
     const uniq = [...new Map(pts.map(p => [p[0], p])).values()].sort((a, b) => a[0].localeCompare(b[0]));
-    await addSeries(sid, name, 'India: macro releases', i.unit === '%' ? '%' : i.unit, 'monthly', i.sources?.[0]?.name?.split(',')[0] || 'Official release', uniq.map(p => p[0]), uniq.map(p => p[1]));
+    await addSeries(sid, name, 'India: macro releases', '% y/y', 'monthly', 'MoSPI', uniq.map(p => p[0]), uniq.map(p => p[1]), { latestStatus: i.latest.status });
   }
   // ---- the connected layer
   // World annual series for other countries live on the country pages and in the API, not as pages of their own
@@ -591,7 +597,8 @@ async function main() {
   for (const id in m.storyData) m.storyData[id] = [...new Map(m.storyData[id].map(x => [x.u, x])).values()].sort((a, b) => b.n - a.n).slice(0, 12);
   // articles join the data space: inline links to data pages, live cards for the series they discuss, and stories connected by shared subjects
   const REOF = Object.fromEntries(ents.map(e => [e.key, e.re]));
-  const ALIASK = { 'india-cpi': 'imf-pcpipch-ind', 'fred-dexinus': 'fx-usdinr', 'wb-brent': 'fred-dcoilbrenteu' };
+  REOF['india-cpi'] = SERIES_KW['imf-pcpipch-ind'];
+  const ALIASK = { 'imf-pcpipch-ind': 'india-cpi', 'fred-dexinus': 'fx-usdinr', 'wb-brent': 'fred-dcoilbrenteu' };
   for (const a of m.articles) {
     const indiaN = ((a.title + ' ' + a.html).match(/\bIndia(?:n|’s|'s)?\b/g) || []).length;
     const items = (m.storyData[a.id] || []).filter(x => !ALIASK[x.k] && (!/^imf-|^india-/.test(x.k) || indiaN >= 4));
@@ -667,7 +674,12 @@ async function main() {
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
 
-  await write('index.html', P({ path: '/', description: 'Independent analysis of India’s economy and the politics around it, with live macro data, policy tracking and tools.', body: home(m, tape, ledger) }));
+  await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger) }));
+  const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
+  const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
+  await write('research/oil-rupee/index.html', P({ title: 'Who pays when the rupee falls?', path: rupeeStressPath, description: 'A reproducible stress test of the rupee, India’s crude imports and household petrol bills.', ogImage: '/research/oil-rupee/pass-through.png', body: stress.body }));
+  await write('research/oil-rupee/inputs.json', stressInputs);
+  await write('research/oil-rupee/results.csv', stress.csv);
   for (const a of m.articles) await write(`a/${a.slug}/index.html`, P({ title: a.title, description: a.excerpt, path: a.url, canonical: a.wpLink, active: a.topic, type: 'article', body: articlePage(a, m) }));
   for (const t of TOPIC_ORDER) await write(`topic/${t}/index.html`, P({ title: TOPICS[t].name, description: TOPICS[t].blurb, path: `/topic/${t}/`, active: t, body: topicPage(t, m) }));
   await write('series/index.html', P({ title: 'Series', path: '/series/', description: 'Questions followed across several articles.', body: seriesIndex(m) }));

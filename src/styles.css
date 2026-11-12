@@ -275,7 +275,6 @@ img{max-width:100%;height:auto}
 }
 @media print{.topbar,.tape,.foot,.rail{display:none}}
 
-@media (max-width:1380px){.tick .p{display:none}}
 .tape{position:relative}
 .toolsnav{border-left:1px solid #3A3E44;padding-left:10px}
 @media (max-width:1080px){
@@ -629,7 +628,11 @@ a.mk-card{color:inherit;text-decoration:none}a.mk-card:hover{border-color:#15171
 .sx-presets{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 18px}
 .sx-presets span{font:700 11px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.08em;color:#6B7078;margin-right:6px}
 .sx-presets button{font:600 13px "IBM Plex Sans",sans-serif;border:1px solid #15171A;background:#fff;padding:6px 12px;cursor:pointer}
-.sx-presets button[aria-pressed],.sx-presets button:hover{background:#15171A;color:#fff}.sx-presets .sx-share{margin-left:auto;border-color:#B42318;color:#B42318}
+.sx-presets button[aria-pressed=true],.sx-presets button:hover{background:#15171A;color:#fff}.sx-presets .sx-share{margin-left:auto;border-color:#B42318;color:#B42318}
+.research-table{overflow-x:auto;margin:16px 0}
+.research-table table{width:100%;border-collapse:collapse}
+.research-table th,.research-table td{padding:8px;border-bottom:1px solid var(--rule);text-align:left}
+.research-chart img{width:100%;height:auto;display:block}
 .sx-grid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:32px;align-items:start;margin-bottom:28px}
 .sx-ctrls{background:#FAF8F4;border:1px solid #E8E2D4;padding:16px 18px;position:sticky;top:16px}
 .sx-c{margin-bottom:16px}.sx-c label{display:flex;justify-content:space-between;font:600 13px "IBM Plex Sans",sans-serif}

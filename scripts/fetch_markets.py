@@ -247,6 +247,10 @@ def imf_wdi():
         out['imf'][code] = {'label': label, 'unit': unit, 'data': {c: {y: v for y, v in vals.get(c, {}).items() if int(y) >= 1990} for c in PEERS}}
         time.sleep(0.4)
     prev = json.load(open(os.path.join(OUT, 'macro_world.json'))) if os.path.exists(os.path.join(OUT, 'macro_world.json')) else {}
+    # Keep the WEO labelling stable when DataMapper returns the same vintage.
+    latest_year = max(out['imf']['NGDP_RPCH']['data']['IND'])
+    previous_year = max(prev.get('imf', {}).get('NGDP_RPCH', {}).get('data', {}).get('IND', {}), default='')
+    out['imfVintageYear'] = prev.get('imfVintageYear', 2026) if latest_year == previous_year else int(latest_year) - 5
     for code, (label, unit) in WDI.items():
         try: j = json.loads(get(f'https://api.worldbank.org/v2/country/{";".join(PEERS)}/indicator/{code}?format=json&per_page=2000&date=1990:2030', timeout=120))
         except Exception as e:

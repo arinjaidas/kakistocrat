@@ -1,0 +1,21 @@
+{
+  "baseline_oil_usd": 100,
+  "baseline_inr_per_usd": 94,
+  "stress_inr_per_usd": 100,
+  "litres_per_barrel": 158.987,
+  "barrels_per_tonne": 7.33,
+  "import_volume_mt": 123.29,
+  "import_period": "April to September 2026",
+  "delhi_petrol_inr_per_litre": 102.12,
+  "delhi_price_effective": "1 November 2026",
+  "delhi_vat_rate": 0.194,
+  "household_litres_per_month": 40,
+  "pass_through": [0, 0.25, 0.5, 0.75, 1],
+  "sources": {
+    "PPAC crude-import volume": "https://ppac.gov.in/import-export",
+    "PPAC September 2026 report": "https://ppac.gov.in/download.php?file=rep_studies%2F1792993366_Final_202609_Monthly+Report_WebVersion.pdf",
+    "Indian Oil Delhi price build-up": "https://iocl.com/admin/img/UploadedFiles/PriceBuildup/Files/English/33bb8af791c64c60be402e4b264acbc6.pdf",
+    "Delhi Budget speech, VAT change": "https://finance.delhi.gov.in/sites/default/files/generic_multiple_files/budget_speech_2022-23_2.pdf",
+    "Energy Institute approximate conversion": "https://www.energyinst.org/statistical-review"
+  }
+}

@@ -19,7 +19,7 @@
       const s0 = start(main.d, range), idx = main.d.map((x, i) => x >= s0 ? i : -1).filter(i => i >= 0);
       const dates = idx.map(i => main.d[i]), vals = idx.map(i => main.v[i]);
       if (!cmp) {
-        const proj = E.annual ? dates.findIndex(x => x > E.today) : -1;
+        const proj = E.projectionFrom ? dates.findIndex(x => x.slice(0, 4) >= E.projectionFrom) : -1;
         c.setOption({ textStyle: { fontFamily: FONT }, animationDuration: 300, grid: { left: 60, right: 20, top: 20, bottom: 40 }, tooltip: { trigger: 'axis', valueFormatter: v => nf(v) },
           xAxis: axis({ type: 'category', data: dates, boundaryGap: false }), yAxis: axis({ type: 'value', scale: true, name: E.unit, nameTextStyle: { color: MUTE } }),
           series: (proj > 0 ? [vals.map((v, i) => i < proj ? v : null), vals.map((v, i) => i >= proj - 1 ? v : null)] : [vals]).map((data, k) => ({ type: 'line', data, showSymbol: E.annual, symbolSize: 4, markLine: k ? undefined : evLine(dates), step: E.id === 'india-repo' ? 'end' : false, lineStyle: { color: RED, width: 2.2, type: k ? 'dashed' : 'solid' }, itemStyle: { color: RED },
