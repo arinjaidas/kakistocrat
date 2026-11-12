@@ -19,14 +19,14 @@ const exists = u => {
   return false;
 };
 
-const noImg = !existsSync(join(OUT, 'img/s')); // chart images are skipped in quick local builds
+const imgSkipped = u => { const m = u.match(/^\/img\/([^/]+)\//); return m && !existsSync(join(OUT, 'img', m[1])); }; // image sets not rendered in this build (no matplotlib, or SKIP_IMG)
 const broken = new Map(); let links = 0;
 const missing = { title: [], description: [], h1: [] };
 for (const f of pages) {
   const h = readFileSync(f, 'utf8'), page = '/' + f.slice(OUT.length + 1).replace(/index\.html$/, '');
   if (/^\/(wp-kit|embed)\//.test(page)) continue;
   for (const m of h.matchAll(/(?:href|src)="(\/[^"#?]*)/g)) {
-    const u = decodeURI(m[1]); if (u.startsWith('//') || (noImg && u.startsWith('/img/s/'))) continue; links++;
+    const u = decodeURI(m[1]); if (u.startsWith('//') || imgSkipped(u)) continue; links++;
     if (!exists(u)) { if (!broken.has(u)) broken.set(u, []); const a = broken.get(u); if (a.length < 3) a.push(page); }
   }
   if (!/<title>[^<]{3,}/.test(h)) missing.title.push(page);
