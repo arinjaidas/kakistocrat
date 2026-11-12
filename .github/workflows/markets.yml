@@ -18,9 +18,13 @@ jobs:
         with: { python-version: '3.12' }
       - run: pip install openpyxl
       - run: python scripts/fetch_markets.py --years 3
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Save today's Daily Desk
+        run: SKIP_IMG=1 node build.mjs >/dev/null || echo "build failed; desk not saved"
       - name: Commit if data changed
         run: |
-          git add data/markets
+          git add data/markets data/desk
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git config user.name "kakistocrat-data"
           git config user.email "actions@users.noreply.github.com"

@@ -25,6 +25,7 @@ import { mapsPage, mapPosters } from './lib/maps.mjs';
 import { scenarioPage } from './lib/scenario.mjs';
 import { externalPage } from './lib/external.mjs';
 import { tradePage, tradeBlock } from './lib/trade.mjs';
+import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
 let MK = null;
 
@@ -54,6 +55,7 @@ const TOOLS = [
   { url: '/world/', kicker: 'India against the world', title: 'Where India ranks', blurb: 'Every economy in the IMF’s World Economic Outlook ranked on size, income, growth, inflation and debt, any year from 1990.' },
   { url: '/hormuz/', kicker: 'Chokepoint watch', title: 'Ships through Hormuz and the shipping lanes', blurb: 'Daily ship counts through Hormuz, Bab el-Mandeb, Suez, the Cape and Malacca, with Brent alongside.' },
   { url: '/tools/pump-price/', kicker: 'Pump price', title: 'What’s in a litre of petrol', blurb: 'The Delhi pump price split into oil company price, excise, dealer commission and VAT, with a calculator.' },
+  { url: '/desk/', kicker: 'The Daily Desk', title: 'What moved today', blurb: 'One page per trading day, written from the numbers: the Nifty, the rupee, oil, yields, reserves, the day’s releases and what is coming up, with an archive of every day.' },
   { url: '/external/', kicker: 'External sector lab', title: 'Reserves, the rupee and the price of dollars', blurb: 'Weekly reserves since 2009, money-market rates and forward premia from the RBI, sustainability ratios, and the 2013 and 2026 FCNR(B) episodes side by side.' },
   { url: '/trade/', kicker: 'Trade', title: 'Who India trades with, and what', blurb: 'Every partner and every product since 2015 from UN Comtrade: surpluses, deficits and the shift from China to the US and the Gulf.' },
   { url: '/rupee/', kicker: 'Rupee & external sector', title: 'The rupee, the rate gap and the external accounts', blurb: 'The rupee against 14 currencies, the India–US rate gap, and the current account, reserves and remittances against peers.' },
@@ -409,7 +411,7 @@ function shockLab(tape) {
 
 function toolsHub(stats) {
   const by = Object.fromEntries(TOOLS.map(t => [t.url, t]));
-  const G = [['Watch', 'What is happening now', ['/today/', '/terminal/', '/markets/', '/commodities/', '/rupee/', '/external/', '/trade/', '/hormuz/']],
+  const G = [['Watch', 'What is happening now', ['/desk/', '/today/', '/terminal/', '/markets/', '/commodities/', '/rupee/', '/external/', '/trade/', '/hormuz/']],
     ['Ask', 'What would happen if', ['/tools/shock-lab/', '/tools/emi/', '/tools/pump-price/', '/tools/budget-x-ray/']],
     ['See', 'India in pictures', ['/maps/', '/infographics/', '/world/', '/tools/india-by-state/']],
     ['Dig', 'Everything, connected', ['/explore/', '/charts/', '/api/', '/chartle/']]];
@@ -531,6 +533,22 @@ async function main() {
   const corr = correlations(SD, catalog);
   const UNUSUAL = unusualMoves(SD, catalog); MK && (MK.unusual = UNUSUAL, MK.movesHTML = movesHTML);
   await write('api/unusual.json', JSON.stringify(UNUSUAL)); api['unusual'] = 'The biggest recent moves across every daily and monthly series, measured against each series’ own usual change';
+  // ---- the Daily Desk: today's snapshot is saved to data/desk/ (committed by the markets workflow) so every day keeps its page
+  if (MK && SD['nse-nifty-50']) {
+    if (!existsSync('data/desk')) await mkdir('data/desk', { recursive: true });
+    const deskDay = SD['nse-nifty-50'].d.at(-1); let saved;
+    saved = readdirSync('data/desk').filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10)).filter(d => d !== deskDay).sort();
+    const evs = JSON.parse(await readFile('data/events.json', 'utf8'));
+    const snap = deskSnapshot({ SD, byId, unusual: UNUSUAL, tape, articles: m.articles, events: evs.events || evs, date: deskDay, prevDate: saved.filter(d => d < deskDay).at(-1) || SD['nse-nifty-50'].d.at(-2) });
+    await writeFile(`data/desk/${deskDay}.json`, JSON.stringify(snap));
+    if (process.env.DESK_BACKFILL) { const ds = SD['nse-nifty-50'].d, n = +process.env.DESK_BACKFILL; for (let k = ds.length - 1 - n; k < ds.length - 1; k++) if (!existsSync(`data/desk/${ds[k]}.json`)) { await writeFile(`data/desk/${ds[k]}.json`, JSON.stringify(deskSnapshot({ SD, byId, unusual: [], tape: { indicators: [] }, articles: m.articles, events: evs.events || evs, date: ds[k], prevDate: ds[k - 1] }))); saved.push(ds[k]); } saved.sort(); }
+    const snaps = [...await Promise.all(saved.map(async d => JSON.parse(await readFile(`data/desk/${d}.json`, 'utf8')))), snap].sort((a, b) => b.date.localeCompare(a.date));
+    const days = snaps.map(x => x.date);
+    for (const x of snaps) await write(`desk/${x.date}/index.html`, P({ title: `The Daily Desk, ${x.date}`, path: `/desk/${x.date}/`, description: `What moved in India’s markets and economy on ${x.date}: the Nifty, the rupee, oil, yields, reserves and the day’s data releases.`, body: deskPage(x, { pageHead, archive: days, movesHTML }) }));
+    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML }) }));
+    await write('desk/archive/index.html', P({ title: 'The Daily Desk: every day', path: '/desk/archive/', description: 'Every Daily Desk page, by month.', body: deskArchive(snaps, { pageHead }) }));
+    await write('api/desk.json', JSON.stringify(snap)); api['desk'] = 'Today’s Daily Desk as data: closing levels and changes for the main Indian and world markets, releases, events and what is coming up';
+  }
   const SC = JSON.parse(await readFile('data/states_countries.json', 'utf8'));
   const W = MK?.imfWorld;
   const ents = [
@@ -658,7 +676,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/external/', '/trade/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/external/', '/trade/', '/desk/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_redirects', ['/data/ /today/ 301', '/tools/two-chart-test/ /charts/ 301', '/tools/two-chart-test /charts/ 301', '/tools/exposure/ /tools/shock-lab/ 301', '/tools/exposure /tools/shock-lab/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
