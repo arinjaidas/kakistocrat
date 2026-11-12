@@ -10,6 +10,7 @@
     addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
     $$('.ig-save').forEach(b => b.addEventListener('click', () => { const c = charts[b.dataset.for]; const a = document.createElement('a'); a.href = c.getDataURL({ pixelRatio: 2, backgroundColor: '#fff' }); a.download = `kakistocrat-${b.dataset.for}.png`; a.click(); }));
 
+    if ($('#ig-rupee')) {
     // 1. Budget rupee sankey
     const R = IG.rupee, MID = 'The Budget rupee';
     const srcCol = n => /Borrow/.test(n) ? '#B42318' : /tax|Customs|excise/i.test(n) ? '#15171A' : '#6B7078';
@@ -25,8 +26,11 @@
     // The sankey needs the left labels on the left: shift left margin
     charts['ig-rupee'].setOption({ series: [{ left: 230 }] });
 
+    }
+    const C = W.countries, G = W.imf.NGDPD.data;
+    if ($('#ig-race')) {
     // 2. bar race of GDP (US$ bn)
-    const G = W.imf.NGDPD.data, C = W.countries, years = Array.from({ length: Y + 5 - 1990 + 1 }, (_, i) => 1990 + i);
+    const years = Array.from({ length: Y + 5 - 1990 + 1 }, (_, i) => 1990 + i);
     const race = mk('ig-race');
     const drawYear = y => { const rows = Object.keys(C).map(k => ({ k, n: C[k], v: G[k]?.[String(y)] })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
       race.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 130, right: 90, top: 20, bottom: 30 }, xAxis: { max: 'dataMax', axisLabel: { fontFamily: MONO, color: MUTE, formatter: v => v >= 1000 ? `$${(v / 1000).toFixed(0)}tn` : `$${v}bn` }, splitLine: { lineStyle: { color: '#EEECE7' } } },
@@ -39,6 +43,8 @@
     $('#ig-year').addEventListener('input', e => drawYear(+e.target.value));
     $('#ig-play').addEventListener('click', () => { if (timer) { clearInterval(timer); timer = null; $('#ig-play').textContent = 'Play'; return; } let y = +$('#ig-year').value >= Y + 5 ? 1990 : +$('#ig-year').value; $('#ig-play').textContent = 'Pause'; drawYear(y); timer = setInterval(() => { y++; if (y > Y + 5) { clearInterval(timer); timer = null; $('#ig-play').textContent = 'Play'; return; } drawYear(y); }, 750); });
 
+    }
+    if ($('#ig-bub')) {
     // 3. bubbles: growth vs inflation
     const bub = mk('ig-bub');
     const drawBub = y => { const pts = Object.keys(C).map(k => ({ k, n: C[k], g: W.imf.NGDP_RPCH.data[k]?.[String(y)], i: W.imf.PCPIPCH.data[k]?.[String(y)], s: G[k]?.[String(y)] })).filter(p => p.g != null && p.i != null && p.s != null);
@@ -49,6 +55,8 @@
           label: { show: true, formatter: p => p.data.n, position: 'top', fontFamily: FONT, fontSize: 11, color: INK }, animationDurationUpdate: 600 }] }, true); };
     drawBub(Y); $('#ig-by').addEventListener('change', e => drawBub(+e.target.value));
 
+    }
+    if ($('#ig-debt')) {
     // 4. debt vs deficit
     const yy = String(Y);
     const pts = Object.keys(C).map(k => ({ k, n: C[k], d: W.imf.GGXWDG_NGDP.data[k]?.[yy], b: W.imf.GGXCNL_NGDP.data[k]?.[yy] })).filter(p => p.d != null && p.b != null);
@@ -57,6 +65,7 @@
       yAxis: { name: 'Overall balance, % of GDP (negative = deficit)', nameTextStyle: { color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#EEECE7' } } },
       series: [{ type: 'scatter', symbolSize: 16, data: pts.map(p => ({ n: p.n, value: [p.d, p.b], itemStyle: { color: FLAG[p.k], opacity: p.k === 'IND' ? 1 : 0.7 } })), label: { show: true, position: 'right', formatter: p => p.data.n, fontFamily: FONT, fontSize: 11, color: INK },
         markLine: { symbol: 'none', silent: true, lineStyle: { color: '#CFCBC2', type: 'dashed' }, label: { fontFamily: MONO, fontSize: 10 }, data: [{ xAxis: 60, name: '60% of GDP' }, { yAxis: -3, name: '−3% deficit' }] } }] });
+    }
   });
 })();
 

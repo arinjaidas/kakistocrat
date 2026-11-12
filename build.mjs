@@ -50,34 +50,41 @@ const TOPICS = {
   'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#334155', blurb: 'Economies, conflicts and export controls beyond India.' },
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
-const MARKET_PATHS = ['/economy/', '/companies/', '/company/', '/markets/', '/commodities/', '/rupee/', '/external/', '/trade/', '/hormuz/', '/world/', '/terminal/', '/charts/'];
+let HAS_CALLS = false, DESK = null;
 export const TAPE_S = { cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' };
 const TOOLS = [
-  { url: '/tools/shock-lab/', kicker: 'Scenario engine', title: 'What if? One shock, every consequence', blurb: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, the import bill, the current account and your EMI change together.' },
-  { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Rule-based readings, from inflation and rates to the rupee, oil, Hormuz shipping, the Budget and growth.' },
-  { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Indices, rates, currencies, commodities, movers, crypto and the data calendar in one dense dark screen, with a command bar that charts any series.' },
-  { url: '/maps/', kicker: 'India in maps', title: 'One idea per map', blurb: 'Poster-style state maps: inflation, income, growth, debt, and every state as a country. Save any as an image.' },
-  { url: '/world/', kicker: 'India against the world', title: 'Where India ranks', blurb: 'Every economy in the IMF’s World Economic Outlook ranked on size, income, growth, inflation and debt, any year from 1990.' },
-  { url: '/hormuz/', kicker: 'Chokepoint watch', title: 'Ships through Hormuz and the shipping lanes', blurb: 'Daily ship counts through Hormuz, Bab el-Mandeb, Suez, the Cape and Malacca, with Brent alongside.' },
-  { url: '/tools/pump-price/', kicker: 'Pump price', title: 'What’s in a litre of petrol', blurb: 'The Delhi pump price split into oil company price, excise, dealer commission and VAT, with a calculator.' },
-  { url: '/desk/', kicker: 'The Daily Desk', title: 'What moved today', blurb: 'One page per trading day, written from the numbers: the Nifty, the rupee, oil, yields, reserves, the day’s releases and what is coming up, with an archive of every day.' },
-  { url: '/stories/hormuz/', kicker: 'Data story', title: 'Hormuz, in numbers', blurb: 'Scroll through the closure of the Strait of Hormuz: ships, tankers, oil, the rupee, India’s oil bill and its Gulf trade, with every number drawn from live data.' },
-  { url: '/maps/districts/', kicker: 'District explorer', title: 'India, district by district', blurb: 'All 640 districts on one map: literacy, women at work, toilets, tap water, cooking gas, phones and the internet from the Census, and stunting and anaemia from NFHS-5. Click any district for its ranks.' },
-  { url: '/companies/', kicker: 'Companies', title: 'The Nifty 500, company by company', blurb: 'A market map of India’s 500 largest listed companies by value and industry, a sortable table, and a page for every company with prices, peers and performance against the market.' },
-  { url: '/economy/', kicker: 'Real-economy tracker', title: 'Factories, banks and trade', blurb: 'Industrial production by sector since 1994, bank credit, deposits and money supply every fortnight, and monthly trade, with a heatmap of which industries are growing.' },
-  { url: '/external/', kicker: 'External sector lab', title: 'Reserves, the rupee and the price of dollars', blurb: 'Weekly reserves since 2009, money-market rates and forward premia from the RBI, sustainability ratios, and the 2013 and 2026 FCNR(B) episodes side by side.' },
-  { url: '/trade/', kicker: 'Trade', title: 'Who India trades with, and what', blurb: 'Every partner and every product since 2015 from UN Comtrade: surpluses, deficits and the shift from China to the US and the Gulf.' },
-  { url: '/rupee/', kicker: 'Rupee & external sector', title: 'The rupee, the rate gap and the external accounts', blurb: 'The rupee against 14 currencies, the India–US rate gap, and the current account, reserves and remittances against peers.' },
-  { url: '/charts/', kicker: 'Chart workbench', title: 'Plot anything against anything', blurb: 'A library of Indian and global series: overlay up to six, transform, zoom, share and download.' },
-  { url: '/markets/', kicker: 'Markets', title: 'Indices, heatmap, rates and currencies', blurb: 'NSE closes for 28 indices, a Nifty 50 heatmap, valuations, yield curves, currency race charts and live crypto.' },
-  { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges, a comparison chart and a year-on-year heat table.' },
-  { url: '/tools/budget-x-ray/', kicker: 'Budget X-Ray', title: 'Halfway through the Budget', blurb: 'Receipts, spending and the deficit against the full-year plan, with a year-end calculator.' },
-  { url: '/tools/india-by-state/', kicker: 'India by State', title: 'Thirty-one states compared', blurb: 'Income, growth, inflation and state debt on a tile map, with any two measures plotted against each other.' },
-  { url: '/infographics/', kicker: 'Infographics', title: 'India in pictures', blurb: 'The Budget rupee as a flow diagram, the inflation basket, a GDP race from 1990, and India against its peers.' },
-  { url: '/chartle/', kicker: 'Chartle', title: 'The daily mystery chart', blurb: 'Guess the series behind today’s chart in six tries, then share your score.' },
-  { url: '/tools/emi/', kicker: 'EMI shock', title: 'What a rate hike does to your EMI', blurb: 'Enter your home loan and see the new instalment, or how much longer you pay if the EMI is held.' },
-  
+  { url: '/desk/', kicker: 'The Daily Desk', title: 'What moved today', blurb: 'The day in numbers, written from the data: markets, releases, unusual moves, what is coming up, and the big picture on one page.' },
+  { url: '/markets/', kicker: 'Markets', title: 'Indices, heatmap, rates and currencies', blurb: 'NSE closes for 28 indices, a Nifty 50 heatmap, valuations, yield curves, currencies and crypto.' },
+  { url: '/companies/', kicker: 'Companies', title: 'The Nifty 500, company by company', blurb: 'A market map of India’s 500 largest listed companies and a page for each.' },
+  { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges and comparisons.' },
+  { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Every market and macro number on one dense screen, with a command bar that charts any series.' },
+  { url: '/economy/', kicker: 'Economy', title: 'Factories, banks and money', blurb: 'Industrial production by sector, bank credit, deposits, money supply and monthly trade.' },
+  { url: '/economy/prices/', kicker: 'Prices', title: 'What’s in the inflation basket', blurb: 'The CPI basket by group, what is driving inflation, and the month’s biggest movers.' },
+  { url: '/economy/budget/', kicker: 'Budget', title: 'The Union Budget, line by line', blurb: 'Receipts, spending and the deficit against the full-year plan, and where the Budget rupee comes from and goes.' },
+  { url: '/external/', kicker: 'External', title: 'The rupee, the reserves and the price of dollars', blurb: 'The rupee against 14 currencies, weekly reserves, money-market rates, the rate gap, and the 2013 and 2026 FCNR(B) episodes.' },
+  { url: '/trade/', kicker: 'Trade', title: 'Who India trades with, and what', blurb: 'Every partner and product since 2015 from UN Comtrade.' },
+  { url: '/hormuz/', kicker: 'Shipping & oil', title: 'Hormuz and the shipping lanes', blurb: 'Daily ship counts through Hormuz, Bab el-Mandeb, Suez, the Cape and Malacca.' },
+  { url: '/states/', kicker: 'States', title: 'India’s states compared', blurb: 'Income, growth, inflation and debt for every state, any two measures plotted together, and each state’s economy as a country.' },
+  { url: '/districts/', kicker: 'Districts', title: 'India, district by district', blurb: '640 districts on one map: literacy, women at work, toilets, tap water, gas, the internet, stunting and anaemia.' },
+  { url: '/world/', kicker: 'World', title: 'Where India ranks', blurb: 'Every economy ranked on size, income, growth, inflation and debt, the GDP race since 1990, and India among its peers.' },
+  { url: '/what-if/', kicker: 'What if?', title: 'One shock, every consequence', blurb: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, the import bill, the current account and your EMI change together.' },
+  { url: '/what-if/pump-price/', kicker: 'Pump price', title: 'What’s in a litre of petrol', blurb: 'The Delhi pump price split into oil company price, excise, dealer commission and VAT.' },
+  { url: '/charts/', kicker: 'Charts', title: 'Plot anything against anything', blurb: 'Overlay up to six series, transform, zoom, share and download.' },
+  { url: '/explore/', kicker: 'Explore', title: 'Everything on the site, connected', blurb: 'Search, the directory of every series, state, country and company, and the data API.' },
+  { url: '/stories/hormuz/', kicker: 'Data story', title: 'Hormuz, in numbers', blurb: 'The closure of the Strait of Hormuz told with live data.' },
 ];
+// The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
+const SECTIONS = [
+  { name: 'Desk', url: '/desk/', blurb: 'Today in numbers and the big picture', tabs: [['/desk/', 'Today'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
+  { name: 'Markets', url: '/markets/', blurb: 'Equities, companies, commodities, the Terminal', tabs: [['/markets/', 'Equities'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'Industry, credit, prices and the Budget', tabs: [['/economy/', 'Industry & credit'], ['/economy/prices/', 'Prices'], ['/economy/budget/', 'Budget']], match: ['/economy/'] },
+  { name: 'External', url: '/external/', blurb: 'The rupee, reserves, trade and shipping', tabs: [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], match: ['/external/', '/trade/', '/hormuz/'] },
+  { name: 'Places', url: '/states/', blurb: 'States, districts and the world', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
+  { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or rates', tabs: [['/what-if/', 'Scenario'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
+  { name: 'Charts', url: '/charts/', blurb: 'Plot any series against any other', tabs: [], match: ['/charts/', '/s/'] },
+  { name: 'Explore', url: '/explore/', blurb: 'Search, directory and data API', tabs: [['/explore/', 'Directory'], ['/api/', 'Data API']], match: ['/explore/', '/api/'] },
+];
+const sectionOf = path => SECTIONS.find(S => S.match.some(x => path.startsWith(x)));
 
 // ---------------------------------------------------------------- helpers
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -215,16 +222,16 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <a class="brand" href="/">The Kakistocrat<small>Economics · Politics · Policy</small></a>
 <button class="menu-btn" aria-expanded="false" aria-controls="nav">Sections</button>
 <nav class="nav" id="nav" aria-label="Topics">${nav}</nav>
-<nav class="toolsnav" aria-label="Tools">${[["/desk/", "Desk"], ["/today/", "Today"], ["/terminal/", "Terminal"], ["/markets/", "Markets"], ["/companies/", "Companies"], ["/maps/", "Maps"], ["/charts/", "Charts"], ["/explore/", "Explore"], ["/tools/", "Tools"]].map(([u, t]) => `<a href="${u}"${path.startsWith(u) || (u === "/markets/" && MARKET_PATHS.some(x => path.startsWith(x)) && !/^\/compan/.test(path)) ? ' aria-current="page"' : ""}>${t}</a>`).join("")}<a href="/explore/" data-qs class="qs-btn" title="Search everything (/ or ⌘K)">Search <kbd>/</kbd></a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
+<nav class="toolsnav" aria-label="Data">${SECTIONS.map(S => `<a href="${S.url}"${sectionOf(path) === S ? ' aria-current="page"' : ''}>${esc(S.name)}</a>`).join("")}<a href="/explore/" data-qs class="qs-btn" title="Search everything (/ or ⌘K)">Search <kbd>/</kbd></a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
 </div></header>
 ${tapeHTML(tape)}
-${MARKET_PATHS.some(x => path.startsWith(x)) || path.startsWith('/s/') ? `<nav class="subnav" aria-label="Markets"><div class="wrap">${[['/terminal/', 'Terminal'], ['/markets/', 'Equities'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/rupee/', 'Rupee & rates'], ['/economy/', 'Real economy'], ['/external/', 'Reserves & flows'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping'], ['/world/', 'World'], ['/charts/', 'Workbench']].map(([u, t]) => `<a href="${u}"${path.startsWith(u) ? ' aria-current="page"' : ''}>${t}</a>`).join('')}<span class="sub-hint">Every name is a link · press / to search</span></div></nav>` : ''}
+${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; const cur = [...S.tabs].sort((a, b) => b[0].length - a[0].length).find(([u]) => path.startsWith(u) || (u === '/companies/' && path.startsWith('/company/'))); return `<nav class="subnav" aria-label="${esc(S.name)}"><div class="wrap"><span class="sub-sec">${esc(S.name)}</span>${S.tabs.map(([u, t]) => `<a href="${u}"${cur && cur[0] === u ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}<span class="sub-hint">Press / to search everything</span></div></nav>`; })()}
 <main id="main">${body}</main>
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/explainers/">Explainers</a></li><li><a href="/archive/">Archive &amp; search</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/forecasts/">Forecast Book</a></li><li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
-<div><h4>Tools</h4><ul>${TOOLS.map(t => `<li><a href="${t.url}">${esc(t.kicker)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a><small>${esc(S.blurb)}</small></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
 <script src="/app.js?v=${BUILT.getTime()}" defer></script><script src="/search.js?v=${BUILT.getTime()}" defer></script>
@@ -257,18 +264,17 @@ function home(m, tape, ledger) {
  </div>
  <div class="col"><h2 class="col-title">Latest</h2><div class="latest-list">${latest.map(a => `<a class="story" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h3 class="h-4">${esc(a.title)}</h3><div class="meta">${esc(shortDate(a.date))}</div></a>`).join('')}</div><p style="margin-top:12px"><a href="/archive/" class="meta" style="color:var(--accent)">Full archive →</a></p></div>
  <div class="col rail-col">
-  <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock, every consequence: the pump, the import bill, the current account and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open the calculator</a></div>
+  <div class="module dark home-desk"><span class="kicker" style="color:#F0A39B">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><h3>Today in numbers</h3>${DESK ? DESK.lines.filter(l => ['nse-nifty-50', 'fx-usdinr', 'fred-dcoilbrenteu', 'nse-india-vix', 'rbi-fx-total'].includes(l.id)).map(l => `<a href="/s/${l.id}/" class="hd-row"><span>${esc(l.label)}</span><b>${l.unit === 'US$ million' ? '$' + (l.last / 1000).toFixed(1) + 'bn' : l.last >= 1000 ? Math.round(l.last).toLocaleString('en-IN') : l.last.toFixed(2)}</b><i class="${(l.id === 'fx-usdinr' || l.id === 'nse-india-vix' ? -l.d1 : l.d1) > 0 ? 'up' : (l.id === 'fx-usdinr' || l.id === 'nse-india-vix' ? -l.d1 : l.d1) < 0 ? 'dn' : ''}">${l.d1 == null ? '' : (l.d1 > 0 ? '+' : l.d1 < 0 ? '−' : '') + (l.rate ? Math.abs(Math.round(l.d1 * 100)) + 'bp' : Math.abs(l.d1).toFixed(2) + '%')}</i></a>`).join('') : ''}<a class="btn" style="background:#fff;color:var(--ink);margin-top:12px" href="/desk/">Read today’s Desk</a></div>
   ${MK?.unusual?.length ? `<div class="module"><span class="kicker">Unusual moves</span><h3>What just moved more than usual</h3><ul class="mini-moves">${MK.unusual.slice(0, 6).map(u => `<li><a href="/s/${u.id}/">${esc(u.name)}</a><span class="${u.ch > 0 ? 'up' : 'dn'}">${u.ch > 0 ? '+' : '−'}${Math.abs(u.ch).toFixed(u.rate ? 2 : 1)}${u.rate ? ' pts' : '%'}</span></li>`).join('')}</ul><a class="more" href="/explore/">Explore everything →</a></div>` : ''}
-  <div class="module"><span class="kicker">Data</span><h3>India at a glance</h3>${tape.indicators.slice(0, 4).map(i => `<a href="/s/${TAPE_S[i.id]}/" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--rule);font:500 13px var(--mono)"><span>${esc(i.label)}</span><b>${esc(tapeVal(i, i.latest.value))}</b></a>`).join('')}<p style="margin:8px 0 0"><a href="/data/" class="meta" style="color:var(--accent)">Data hub →</a></p></div>
  </div>
 </div>
 ${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
 <div class="sec-head"><h2>Series</h2><a href="/series/">All series →</a></div>
 <div class="series-strip">${m.series.slice(0, 4).map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · latest ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div>
 ${TOPIC_ORDER.slice(2).map(deskBlock).join('')}
-${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/explainers/">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
+${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/archive/#explainers">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
 </div>
-<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">Tools</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Test the numbers yourself</h2><div class="tools-grid">${TOOLS.slice(0, 4).map(t => `<a class="tool-card" href="${t.url}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p></a>`).join('')}</div><p style="margin:16px 0 0"><a href="/tools/" style="color:#fff;text-decoration:underline;font-weight:600">All tools →</a></p></div></section>`;
+<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">The data</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Eight ways into the numbers</h2><div class="tools-grid sec-grid">${SECTIONS.map(S => `<a class="tool-card" href="${S.url}"><span class="kicker">${esc(S.name)}</span><h3>${esc(S.blurb)}</h3>${S.tabs.length > 1 ? `<p>${S.tabs.map(t => esc(t[1])).join(' · ')}</p>` : ''}</a>`).join('')}</div></div></section>`;
 }
 
 function articlePage(a, m) {
@@ -281,10 +287,11 @@ function articlePage(a, m) {
  <h1>${esc(a.title)}</h1><p class="dek">${esc(a.excerpt)}</p>
  <div class="byline"><span>By <b>Arinjai Das</b></span><span>${esc(longDate(a.date))}</span><span>${a.minutes} min read</span><a href="${esc(a.wpLink)}">Comment or subscribe on WordPress →</a></div></header>
  <div class="prose">${a.linkedHtml || a.html}</div>
- ${a.dataCards || (a.places || []).length ? `<section class="story-space"><div class="ss-head"><span class="kicker">The data behind this story</span><a href="/explore/">Explore everything →</a></div>
+ ${a.dataCards || (a.places || []).length ? `<section class="story-space"><div class="ss-head"><span class="kicker">${a.dataFallback ? `Data on ${esc(TOPICS[a.topic].short.toLowerCase())}` : 'The data behind this story'}</span><a href="/explore/">Explore everything →</a></div>
   ${a.dataCards ? `<div class="sd-cards">${a.dataCards}</div>` : ''}
   ${(a.places || []).length ? `<div class="ss-places"><span>Places in this story</span><div class="en-chips">${a.places.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
-  ${a.whatIf ? `<a class="ss-whatif" href="/tools/shock-lab/"><b>What if?</b> Push oil, the rupee or the repo rate further and see the pump price, the import bill and your EMI move →</a>` : ''}
+  ${(a.topicTools || []).length ? `<div class="ss-places"><span>Dashboards</span><div class="en-chips">${a.topicTools.map(([u, n]) => `<a href="${u}">${esc(n)}</a>`).join('')}</div></div>` : ''}
+  ${a.whatIf ? `<a class="ss-whatif" href="/what-if/"><b>What if?</b> Push oil, the rupee or the repo rate further and see the pump price, the import bill and your EMI move →</a>` : ''}
  </section>` : ''}
  ${seriesBoxes}
  <p class="origin-note">First published on <a href="${esc(a.wpLink)}" style="text-decoration:underline">thekakisto.wordpress.com</a>. Figures are as cited at the time of publication; check the linked sources for later revisions.</p>
@@ -293,7 +300,7 @@ function articlePage(a, m) {
  ${(a.connected || []).length ? `<div class="module"><span class="kicker">Connected stories</span><p class="meta" style="margin:4px 0 6px">Other pieces about the same things.</p><div class="rule-list">${a.connected.map(c => `<a class="story" href="${c.b.url}"><h3 class="h-4">${esc(c.b.title)}</h3><div class="meta">${esc(c.shared.join(' · '))}</div></a>`).join('')}</div></div>` : ''}
  ${(a.storyItems || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${a.storyItems.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
  <div class="module"><span class="kicker desk" style="--desk:${t.color}">More in ${esc(t.short)}</span><div class="rule-list" style="margin-top:8px">${sameTopic.map(x => `<a class="story" href="${x.url}"><h3 class="h-4">${esc(x.title)}</h3><div class="meta">${esc(shortDate(x.date))}</div></a>`).join('')}</div></div>
- <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open</a></div>
+ <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/what-if/">Open</a></div>
 </div></aside>
 </article></div>`;
 }
@@ -327,7 +334,7 @@ function archivePage(m) {
   `<div class="wrap" id="archive"><div class="search-box"><label class="sr" for="q">Search the archive</label><input id="q" type="search" placeholder="Search: inflation, tariff, rupee, Greece…" autocomplete="off"></div>
   <div class="filters"><span class="lbl">Topic</span>${chips('topic', TOPIC_ORDER.map(t => [t, TOPICS[t].short]))}</div>
   <div class="filters"><span class="lbl">Format</span>${chips('format', [['Analysis','Analysis'],['Explainer','Explainer'],['Brief','Brief']])}<span class="lbl" style="margin-left:14px">Year</span>${chips('year', years.map(y => [y, y]))}</div>
-  <p class="meta" id="count" aria-live="polite"></p><div id="results"></div></div>`;
+  <p class="meta" id="count" aria-live="polite"></p><div id="results"></div></div><script>addEventListener('load', () => { if (location.hash === '#explainers') { const b = document.querySelector('[data-filter="format"][data-value="Explainer"]'); b && b.click(); } });</script>`;
 }
 
 function explainersPage(m) {
@@ -418,17 +425,6 @@ function shockLab(tape) {
   </div></div>`;
 }
 
-function toolsHub(stats) {
-  const by = Object.fromEntries(TOOLS.map(t => [t.url, t]));
-  const G = [['Watch', 'What is happening now', ['/desk/', '/today/', '/economy/', '/terminal/', '/markets/', '/companies/', '/commodities/', '/rupee/', '/external/', '/trade/', '/hormuz/']],
-    ['Ask', 'What would happen if', ['/tools/shock-lab/', '/tools/emi/', '/tools/pump-price/', '/tools/budget-x-ray/']],
-    ['See', 'India in pictures', ['/stories/hormuz/', '/maps/', '/maps/districts/', '/infographics/', '/world/', '/tools/india-by-state/']],
-    ['Dig', 'Everything, connected', ['/explore/', '/charts/', '/api/', '/chartle/']]];
-  const extra = { '/explore/': { kicker: 'Explore', title: 'Everything, connected', blurb: 'Every series, state, country and article with its own page, linked by what moves together and what the articles discuss.' }, '/api/': { kicker: 'Data API', title: 'Download it all', blurb: 'Every dataset as JSON, free to use, with cross-origin access.' } };
-  return pageHead('The data space', 'One connected data space', `${stats.series} data series, ${stats.states} states, ${stats.countries} countries and ${stats.articles} articles, joined by ${stats.links.toLocaleString('en-IN')} links. Every name on every page opens the page for that thing; every page leads back to the tools and stories that use it. Press / anywhere to search.`) +
-  `<div class="wrap">${G.map(([h, sub, urls]) => `<section class="hub-g"><div class="hub-h"><h2>${h}</h2><span>${sub}</span></div><div class="hub">${urls.map(u => [u, by[u] || extra[u]]).filter(x => x[1]).map(([u, t]) => `<a href="${u}"><span class="kicker">${esc(t.kicker)}</span><h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p></a>`).join('')}</div></section>`).join('')}
-  <p class="meta" style="margin:10px 0 40px">Also: the <a href="/ledger/" style="text-decoration:underline">Policy Ledger</a> and the <a href="/forecasts/" style="text-decoration:underline">Forecast Book</a>.</p></div>`;
-}
 
 function apiPage(api) {
   return pageHead('Data API', 'Data API', 'Every dataset on this site as plain JSON. Free to use with attribution to the original source named in each file and on the page that uses it. Cross-origin requests are allowed, so you can call these from your own pages and notebooks.') +
@@ -452,7 +448,7 @@ async function main() {
     catch (e) { console.warn('Market data refresh skipped:', e.message); }
   }
   const [wp, tape, ledger, fc, budget, states, twocharts, exposure] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states', 'twocharts', 'exposure'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
-  __tapeRef = tape;
+  __tapeRef = tape; HAS_CALLS = (fc.calls || []).length > 0;
   const m = model(wp);
   if (existsSync(OUT)) await rm(OUT, { recursive: true });
   await mkdir(OUT, { recursive: true });
@@ -550,6 +546,8 @@ async function main() {
     await addSeries(sid, name, 'India: macro releases', i.unit === '%' ? '%' : i.unit, 'monthly', i.sources?.[0]?.name?.split(',')[0] || 'Official release', uniq.map(p => p[0]), uniq.map(p => p[1]));
   }
   // ---- the connected layer
+  // World annual series for other countries live on the country pages and in the API, not as pages of their own
+  const HIDDEN = catalog.filter(c => c.group === 'World economy: annual'); for (let i = catalog.length - 1; i >= 0; i--) if (catalog[i].group === 'World economy: annual') catalog.splice(i, 1);
   const byId = Object.fromEntries(catalog.map(c => [c.id, c]));
   const corr = correlations(SD, catalog);
   const UNUSUAL = unusualMoves(SD, catalog); MK && (MK.unusual = UNUSUAL, MK.movesHTML = movesHTML);
@@ -561,12 +559,12 @@ async function main() {
     saved = readdirSync('data/desk').filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).map(f => f.slice(0, 10)).filter(d => d !== deskDay).sort();
     const evs = JSON.parse(await readFile('data/events.json', 'utf8'));
     const snap = deskSnapshot({ SD, byId, unusual: UNUSUAL, tape, articles: m.articles, events: evs.events || evs, date: deskDay, prevDate: saved.filter(d => d < deskDay).at(-1) || SD['nse-nifty-50'].d.at(-2) });
-    await writeFile(`data/desk/${deskDay}.json`, JSON.stringify(snap));
+    await writeFile(`data/desk/${deskDay}.json`, JSON.stringify(snap)); DESK = snap;
     if (process.env.DESK_BACKFILL) { const ds = SD['nse-nifty-50'].d, n = +process.env.DESK_BACKFILL; for (let k = ds.length - 1 - n; k < ds.length - 1; k++) if (!existsSync(`data/desk/${ds[k]}.json`)) { await writeFile(`data/desk/${ds[k]}.json`, JSON.stringify(deskSnapshot({ SD, byId, unusual: [], tape: { indicators: [] }, articles: m.articles, events: evs.events || evs, date: ds[k], prevDate: ds[k - 1] }))); saved.push(ds[k]); } saved.sort(); }
     const snaps = [...await Promise.all(saved.map(async d => JSON.parse(await readFile(`data/desk/${d}.json`, 'utf8')))), snap].sort((a, b) => b.date.localeCompare(a.date));
     const days = snaps.map(x => x.date);
     for (const x of snaps) await write(`desk/${x.date}/index.html`, P({ title: `The Daily Desk, ${x.date}`, path: `/desk/${x.date}/`, ogImage: `/img/desk/${x.date}.png`, description: `What moved in India’s markets and economy on ${x.date}: the Nifty, the rupee, oil, yields, reserves and the day’s data releases.`, body: deskPage(x, { pageHead, archive: days, movesHTML }) }));
-    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', ogImage: `/img/desk/${snap.date}.png`, description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML }) }));
+    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', ogImage: `/img/desk/${snap.date}.png`, description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML, extra: (() => { const T = todayPage({ pageHead, tape, budget, MK, BUILT, embed: true }); return T.tiles + T.heat; })() }) }));
     await write('desk/archive/index.html', P({ title: 'The Daily Desk: every day', path: '/desk/archive/', description: 'Every Daily Desk page, by month.', body: deskArchive(snaps, { pageHead }) }));
     await write('api/desk.json', JSON.stringify(snap)); api['desk'] = 'Today’s Daily Desk as data: closing levels and changes for the main Indian and world markets, releases, events and what is coming up';
   }
@@ -610,8 +608,13 @@ async function main() {
     'energy-climate': ['fred-dcoilbrenteu', 'fred-dhhngsp', 'wb-coal', 'pw-strait-of-hormuz', 'wb-ngeu', 'nse-nifty-energy'],
     'world-geopolitics': ['pw-strait-of-hormuz', 'fred-dtwexbgs', 'fx-usdcny', 'wb-gold', 'fred-dgs10', 'pw-bab-el-mandeb-strait'],
   };
-  const TOPIC_TOOLS = { 'money-finance': [['/rupee/', 'Rupee & rates'], ['/tools/emi/', 'EMI shock']], 'trade-external-sector': [['/rupee/', 'External sector'], ['/hormuz/', 'Shipping']], 'public-finance': [['/tools/budget-x-ray/', 'Budget X-Ray'], ['/maps/#debt', 'State debt map']],
-    'growth-jobs-industry': [['/world/', 'World rankings'], ['/maps/#growth', 'Growth map']], 'rural-economy-welfare': [['/commodities/', 'Fertiliser & food prices'], ['/maps/#inflation', 'Inflation map']], 'energy-climate': [['/tools/pump-price/', 'Pump price'], ['/tools/shock-lab/', 'What if?']], 'world-geopolitics': [['/world/', 'World rankings'], ['/hormuz/', 'Chokepoints']] };
+  const TOPIC_TOOLS = { 'money-finance': [['/external/', 'Rupee & reserves'], ['/economy/', 'Credit & money'], ['/what-if/', 'What if?']], 'trade-external-sector': [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], 'public-finance': [['/economy/budget/', 'Budget'], ['/states/', 'State finances']],
+    'growth-jobs-industry': [['/economy/', 'Industry'], ['/world/', 'World rankings'], ['/companies/', 'Companies']], 'rural-economy-welfare': [['/economy/prices/', 'Prices'], ['/commodities/', 'Fertiliser & food'], ['/districts/', 'Districts']], 'energy-climate': [['/what-if/pump-price/', 'Pump price'], ['/what-if/', 'What if?'], ['/hormuz/', 'Shipping & oil']], 'world-geopolitics': [['/world/', 'World rankings'], ['/hormuz/', 'Shipping & oil'], ['/trade/', 'Trade']] };
+  // every article reaches the data: articles that name no series get their topic's main series and dashboards
+  for (const a of m.articles) {
+    a.topicTools = TOPIC_TOOLS[a.topic] || [];
+    if (!a.dataCards) { const ids = (TOPIC_SERIES[a.topic] || []).filter(id => SD[id] && byId[id]).slice(0, 3); if (ids.length) { a.dataCards = storyCards(ids.map(k => ({ k, type: 'series' })), SD, byId, 3); a.dataFallback = true; } }
+  }
   m.topicData = {};
   for (const t of TOPIC_ORDER) {
     const ids = (TOPIC_SERIES[t] || []).filter(id => SD[id]);
@@ -632,11 +635,11 @@ async function main() {
   for (const st of states.states) await write(`state/${slugify(st.name)}/index.html`, P({ title: st.name, path: `/state/${slugify(st.name)}/`, description: `${st.name}: income, growth, inflation, debt and finances, ranked against every state, with similar states and related articles.`, body: statePage(st, { S: states, SC, ment, posters }) }));
   if (W) { const fxCodes = new Set(Object.keys(MK.fx?.rates || {}));
     for (const iso of Object.keys(W.countries)) { const n = cleanCountry(W.countries[iso]); await write(`country/${slugify(n)}/index.html`, P({ title: n, path: `/country/${slugify(n)}/`, description: `${n}: GDP, income per person, growth, inflation and debt, ranked among every economy, with India alongside.`, body: countryPage(iso, { W, SC, ment, year: BUILT.getUTCFullYear(), catalog, fxCodes, tradeHTML: MK?.trade ? tradeBlock(MK.trade, iso, n) : '' }) })); }
-    await write('explore/index.html', P({ title: 'Explore', path: '/explore/', description: 'Every series, state, country and article on the site, connected.', body: explorePage({ catalog, S: states, W, ment, articles: m.articles, net, unusual: UNUSUAL }) })); }
+    await write('explore/index.html', P({ title: 'Explore', path: '/explore/', description: 'Every series, state, country and article on the site, connected.', body: explorePage({ sections: SECTIONS, catalog, S: states, W, ment, articles: m.articles, net, unusual: UNUSUAL }) })); }
   // site-wide search index: [type, name, url, extra]
   const searchIdx = [
     ...TOOLS.map(t => ['t', t.kicker, t.url, t.title]),
-    ...posters.map(p => ['m', `Map: ${p.kicker}`, `/maps/#${p.id}`, p.title]),
+    ...posters.map(p => ['m', `Map: ${p.kicker}`, `/states/#${p.id}`, p.title]),
     ...catalog.map(c => ['s', c.name, `/s/${c.id}/`, c.group]),
     ...states.states.map(st => ['st', st.name, `/state/${slugify(st.name)}/`, 'State']),
     ...(W ? Object.values(W.countries).map(n => ['c', cleanCountry(n), `/country/${slugify(cleanCountry(n))}/`, 'Country']) : []),
@@ -648,13 +651,13 @@ async function main() {
   api['search'] = 'Site-wide search index: [type, name, url, detail]';
   await write('api/graph.json', JSON.stringify({ built: BUILT.toISOString(), nodes: { series: catalog.map(c => ({ id: c.id, name: c.name, group: c.group, url: `/s/${c.id}/` })), states: states.states.map(st => ({ name: st.name, url: `/state/${slugify(st.name)}/` })), countries: W ? Object.entries(W.countries).map(([iso, n]) => ({ iso, name: cleanCountry(n), url: `/country/${slugify(cleanCountry(n))}/` })) : [] }, articles: m.articles.map(a => ({ url: a.url, title: a.title, date: a.date.slice(0, 10), topic: a.topic, subjects: (a.storyItems || []).map(x => x.k), connected: (a.connected || []).map(c => c.b.url) })), correlations: corr, network: net }));
   api['graph'] = 'The whole data space as one graph: every series, state, country and article; which subjects each article discusses; correlations between all series; and the network of subjects discussed together';
-  await write('api/catalog.json', JSON.stringify(catalog));
+  await write('api/catalog.json', JSON.stringify([...catalog, ...HIDDEN.map(c => ({ ...c, hidden: true }))]));
   // chart images at fixed URLs for embedding in WordPress posts (redrawn on every build)
   try { execSync(`python3 scripts/render_cards.py ${OUT}`, { stdio: 'inherit', timeout: 300000 }); } catch (e) { console.warn('Social cards skipped:', e.message); }
   if (!process.env.SKIP_IMG) { try { execSync(`python3 scripts/render_charts.py ${OUT}`, { stdio: 'inherit', timeout: 900000 }); } catch (e) { console.warn('Chart images skipped:', e.message); } }
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
   api['health'] = 'Site health from the last build: broken internal links, data series that have gone stale, pages missing a title or description';
-  api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
+  api['catalog'] = `Catalogue of ${catalog.length + HIDDEN.length} series (${HIDDEN.length} world series marked hidden have no page but can be charted); each is at /api/series/{id}.json`;
   if (MK) { await write('api/rupee.json', JSON.stringify(rupeeData(MK, tape))); api['rupee'] = 'Rupee page bundle: 15 currencies per US dollar (daily), US rates and dollar index, India repo and 10-year yield, external-sector indicators for India and 13 peers'; }
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
@@ -664,31 +667,25 @@ async function main() {
   for (const t of TOPIC_ORDER) await write(`topic/${t}/index.html`, P({ title: TOPICS[t].name, description: TOPICS[t].blurb, path: `/topic/${t}/`, active: t, body: topicPage(t, m) }));
   await write('series/index.html', P({ title: 'Series', path: '/series/', description: 'Questions followed across several articles.', body: seriesIndex(m) }));
   for (const s of m.series) await write(`series/${s.slug}/index.html`, P({ title: s.name, path: `/series/${s.slug}/`, description: s.description, body: seriesPage(s) }));
-  await write('explainers/index.html', P({ title: 'Explainers', path: '/explainers/', description: 'Primers on Indian economics and policy.', body: explainersPage(m) }));
   await write('archive/index.html', P({ title: 'Archive and search', path: '/archive/', description: 'Search every article.', body: archivePage(m) }));
   if (false) await write('data/index.html', P({ title: 'India macro data', path: '/data/', description: 'CPI, repo rate, rupee, bond yields, Brent and the Nifty with sources.', body: dataHub(tape, m) }));
   if (false) for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
   const FCS = scoreCalls(fc, SD, BUILT.toISOString().slice(0, 10)); await write('api/forecasts.json', JSON.stringify({ method: fc.method, calls: FCS.map(({ spark, ...c }) => c) }));
-  await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: fcPage(fc, FCS, { pageHead }) }));
-  await write('tools/shock-lab/index.html', P({ title: 'Scenario engine: what if?', path: '/tools/shock-lab/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
-  await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub(HUBSTATS) }));
-  await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
-  await write('tools/india-by-state/index.html', P({ title: 'India by State', path: '/tools/india-by-state/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, with sources.', body: statesPage(states, { pageHead }) }));
+  if (HAS_CALLS) await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: fcPage(fc, FCS, { pageHead }) }));
+  await write('what-if/index.html', P({ title: 'What if? The scenario engine', path: '/what-if/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
+  await write('economy/budget/index.html', P({ title: 'The Union Budget 2026-27, line by line', path: '/economy/budget/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['rupee'], head: false }) }));
+  await write('states/index.html', P({ title: 'India’s states compared', path: '/states/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, and each state’s economy set beside a country of the same size.', body: statesPage(states, { pageHead }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), sc: JSON.parse(await readFile('data/states_countries.json', 'utf8')), statePos: states.states, only: ['sc'], head: false }) }));
   if (false) await write('tools/two-chart-test/index.html', P({ title: 'The Two-Chart Test', path: '/tools/two-chart-test/', description: 'Common claims about India’s economy tested against two charts side by side.', body: twoChartPage(twocharts, { pageHead }) }));
   if (false) await write('tools/exposure/index.html', P({ title: 'Geoeconomics Exposure Map', path: '/tools/exposure/', description: 'India’s dependence on foreign suppliers for oil, fertiliser and China-sourced electronics, with a disruption calculator.', body: exposurePage(exposure, { pageHead, inrRate: tape.indicators.find(i => i.id === 'inr').latest.value }) }));
   if (MK) {
     await write('markets/index.html', P({ title: 'Markets', path: '/markets/', description: 'NSE indices, Nifty 50 heatmap, valuations, yield curves, currencies and live crypto.', body: marketsPage(MK, { pageHead }) }));
     await write('commodities/index.html', P({ title: 'Commodities', path: '/commodities/', description: 'Energy, metals, fertiliser and food prices with five-year ranges and comparison charts.', body: commoditiesPage(MK, { pageHead }) }));
-    await write('rupee/index.html', P({ title: 'Rupee, rates and the external sector', path: '/rupee/', description: 'The rupee against the dollar and 14 currencies, the India–US interest-rate gap, and India’s current account, reserves, remittances and FDI against peers.', body: rupeePage(MK, tape, { pageHead }) }));
   }
-  { const rp = tape.indicators.find(i => i.id === 'repo'); const ch = Math.round((rp.latest.value - rp.previous.value) * 100);
-    await write('tools/emi/index.html', P({ title: 'EMI shock calculator', path: '/tools/emi/', description: 'What a repo rate change does to your home loan EMI or tenure.', body: emiPage({ pageHead, repo: { value: rp.latest.value.toFixed(2), change: `${ch > 0 ? '+' : ''}${ch} basis point`, date: longDate(rp.latest.released + 'T00:00:00Z') } }) })); }
   { const pump = JSON.parse(await readFile('data/pump.json', 'utf8')); const b = MK?.fredLast?.DCOILBRENTEU, ir = MK?.fxOut?.table.find(t => t.c === 'INR');
-    await write('tools/pump-price/index.html', P({ title: 'What’s in a litre of petrol', path: '/tools/pump-price/', description: 'The Delhi petrol price broken into oil company price, central excise, dealer commission and VAT, with a calculator.', body: pumpPage(pump, { pageHead, brent: b ? { v: b.last[1], d: b.last[0] } : null, inr: ir?.last }) })); }
+    await write('what-if/pump-price/index.html', P({ title: 'What’s in a litre of petrol', path: '/what-if/pump-price/', description: 'The Delhi petrol price broken into oil company price, central excise, dealer commission and VAT, with a calculator.', body: pumpPage(pump, { pageHead, brent: b ? { v: b.last[1], d: b.last[0] } : null, inr: ir?.last }) })); }
   if (existsSync('data/districts.json')) { const DD = JSON.parse(await readFile('data/districts.json', 'utf8')); await write('api/districts.json', JSON.stringify(DD)); api['districts'] = 'District indicators keyed by Census 2011 district code (Census 2011 and NFHS-5 phase 1), with names; boundaries at /geo/india-districts.json';
-    await write('maps/districts/index.html', P({ title: 'India, district by district', path: '/maps/districts/', description: 'An interactive map of India’s 640 districts: literacy, women at work, toilets, tap water, cooking gas, phones, the internet, child stunting and anaemia.', body: districtsPage(DD, { pageHead }) })); }
-  await write('maps/index.html', P({ title: 'India in maps', path: '/maps/', description: 'Poster-style maps of India’s states: inflation, income, growth, debt, and each state’s economy as a country.', body: mapsPage(states, JSON.parse(await readFile('data/states_countries.json', 'utf8')), { pageHead }) }));
+    await write('districts/index.html', P({ title: 'India, district by district', path: '/districts/', description: 'An interactive map of India’s 640 districts: literacy, women at work, toilets, tap water, cooking gas, phones, the internet, child stunting and anaemia.', body: districtsPage(DD, { pageHead }) })); }
   // ---- Nifty 500 companies
   const CO = loadCompanies();
   if (CO) {
@@ -702,23 +699,22 @@ async function main() {
   }
   if (MK?.iip || MK?.rbiMoney) await write('economy/index.html', P({ title: 'The real-economy tracker: industry, credit, money and trade', path: '/economy/', description: 'India’s industrial production by sector, bank credit and deposits, money supply and monthly trade, updated from MoSPI and the RBI, with every series on its own page.', body: economyPage(SD, byId, { pageHead, tape }) }));
   if (MK?.trade) { const cs = {}, cn = {}; for (const iso of Object.keys(W.countries)) { cn[iso] = cleanCountry(W.countries[iso]); cs[iso] = slugify(cn[iso]); } await write('trade/index.html', P({ title: 'India’s trade: who buys, who sells, and what', path: '/trade/', description: 'India’s goods exports and imports by partner and product since 2015, from UN Comtrade, with surpluses, deficits and every partner linked to its country page.', body: tradePage(MK.trade, { pageHead, countrySlug: cs, countryName: cn }) })); }
-  if (MK?.rbiFx) await write('external/index.html', P({ title: 'External sector lab: reserves, the rupee and the price of dollars', path: '/external/', description: 'India’s foreign exchange reserves every week since 1998, money-market rates, forward premia and external sustainability indicators, with the 2013 and 2026 FCNR(B) episodes side by side.', body: externalPage(MK, { pageHead, episodes: JSON.parse(await readFile('data/episodes.json', 'utf8')) }) }));
-  if (MK?.imfWorld) await write('world/index.html', P({ title: 'India against the world', path: '/world/', description: 'Where India ranks among every economy in the IMF World Economic Outlook: GDP, income per person, growth, inflation, debt and the current account.', body: worldPage(MK.imfWorld, { pageHead, year: BUILT.getUTCFullYear() }) }));
+  if (MK?.rbiFx) await write('external/index.html', P({ title: 'External sector lab: reserves, the rupee and the price of dollars', path: '/external/', description: 'India’s foreign exchange reserves every week since 1998, money-market rates, forward premia and external sustainability indicators, with the 2013 and 2026 FCNR(B) episodes side by side.', body: externalPage(MK, { pageHead, episodes: JSON.parse(await readFile('data/episodes.json', 'utf8')), rupee: rupeePage(MK, tape, { pageHead, embed: true }) }) }));
+  if (MK?.imfWorld) await write('world/index.html', P({ title: 'India against the world', path: '/world/', description: 'Where India ranks among every economy in the IMF World Economic Outlook: GDP, income per person, growth, inflation, debt and the current account.', body: worldPage(MK.imfWorld, { pageHead, year: BUILT.getUTCFullYear() }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['race', 'bub', 'debt'], head: false }) }));
   if (MK?.portwatch) { const st = hormuzStory(MK, SD, { pageHead, trade: MK.trade }); if (st) await write('stories/hormuz/index.html', P({ title: 'Hormuz, in numbers: the closure and India', path: '/stories/hormuz/', description: 'A scrolling data story: ship counts through the Strait of Hormuz before and after the March 2026 closure, oil, the rupee, India’s oil bill and its Gulf trade, all from live data.', body: st })); }
   if (MK?.portwatch) await write('hormuz/index.html', P({ title: 'Chokepoint watch: Hormuz and the shipping lanes', path: '/hormuz/', description: 'Daily ship transits through the Strait of Hormuz, Bab el-Mandeb, Suez, the Cape of Good Hope and Malacca, from IMF PortWatch.', body: hormuzPage(MK, { pageHead }) }));
   if (MK) await write('terminal/index.html', P({ title: 'The Kakistocrat Terminal', path: '/terminal/', description: 'Every Indian and global market and macro number on one dense screen, with a command bar to chart any of 300 series.', body: terminalPage({ MK, tape, articles: m.articles, BUILT }) }));
-  if (MK) await write('today/index.html', P({ title: 'India Today', path: '/today/', description: 'The Indian economy on one screen: inflation, rates, the rupee, markets, oil, the Budget, growth and the external balance.', body: todayPage({ pageHead, tape, budget, MK, BUILT }) }));
-  await write('infographics/index.html', P({ title: 'India in pictures', path: '/infographics/', description: 'Interactive infographics: the Budget rupee, the GDP race, growth against inflation, debt and deficits.', body: infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), basket: JSON.parse(await readFile('data/cpi_basket.json', 'utf8')), sc: JSON.parse(await readFile('data/states_countries.json', 'utf8')), statePos: states.states }) }));
-  await write('chartle/index.html', P({ title: 'Chartle: the daily mystery chart', path: '/chartle/', description: 'Guess the economic series behind today’s chart in six tries.', body: chartlePage({ pageHead }) }));
+  await write('economy/prices/index.html', P({ title: 'Prices: what’s in the inflation basket', path: '/economy/prices/', description: 'India’s consumer price index by group, each group’s contribution to inflation, and the month’s biggest movers, with links to every price series on the site.', body: pageHead('Economy', 'Prices: what’s in the inflation basket', `Consumer inflation was ${tape.indicators.find(i => i.id === 'cpi').latest.value}% in ${tape.indicators.find(i => i.id === 'cpi').latest.period}. What the basket holds, what is pushing it, and the month’s biggest movers. Prices for oil, fertilisers and food are under <a href="/commodities/">Commodities</a>; inflation by state is under <a href="/states/">States</a>.`) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), basket: JSON.parse(await readFile('data/cpi_basket.json', 'utf8')), only: ['cpi'], head: false }) + `<div class="wrap"><section class="xr-sec"><h2 class="col-title">Price series</h2><div class="chips">${[['india-cpi', 'CPI inflation'], ['india-repo', 'Repo rate'], ['imf-pcpipch-ind', 'Inflation, IMF annual'], ['wb-rice', 'Rice'], ['wb-wheat', 'Wheat'], ['wb-palm', 'Palm oil'], ['wb-urea', 'Urea'], ['fred-dcoilbrenteu', 'Brent']].filter(([id]) => byId[id]).map(([id, n]) => `<a class="chip" href="/s/${id}/">${n}</a>`).join('')}</div></section></div>` }));
   await write('api/index.html', P({ title: 'Data API', path: '/api/', description: 'Free JSON endpoints for every dataset on the site.', body: apiPage(api) }));
   await write('404.html', P({ title: 'Page not found', path: '/404', body: notFound() }));
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/maps/districts/', '/external/', '/trade/', '/economy/', '/companies/', '/stories/hormuz/', '/desk/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
+  const urls = ['/', '/series/', '/archive/', '/explore/', '/ledger/', ...(HAS_CALLS ? ['/forecasts/'] : []), '/desk/', '/desk/archive/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/prices/', '/economy/budget/', '/external/', '/trade/', '/hormuz/', '/states/', '/districts/', '/world/', '/what-if/', '/what-if/pump-price/', '/charts/', '/stories/hormuz/', '/api/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
-  await write('_redirects', ['/data/ /today/ 301', '/tools/two-chart-test/ /charts/ 301', '/tools/two-chart-test /charts/ 301', '/tools/exposure/ /tools/shock-lab/ 301', '/tools/exposure /tools/shock-lab/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
+  const MOVED = [['/today/', '/desk/'], ['/rupee/', '/external/'], ['/maps/', '/states/'], ['/maps/districts/', '/districts/'], ['/infographics/', '/states/'], ['/tools/', '/explore/'], ['/tools/shock-lab/', '/what-if/'], ['/tools/pump-price/', '/what-if/pump-price/'], ['/tools/emi/', '/what-if/'], ['/tools/budget-x-ray/', '/economy/budget/'], ['/tools/india-by-state/', '/states/'], ['/tools/two-chart-test/', '/charts/'], ['/tools/exposure/', '/what-if/'], ['/chartle/', '/charts/'], ['/explainers/', '/archive/'], ['/data/', '/desk/'], ...(HAS_CALLS ? [] : [['/forecasts/', '/ledger/']]), ...HIDDEN.map(c => { const iso = c.id.split('-').pop().toUpperCase(), n = W?.countries?.[iso]; return n ? [`/s/${c.id}/`, `/country/${slugify(cleanCountry(n))}/`] : null; }).filter(Boolean), ...Object.entries(TAPE_S).map(([k, v]) => [`/data/${k}/`, `/s/${v}/`])];
+  await write('_redirects', MOVED.flatMap(([a, b]) => [`${a} ${b} 301`, `${a.replace(/\/$/, '')} ${b} 301`]).join('\n') + '\n');
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
   console.log(`Built ${m.articles.length} articles, ${m.series.length} series → ${OUT}/`);
   try { execSync(`node scripts/check_site.mjs ${OUT}`, { stdio: 'inherit' }); } catch (e) { console.warn('Site checks failed to run:', e.message); }

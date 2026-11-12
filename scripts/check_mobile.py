@@ -2,8 +2,8 @@
 # Usage: python3 scripts/check_mobile.py http://localhost:8811
 import sys, asyncio
 from playwright.async_api import async_playwright
-PAGES = ['/', '/desk/', '/today/', '/terminal/', '/markets/', '/commodities/', '/rupee/', '/external/', '/trade/', '/hormuz/', '/world/', '/maps/', '/charts/',
-         '/explore/', '/tools/', '/tools/shock-lab/', '/tools/pump-price/', '/infographics/', '/s/fx-usdinr/', '/state/kerala/', '/country/china/', '/topic/trade-external-sector/']
+PAGES = ['/', '/desk/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/prices/', '/economy/budget/', '/external/', '/trade/', '/hormuz/',
+         '/states/', '/districts/', '/world/', '/what-if/', '/what-if/pump-price/', '/charts/', '/explore/', '/stories/hormuz/', '/s/fx-usdinr/', '/state/kerala/', '/country/china/', '/company/hdfcbank/', '/topic/trade-external-sector/']
 async def main(base):
     bad = []
     async with async_playwright() as p:

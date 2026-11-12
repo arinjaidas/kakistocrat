@@ -33,7 +33,7 @@ def fmt(v):
     return f'{v:,.0f}' if a >= 1000 else f'{v:,.1f}' if a >= 100 else f'{v:,.2f}'
 
 def main():
-    cat = load(os.path.join(OUT, 'api', 'catalog.json'))
+    cat = [c for c in load(os.path.join(OUT, 'api', 'catalog.json')) if not c.get('hidden')]
     ev_path = os.path.join(HERE, '..', 'data', 'events.json')
     events = load(ev_path)['events'] if os.path.exists(ev_path) else []
     os.makedirs(os.path.join(OUT, 'img', 's'), exist_ok=True)
