@@ -23,7 +23,7 @@ import { hormuzPage } from './lib/hormuz.mjs';
 import { worldPage } from './lib/world.mjs';
 import { mapsPage, mapPosters } from './lib/maps.mjs';
 import { scenarioPage } from './lib/scenario.mjs';
-import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx } from './lib/entities.mjs';
+import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML } from './lib/entities.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -498,6 +498,8 @@ async function main() {
   // ---- the connected layer
   const byId = Object.fromEntries(catalog.map(c => [c.id, c]));
   const corr = correlations(SD, catalog);
+  const UNUSUAL = unusualMoves(SD, catalog); MK && (MK.unusual = UNUSUAL, MK.movesHTML = movesHTML);
+  await write('api/unusual.json', JSON.stringify(UNUSUAL)); api['unusual'] = 'The biggest recent moves across every daily and monthly series, measured against each series’ own usual change';
   const SC = JSON.parse(await readFile('data/states_countries.json', 'utf8'));
   const W = MK?.imfWorld;
   const ents = [
@@ -527,7 +529,7 @@ async function main() {
   for (const st of states.states) await write(`state/${slugify(st.name)}/index.html`, P({ title: st.name, path: `/state/${slugify(st.name)}/`, description: `${st.name}: income, growth, inflation, debt and finances, ranked against every state, with similar states and related articles.`, body: statePage(st, { S: states, SC, ment, posters }) }));
   if (W) { const fxCodes = new Set(Object.keys(MK.fx?.rates || {}));
     for (const iso of Object.keys(W.countries)) { const n = cleanCountry(W.countries[iso]); await write(`country/${slugify(n)}/index.html`, P({ title: n, path: `/country/${slugify(n)}/`, description: `${n}: GDP, income per person, growth, inflation and debt, ranked among every economy, with India alongside.`, body: countryPage(iso, { W, SC, ment, year: BUILT.getUTCFullYear(), catalog, fxCodes }) })); }
-    await write('explore/index.html', P({ title: 'Explore', path: '/explore/', description: 'Every series, state, country and article on the site, connected.', body: explorePage({ catalog, S: states, W, ment, articles: m.articles, net }) })); }
+    await write('explore/index.html', P({ title: 'Explore', path: '/explore/', description: 'Every series, state, country and article on the site, connected.', body: explorePage({ catalog, S: states, W, ment, articles: m.articles, net, unusual: UNUSUAL }) })); }
   // site-wide search index: [type, name, url, extra]
   const searchIdx = [
     ...TOOLS.map(t => ['t', t.kicker, t.url, t.title]),
