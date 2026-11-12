@@ -257,6 +257,99 @@ def rbi_fx(limit=150):
     json.dump(cache, open(path, 'w'), separators=(',', ':'))
     w = cache['weeks']; print('RBI FX reserves:', len(w), 'weeks', (min(w), max(w)) if w else '')
 
+# RBI WSS Tables 3 and 7 (fortnightly): bank deposits and credit, and money supply. Outstanding as on the reporting fortnight; growth is year on year.
+def _first_num(t, label):
+    m = re.search('(?:' + label + ')', t)
+    if not m: return None
+    for cell in t[m.end():].split('|')[1:6]:
+        c = cell.strip().replace(',', '')
+        if re.fullmatch(r'-?\d+(\.\d+)?', c): return float(c)
+    return None
+def _wss_page(i, key):
+    h = get(RBI + f'WSSView.aspx?Id={i}', timeout=60).decode('utf-8', 'replace')
+    k = h.find(key); t = re.sub(r'<(td|th)[^>]*>', '|', h[k:k + 30000]); t = re.sub(r'</tr>', '\n', t); t = re.sub(r'<[^>]+>', ' ', t).replace('&nbsp;', ' ').replace('&lsquo;', "'").replace('&rsquo;', "'")
+    return re.sub(r'[ \t]+', ' ', t)
+def _fortnight(t):
+    iss = re.search(r'Date\s*:\s*([A-Za-z]{3})\w*\.?\s+(\d{1,2}),\s*(\d{4})', t)
+    m = re.search(r'Outstanding as on\s+([A-Za-z]{3})\w*\.?\s+(\d{1,2}),\s*(\d{4})', t)
+    if m: return f'{int(m.group(3)):04d}-{MONTHS[m.group(1).lower()]:02d}-{int(m.group(2)):02d}'
+    if not iss: return None
+    # money stock table: "| Mar. 31 | Oct. 15 |" with the year on the row above; the second date is the reporting fortnight
+    ds = re.findall(r'\|\s*([A-Z][a-z]{2})\.?\s+(\d{1,2})\s*(?=\|)', t[:3000])
+    if len(ds) < 2: return None
+    mon, day = MONTHS[ds[1][0].lower()], int(ds[1][1]); iy, im = int(iss.group(3)), MONTHS[iss.group(1).lower()]
+    return f'{iy - (1 if mon > im else 0):04d}-{mon:02d}-{day:02d}'
+def rbi_money(limit=150):
+    path = os.path.join(OUT, 'rbi_money.json')
+    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 3 (Scheduled Commercial Banks, business in India) and Table 7 (Money Stock), fortnightly; ₹ crore and per cent', 'fortnights': {}, 'seen': []}
+    seen = set(cache.get('seen', []))
+    for sec, key in [(3, 'Scheduled Commercial Banks - Business in India'), (7, 'Money Stock')]:
+        idx = get(RBI + f'WSSViewDetail.aspx?TYPE=Section&PARAM1={sec}', timeout=90).decode('utf-8', 'replace')
+        ids = [i for i in re.findall(r'WSSView.aspx\?Id=(\d+)>', idx) if f'{sec}:{i}' not in seen][: limit or None]
+        for n, i in enumerate(ids):
+            try: t = _wss_page(i, key)
+            except Exception as e: print('  skip', i, e); continue
+            d = _fortnight(t)
+            if d:
+                row = cache['fortnights'].setdefault(d, {})
+                if sec == 3:
+                    row.update({k: v for k, v in {'deposits': _first_num(t, r'2\.1 Aggregate Deposits'), 'deposits_yoy': _last_num(t, r'2\.1a Growth \(Per cent\)'), 'credit': _first_num(t, r'\|\s*7 Bank Credit'),
+                                'credit_yoy': _last_num(t, r'7\.1a Growth \(Per cent\)'), 'nonfood': _first_num(t, r'7a\.2 Non-food credit'), 'gsec': _first_num(t, r'6\.1 Government Securities')}.items() if v is not None})
+                else:
+                    row.update({k: v for k, v in {'m3': _nth_num(t, r'\|\s*M3\s', 1), 'm3_yoy': _last_num(t, r'\|\s*M3\s'), 'cic_yoy': _last_num(t, r'1\.1 Currency with the Public'), 'bccs_yoy': _last_num(t, r'2\.2 Bank Credit to Commercial Sector')}.items() if v is not None})
+            seen.add(f'{sec}:{i}')
+            if n % 50 == 49: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_money s{sec} {n + 1}/{len(ids)}')
+            time.sleep(0.25)
+    cache['seen'] = sorted(seen); cache['fortnights'] = dict(sorted((k, v) for k, v in cache['fortnights'].items() if v))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'))
+    f = cache['fortnights']; print('RBI money and credit:', len(f), 'fortnights', (min(f), max(f)) if f else '')
+def _nth_num(t, label, n):
+    m = re.search('(?:' + label + ')', t)
+    if not m: return None
+    vals = [c.strip().replace(',', '') for c in t[m.end():].split('|')[1:8]]
+    vals = [float(c) for c in vals if re.fullmatch(r'-?\d+(\.\d+)?', c)]
+    return vals[n] if len(vals) > n else None
+
+# MoSPI eSankhyiki API (no key): Index of Industrial Production, monthly, general index, sectors and use-based groups.
+# Growth is year on year; where two base years overlap the newest base is kept.
+MOSPI = 'https://api.mospi.gov.in/api/'
+def mospi_pages(path, params):
+    out, page = [], 1
+    while True:
+        j = json.loads(get(MOSPI + path + '?' + urllib.parse.urlencode({**params, 'limit': 200, 'page': page}), timeout=90))
+        out += j.get('data') or []
+        if page >= (j.get('meta_data') or {}).get('totalPages', 1): return out
+        page += 1; time.sleep(0.3)
+def iip():
+    MON = {m: i + 1 for i, m in enumerate(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])}
+    series = {}
+    for typ in ['General', 'Sectoral', 'Use-based category']:
+        for r in mospi_pages('iip/getIIPMonthly', {'type': typ}):
+            if r.get('sub_category') or r.get('month') not in MON: continue
+            name = {'Mining & Quarrying': 'Mining', 'Electricity & Gas Supply': 'Electricity'}.get(r['category'], r['category']).replace('Infrastructure/ Construction', 'Infrastructure/construction')
+            if name in ('Basic Goods', 'Water Supply, Sewerage & Waste Management'): continue
+            d = f"{int(r['year']):04d}-{MON[r['month']]:02d}-01"; by = r['base_year']
+            s = series.setdefault(name, {'type': typ, 'pts': {}})
+            old = s['pts'].get(d)
+            if old and old['base'] >= by: continue
+            try: s['pts'][d] = {'base': by, 'index': float(r['index']) if r.get('index') not in (None, '') else None, 'growth': float(r['growth_rate']) if r.get('growth_rate') not in (None, '', 'NA') else None}
+            except ValueError: pass
+    for s in series.values(): s['pts'] = dict(sorted(s['pts'].items()))
+    if series: save('iip', {'source': 'MoSPI, Index of Industrial Production (eSankhyiki API); growth is year on year', 'series': series})
+    print('IIP:', {k: list(v['pts'].items())[-1] for k, v in series.items() if k == 'General'}, len(series), 'series')
+
+# India monthly activity from FRED (OECD Main Economic Indicators, seasonally adjusted, US$)
+FRED_IN = {'XTEXVA01INM667S': ('India merchandise exports, monthly (seasonally adjusted)', 'US$'), 'XTIMVA01INM667S': ('India merchandise imports, monthly (seasonally adjusted)', 'US$')}
+def india_monthly():
+    out = {}
+    for sid, (label, unit) in FRED_IN.items():
+        raw = get(f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}&cosd=2010-01-01')
+        pts = [[r[0], num(r[1])] for r in csv.reader(io.StringIO(raw.decode())) if len(r) == 2 and r[0][:2] in ('19', '20') and num(r[1]) is not None]
+        if pts: out[sid] = {'label': label, 'unit': unit, 'pts': pts}
+        time.sleep(0.3)
+    if out: save('india_monthly', out)
+    print('India monthly (FRED):', {k: v['pts'][-1] for k, v in out.items()})
+
 # RBI WSS Table 4 (Ratios and Rates): money-market and bond rates, the RBI/FBIL rupee reference rate and forward premia; we keep the latest week on each page
 RATE_ROWS = {'call': r'Call Money Rate[^|]*', 'tb91': r'91[- ]Day Treasury Bill[^|]*', 'tb364': r'364[- ]Day Treasury Bill[^|]*', 'gsec10': r'10[- ]Year (?:G-Sec|Government Securities)[^|]*',
              'inr': r'INR[- ]US\$ Spot Rate[^|]*|Rupee[- ]US Dollar[^|]*|Reference Rate[^|]*US\$[^|]*', 'fwd1m': r'Forward Premia of US\$ 1-month', 'fwd3m': r'\|\s*3-month', 'fwd6m': r'\|\s*6-month', 'crr': r'Cash Reserve Ratio', 'repo': r'Policy Repo Rate|Repo Rate'}
@@ -377,7 +470,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('comtrade', comtrade)]
     if '--only' in sys.argv:
         only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True
