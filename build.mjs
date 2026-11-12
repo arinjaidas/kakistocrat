@@ -612,6 +612,7 @@ async function main() {
   // chart images at fixed URLs for embedding in WordPress posts (redrawn on every build)
   if (!process.env.SKIP_IMG) { try { execSync(`python3 scripts/render_charts.py ${OUT}`, { stdio: 'inherit', timeout: 900000 }); } catch (e) { console.warn('Chart images skipped:', e.message); } }
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
+  api['health'] = 'Site health from the last build: broken internal links, data series that have gone stale, pages missing a title or description';
   api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
   if (MK) { await write('api/rupee.json', JSON.stringify(rupeeData(MK, tape))); api['rupee'] = 'Rupee page bundle: 15 currencies per US dollar (daily), US rates and dollar index, India repo and 10-year yield, external-sector indicators for India and 13 peers'; }
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
@@ -663,5 +664,6 @@ async function main() {
   await write('_redirects', ['/data/ /today/ 301', '/tools/two-chart-test/ /charts/ 301', '/tools/two-chart-test /charts/ 301', '/tools/exposure/ /tools/shock-lab/ 301', '/tools/exposure /tools/shock-lab/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
   console.log(`Built ${m.articles.length} articles, ${m.series.length} series → ${OUT}/`);
+  try { execSync(`node scripts/check_site.mjs ${OUT}`, { stdio: 'inherit' }); } catch (e) { console.warn('Site checks failed to run:', e.message); }
 }
 main().catch(e => { console.error(e); process.exit(1); });

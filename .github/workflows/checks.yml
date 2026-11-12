@@ -1,0 +1,25 @@
+name: Site checks
+# Builds the site and checks for broken links, stale data and pages that break on phones.
+on:
+  push: { branches: [main] }
+  schedule: [{ cron: '30 3 * * *' }]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Build
+        run: SKIP_IMG=1 node build.mjs
+      - name: Links and freshness
+        run: node scripts/check_site.mjs dist --strict
+      - name: Phones
+        run: |
+          pip install -q playwright && python -m playwright install --with-deps chromium >/dev/null
+          (python -m http.server 8811 -d dist >/dev/null 2>&1 &) && sleep 2
+          python scripts/check_mobile.py http://localhost:8811
