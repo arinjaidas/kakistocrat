@@ -578,3 +578,12 @@ pre.code{background:var(--ink);color:#E9EAEC;padding:14px 16px;font:500 12.5px/1
 .wd-rank b{display:block;font:700 64px/1 "Newsreader",Georgia,serif;color:#B42318}.wd-rank span{font:500 13px "IBM Plex Mono",monospace;color:#3A3E44}
 .wd-nb{margin:18px 0 0;padding:0 0 0 34px;font-size:14px}.wd-nb li{padding:4px 0;border-bottom:1px solid #EEECE7}.wd-nb li span{display:inline-block;width:150px}.wd-nb li b{font:600 13px "IBM Plex Mono",monospace;float:right}.wd-nb li.me{color:#B42318;font-weight:700}
 @media (max-width:820px){.wd-two{grid-template-columns:1fr}}
+/* india in maps */
+.mp-nav{display:flex;flex-wrap:wrap;gap:6px 16px;margin:6px 0 22px;font:600 13px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.06em}
+.mp-nav a{color:#15171A;border-bottom:2px solid #B42318;padding-bottom:2px}
+.mp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.mp-card{margin:0;background:#FAF6EE;box-shadow:0 1px 0 #E2DFD8,0 10px 30px rgba(21,23,26,.08);scroll-margin-top:90px}
+.mp-map{width:100%;aspect-ratio:4/5}
+.mp-card figcaption{display:flex;gap:14px;align-items:center;padding:10px 14px;border-top:1px solid #E8E2D4;background:#fff}
+.mp-link{font:500 13px "IBM Plex Mono",monospace;color:#6B7078}
+@media (max-width:820px){.mp-grid{grid-template-columns:1fr}}
