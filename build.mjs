@@ -190,13 +190,13 @@ function tapeHTML(tape) {
   return `<div class="tape" role="region" aria-label="India markets and macro tape"><div class="wrap tape-wrap"><span class="tape-label">India tape</span><div class="tape-viewport"><div class="tape-track">${ticks}${mticks}<span class="tape-gap"></span><span class="tape-dup" aria-hidden="true" inert>${ticks}${mticks}</span><span class="tape-gap"></span></div></div><a class="tape-more" href="/markets/">Markets →</a></div></div>`;
 }
 
-function layout({ title, description = '', path = '/', body, canonical, tape, active = '', type = 'website' }) {
+function layout({ title, description = '', path = '/', body, canonical, tape, active = '', type = 'website', ogImage }) {
   const full = title ? `${title} · The Kakistocrat` : 'The Kakistocrat · A deeper look at economics and politics';
   const nav = TOPIC_ORDER.map(s => `<a href="/topic/${s}/"${active === s ? ' aria-current="page"' : ''}>${esc(TOPICS[s].short)}</a>`).join('');
   return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(full)}</title><meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${esc(canonical || BASE_URL + path)}">
-<meta property="og:title" content="${esc(title || 'The Kakistocrat')}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="${type}"><meta property="og:url" content="${esc(BASE_URL + path)}"><meta property="og:image" content="${BASE_URL}/og/${ogSlug(path)}.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${BASE_URL}/og/${ogSlug(path)}.png">
+<meta property="og:title" content="${esc(title || 'The Kakistocrat')}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="${type}"><meta property="og:url" content="${esc(BASE_URL + path)}"><meta property="og:image" content="${ogImage ? BASE_URL + ogImage : `${BASE_URL}/og/${ogSlug(path)}.png`}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${ogImage ? BASE_URL + ogImage : `${BASE_URL}/og/${ogSlug(path)}.png`}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css?v=${BUILT.getTime()}"><link rel="alternate" type="application/rss+xml" title="The Kakistocrat" href="https://${SITE}/feed/">
@@ -545,8 +545,8 @@ async function main() {
     if (process.env.DESK_BACKFILL) { const ds = SD['nse-nifty-50'].d, n = +process.env.DESK_BACKFILL; for (let k = ds.length - 1 - n; k < ds.length - 1; k++) if (!existsSync(`data/desk/${ds[k]}.json`)) { await writeFile(`data/desk/${ds[k]}.json`, JSON.stringify(deskSnapshot({ SD, byId, unusual: [], tape: { indicators: [] }, articles: m.articles, events: evs.events || evs, date: ds[k], prevDate: ds[k - 1] }))); saved.push(ds[k]); } saved.sort(); }
     const snaps = [...await Promise.all(saved.map(async d => JSON.parse(await readFile(`data/desk/${d}.json`, 'utf8')))), snap].sort((a, b) => b.date.localeCompare(a.date));
     const days = snaps.map(x => x.date);
-    for (const x of snaps) await write(`desk/${x.date}/index.html`, P({ title: `The Daily Desk, ${x.date}`, path: `/desk/${x.date}/`, description: `What moved in India’s markets and economy on ${x.date}: the Nifty, the rupee, oil, yields, reserves and the day’s data releases.`, body: deskPage(x, { pageHead, archive: days, movesHTML }) }));
-    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML }) }));
+    for (const x of snaps) await write(`desk/${x.date}/index.html`, P({ title: `The Daily Desk, ${x.date}`, path: `/desk/${x.date}/`, ogImage: `/img/desk/${x.date}.png`, description: `What moved in India’s markets and economy on ${x.date}: the Nifty, the rupee, oil, yields, reserves and the day’s data releases.`, body: deskPage(x, { pageHead, archive: days, movesHTML }) }));
+    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', ogImage: `/img/desk/${snap.date}.png`, description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML }) }));
     await write('desk/archive/index.html', P({ title: 'The Daily Desk: every day', path: '/desk/archive/', description: 'Every Daily Desk page, by month.', body: deskArchive(snaps, { pageHead }) }));
     await write('api/desk.json', JSON.stringify(snap)); api['desk'] = 'Today’s Daily Desk as data: closing levels and changes for the main Indian and world markets, releases, events and what is coming up';
   }
@@ -607,7 +607,8 @@ async function main() {
   const posters = mapPosters(states, SC);
   const tapeBy = Object.fromEntries(tape.indicators.map(i => [TAPE_S[i.id], i]));
   const crumbsFor = c => `<a href="/explore/">Explore</a> › <a href="/explore/#series">${esc(c.group)}</a>`;
-  for (const c of catalog) await write(`s/${c.id}/index.html`, P({ title: c.name, path: `/s/${c.id}/`, description: `${c.name}: ${c.unit}, ${c.freq}, ${c.first} to ${c.last}. Chart, history, what moves with it, and the articles that mention it.`, body: entitySeriesPage(c, SD[c.id], { catalog, corr, ment, byId, crumbsFor, tapeBy }) }));
+  const TAPE_INV = Object.fromEntries(Object.entries(TAPE_S).map(([k, v]) => [v, k]));
+  for (const c of catalog) await write(`s/${c.id}/index.html`, P({ title: c.name, path: `/s/${c.id}/`, ogImage: TAPE_INV[c.id] ? `/img/release/${TAPE_INV[c.id]}.png` : undefined, description: `${c.name}: ${c.unit}, ${c.freq}, ${c.first} to ${c.last}. Chart, history, what moves with it, and the articles that mention it.`, body: entitySeriesPage(c, SD[c.id], { catalog, corr, ment, byId, crumbsFor, tapeBy }) }));
   for (const st of states.states) await write(`state/${slugify(st.name)}/index.html`, P({ title: st.name, path: `/state/${slugify(st.name)}/`, description: `${st.name}: income, growth, inflation, debt and finances, ranked against every state, with similar states and related articles.`, body: statePage(st, { S: states, SC, ment, posters }) }));
   if (W) { const fxCodes = new Set(Object.keys(MK.fx?.rates || {}));
     for (const iso of Object.keys(W.countries)) { const n = cleanCountry(W.countries[iso]); await write(`country/${slugify(n)}/index.html`, P({ title: n, path: `/country/${slugify(n)}/`, description: `${n}: GDP, income per person, growth, inflation and debt, ranked among every economy, with India alongside.`, body: countryPage(iso, { W, SC, ment, year: BUILT.getUTCFullYear(), catalog, fxCodes, tradeHTML: MK?.trade ? tradeBlock(MK.trade, iso, n) : '' }) })); }
@@ -629,6 +630,7 @@ async function main() {
   api['graph'] = 'The whole data space as one graph: every series, state, country and article; which subjects each article discusses; correlations between all series; and the network of subjects discussed together';
   await write('api/catalog.json', JSON.stringify(catalog));
   // chart images at fixed URLs for embedding in WordPress posts (redrawn on every build)
+  try { execSync(`python3 scripts/render_cards.py ${OUT}`, { stdio: 'inherit', timeout: 300000 }); } catch (e) { console.warn('Social cards skipped:', e.message); }
   if (!process.env.SKIP_IMG) { try { execSync(`python3 scripts/render_charts.py ${OUT}`, { stdio: 'inherit', timeout: 900000 }); } catch (e) { console.warn('Chart images skipped:', e.message); } }
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
   api['health'] = 'Site health from the last build: broken internal links, data series that have gone stale, pages missing a title or description';
