@@ -7,7 +7,7 @@ PAGES = ['/', '/desk/', '/today/', '/terminal/', '/markets/', '/commodities/', '
 async def main(base):
     bad = []
     async with async_playwright() as p:
-        b = await p.chromium.launch(); pg = await b.new_page(viewport={'width': 390, 'height': 844})
+        b = await p.chromium.launch(); pg = await b.new_page(viewport={'width': 360, 'height': 780})
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         for u in PAGES:
             errs.clear()
@@ -15,7 +15,7 @@ async def main(base):
             except Exception as e: bad.append((u, f'load: {e}'[:120])); continue
             await pg.wait_for_timeout(700)
             w = await pg.evaluate('document.documentElement.scrollWidth')
-            if w > 395: bad.append((u, f'scrolls sideways: {w}px wide'))
+            if w > 365: bad.append((u, f'scrolls sideways: {w}px wide'))
             if errs: bad.append((u, 'script error: ' + errs[0][:120]))
         await b.close()
     print(f'Mobile: {len(PAGES)} pages, {len(bad)} problems')
