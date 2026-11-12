@@ -102,6 +102,49 @@ def nse_stocks(latest_date):
     save('nse_stocks', {'date': latest_date, 'nifty50': stocks, 'breadth': {'advances': adv, 'declines': dec, 'unchanged': len(px) - adv - dec, 'universe': len(px)}})
     print(f'NSE stocks: {len(stocks)} Nifty 50 names, breadth {adv}/{dec}')
 
+# ------------------------------------------------------------------ Nifty 500 companies: daily closes, turnover and delivery share from NSE bhavcopies,
+# kept in monthly files (data/markets/nse500/YYYY-MM.json) so each day's refresh touches one small file. Market cap from the latest PR file.
+def nse500(days=10):
+    lst = list(csv.DictReader(io.StringIO(get('https://archives.nseindia.com/content/indices/ind_nifty500list.csv').decode())))
+    meta = {r['Symbol'].strip(): {'n': r['Company Name'].strip().replace(' Ltd.', '').replace(' Limited', ''), 'ind': r['Industry'].strip(), 'isin': r['ISIN Code'].strip()} for r in lst if r.get('Symbol')}
+    syms = set(meta); folder = os.path.join(OUT, 'nse500'); os.makedirs(folder, exist_ok=True)
+    idx = json.load(open(os.path.join(OUT, 'nse_indices.json'))) if os.path.exists(os.path.join(OUT, 'nse_indices.json')) else {}
+    tdays = sorted(idx)[-days:]
+    have = set()
+    for f in os.listdir(folder):
+        if f.endswith('.json') and f[:4].isdigit(): have |= set(json.load(open(os.path.join(folder, f))))
+    months = {}
+    for n, d in enumerate(t for t in tdays if t not in have):
+        dd = dt.date.fromisoformat(d)
+        raw = get(f'https://archives.nseindia.com/products/content/sec_bhavdata_full_{dd:%d%m%Y}.csv', timeout=60)
+        if not raw: continue
+        rows = {}
+        for r in csv.DictReader(io.StringIO(raw.decode()), skipinitialspace=True):
+            sym = (r.get('SYMBOL') or '').strip()
+            if sym in syms and (r.get('SERIES') or '').strip() in ('EQ', 'BE'):
+                c = num(r['CLOSE_PRICE']); t = num(r['TURNOVER_LACS']); dp = num(r.get('DELIV_PER'))
+                if c: rows[sym] = [c, round(t / 100, 2) if t else None, dp]   # close ₹, turnover ₹ crore, delivery %
+        mk = d[:7]
+        if mk not in months:
+            p = os.path.join(folder, mk + '.json'); months[mk] = json.load(open(p)) if os.path.exists(p) else {}
+        months[mk][d] = rows
+        if n % 25 == 24: print(f'  nse500 {n + 1} days')
+        time.sleep(0.3)
+    for mk, m in months.items():
+        with open(os.path.join(folder, mk + '.json'), 'w') as fh: json.dump(dict(sorted(m.items())), fh, separators=(',', ':'))
+    # market cap and listing meta from the latest PR zip
+    last = max(have | {d for m in months.values() for d in m}) if (have or months) else None
+    if last:
+        dd = dt.date.fromisoformat(last); pr = get(f'https://archives.nseindia.com/archives/equities/bhavcopy/pr/PR{dd:%d%m%y}.zip')
+        if pr:
+            z = zipfile.ZipFile(io.BytesIO(pr)); mf = next((n for n in z.namelist() if n.startswith('mcap')), None)
+            if mf:
+                for r in csv.DictReader(io.StringIO(z.read(mf).decode('utf-8', 'replace'))):
+                    r = {k.strip(): (v or '').strip() for k, v in r.items() if k}
+                    if r.get('Symbol') in meta and r.get('Series') in ('EQ', 'BE'): meta[r['Symbol']]['mcap'] = round((num(r.get('Market Cap(Rs.)')) or 0) / 1e7)
+    save('nse500_meta', {'date': last, 'companies': meta})
+    print(f'Nifty 500: {len(meta)} companies, {len(have) + sum(len(m) for m in months.values())} days, latest {last}')
+
 # ------------------------------------------------------------------ FRED (public-domain series only)
 FRED = {'DGS3MO': 'US 3-month Treasury', 'DGS2': 'US 2-year Treasury', 'DGS10': 'US 10-year Treasury', 'DGS30': 'US 30-year Treasury',
         'DFF': 'US federal funds rate', 'T10YIE': 'US 10-year breakeven inflation', 'DTWEXBGS': 'Broad US dollar index',
@@ -470,7 +513,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('nse500', nse500), ('comtrade', comtrade)]
     if '--only' in sys.argv:
         only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True
