@@ -22,6 +22,7 @@ import { pumpPage } from './lib/pump.mjs';
 import { hormuzPage } from './lib/hormuz.mjs';
 import { worldPage } from './lib/world.mjs';
 import { mapsPage, mapPosters } from './lib/maps.mjs';
+import { scenarioPage } from './lib/scenario.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx } from './lib/entities.mjs';
 let MK = null;
 
@@ -44,6 +45,7 @@ const TOPIC_ORDER = Object.keys(TOPICS);
 const MARKET_PATHS = ['/markets/', '/commodities/', '/rupee/', '/hormuz/', '/world/', '/terminal/', '/charts/'];
 export const TAPE_S = { cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' };
 const TOOLS = [
+  { url: '/tools/shock-lab/', kicker: 'Scenario engine', title: 'What if? One shock, every consequence', blurb: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, the import bill, the current account and your EMI change together.' },
   { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Rule-based readings, from inflation and rates to the rupee, oil, Hormuz shipping, the Budget and growth.' },
   { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Indices, rates, currencies, commodities, movers, crypto and the data calendar in one dense dark screen, with a command bar that charts any series.' },
   { url: '/maps/', kicker: 'India in maps', title: 'One idea per map', blurb: 'Poster-style state maps: inflation, income, growth, debt, and every state as a country. Save any as an image.' },
@@ -61,7 +63,7 @@ const TOOLS = [
   { url: '/tools/emi/', kicker: 'EMI shock', title: 'What a rate hike does to your EMI', blurb: 'Enter your home loan and see the new instalment, or how much longer you pay if the EMI is held.' },
   { url: '/tools/exposure/', kicker: 'Exposure Map', title: 'Where India is exposed', blurb: 'Crude suppliers, the Hormuz chokepoint, fertiliser and China-sourced goods, with a supplier-disruption calculator.' },
   { url: '/tools/two-chart-test/', kicker: 'Two-Chart Test', title: 'Claims against data', blurb: 'Common claims about the economy, each tested by putting two charts side by side.' },
-  { url: '/tools/shock-lab/', kicker: 'Shock Lab', title: 'Oil and the rupee', blurb: 'Change crude and the exchange rate. See who pays: importer, pump or household.' },
+  
   { url: '/ledger/', kicker: 'Policy Ledger', title: 'Announced to measured', blurb: 'Every scheme we cover, tracked from promise to outcome, with the date we check again.' },
   { url: '/forecasts/', kicker: 'Forecast Book', title: 'Calls on the record', blurb: 'Testable calls with probabilities, revisions and results, dated when made.' },
 ];
@@ -244,7 +246,7 @@ function home(m, tape, ledger) {
  </div>
  <div class="col"><h2 class="col-title">Latest</h2><div class="latest-list">${latest.map(a => `<a class="story" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h3 class="h-4">${esc(a.title)}</h3><div class="meta">${esc(shortDate(a.date))}</div></a>`).join('')}</div><p style="margin-top:12px"><a href="/archive/" class="meta" style="color:var(--accent)">Full archive →</a></p></div>
  <div class="col rail-col">
-  <div class="module dark"><span class="kicker" style="color:#F0A39B">Shock Lab</span><h3>What does a $10 oil spike cost?</h3><p>Move oil and the rupee, see the bill for an importer, the pump and a household.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open the calculator</a></div>
+  <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock, every consequence: the pump, the import bill, the current account and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open the calculator</a></div>
   <div class="module"><span class="kicker">Policy Ledger</span><h3>From promise to proof</h3><ul class="mini-ledger">${ledger.items.slice(0, 4).map(i => `<li><a href="/ledger/#${i.id}"><b style="font:500 14.5px/1.3 var(--serif)">${esc(i.title)}</b></a>${pips(i)}<div class="meta" style="margin-top:4px">${stagesDone(i)}/5 · next check ${esc(isoOrMonth(i.nextCheck))}</div></li>`).join('')}</ul><p style="margin:8px 0 0"><a href="/ledger/" class="meta" style="color:var(--accent)">All tracked policies →</a></p></div>
   <div class="module"><span class="kicker">Data</span><h3>India at a glance</h3>${tape.indicators.slice(0, 4).map(i => `<a href="/s/${TAPE_S[i.id]}/" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--rule);font:500 13px var(--mono)"><span>${esc(i.label)}</span><b>${esc(tapeVal(i, i.latest.value))}</b></a>`).join('')}<p style="margin:8px 0 0"><a href="/data/" class="meta" style="color:var(--accent)">Data hub →</a></p></div>
  </div>
@@ -274,7 +276,7 @@ function articlePage(a, m) {
 <aside class="rail"><div class="sticky">
  ${(m.storyData?.[a.id] || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${m.storyData[a.id].map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
  <div class="module"><span class="kicker desk" style="--desk:${t.color}">More in ${esc(t.short)}</span><div class="rule-list" style="margin-top:8px">${sameTopic.map(x => `<a class="story" href="${x.url}"><h3 class="h-4">${esc(x.title)}</h3><div class="meta">${esc(shortDate(x.date))}</div></a>`).join('')}</div></div>
- <div class="module dark"><span class="kicker" style="color:#F0A39B">Shock Lab</span><h3>Run your own scenario</h3><p>Oil, the rupee and who pays.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open</a></div>
+ <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open</a></div>
 </div></aside>
 </article></div>`;
 }
@@ -439,6 +441,7 @@ async function main() {
   await cp('src/maps.js', join(OUT, 'maps.js'));
   await cp('src/entity.js', join(OUT, 'entity.js'));
   await cp('src/search.js', join(OUT, 'search.js'));
+  await cp('src/scenario.js', join(OUT, 'scenario.js'));
   if (existsSync('static')) await cp('static', OUT, { recursive: true });
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
@@ -557,7 +560,7 @@ async function main() {
   if (false) for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
   await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: forecastsPage(fc) }));
-  await write('tools/shock-lab/index.html', P({ title: 'Shock Lab: oil and the rupee', path: '/tools/shock-lab/', description: 'Calculate what an oil or rupee shock does to an importer, the pump and a household.', body: shockLab(tape) }));
+  await write('tools/shock-lab/index.html', P({ title: 'Scenario engine: what if?', path: '/tools/shock-lab/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
   await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub() }));
   await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
   await write('tools/india-by-state/index.html', P({ title: 'India by State', path: '/tools/india-by-state/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, with sources.', body: statesPage(states, { pageHead }) }));
@@ -584,7 +587,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   await write('_redirects', ['/data/ /today/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');

@@ -1,0 +1,12 @@
+{
+  "checked": "2026-11-12",
+  "crudeImportsMt": 245.3,
+  "crudeImportsYear": "2025-26 (provisional)",
+  "barrelsPerTonne": 7.33,
+  "loan": { "principal": 5000000, "years": 20, "rate": 8.5 },
+  "sources": [
+    { "name": "Crude imports of 245.3 million tonnes in 2025-26, provisional government oil and gas data (reported 21 April 2026)", "url": "https://news.visitinrajasthan.com/?p=62219" },
+    { "name": "Barrels per tonne: 7.33 is the conventional average conversion for crude oil (BP Statistical Review approximate conversion factors)", "url": "https://www.energyinst.org/statistical-review" },
+    { "name": "Pump price build-up: Indian Oil, Delhi, effective 1 November 2026 (see the pump price page)", "url": "/tools/pump-price/" }
+  ]
+}
