@@ -1,0 +1,27 @@
+{
+  "checked": "2026-11-12",
+  "episodes": [
+    {
+      "id": "2013",
+      "name": "2013: taper tantrum and the FCNR(B) swap window",
+      "start": "2013-05-22", "window": ["2013-09-04", "2013-11-30"], "anchor": "2013-09-04",
+      "facts": [
+        { "text": "The RBI announced a special window on 4 September 2013 to swap fresh FCNR(B) dollar deposits of at least three years’ maturity at a fixed 3.5% a year, open until 30 November; banks’ overseas borrowing limit was raised from 50% to 100% of tier-I capital, swappable at 100bp below the market rate.", "source": "Business Standard, 5 Sep 2013", "url": "https://www.business-standard.com/amp/article/finance/rbi-to-offer-banks-window-to-swap-fresh-fcnr-b-deposits-113090400991_1.html" },
+        { "text": "The rupee had fallen about 30% against the dollar between April and August 2013.", "source": "Business Standard, 6 Dec 2013", "url": "https://www.business-standard.com/article/finance/bankers-say-extended-fcnr-b-facility-makes-little-sense-113120600601_1.html" },
+        { "text": "The two swap windows mobilised about $34 billion, according to the RBI; about $26–27 billion of it came through FCNR(B) deposits and about $8 billion through banks’ overseas borrowing.", "source": "Business Standard, 3 Dec 2013 and 15 Feb 2017", "url": "https://www.business-standard.com/amp/article/economy-policy/fcnr-b-deposit-pool-shrinks-sharply-in-q3-on-redemption-117021500045_1.html" },
+        { "text": "The deposits matured mostly in 2016: FCNR(B) deposits fell from $44.11 billion at end-September 2016 to $20.85 billion at end-December 2016.", "source": "Business Standard, 15 Feb 2017", "url": "https://www.business-standard.com/amp/article/economy-policy/fcnr-b-deposit-pool-shrinks-sharply-in-q3-on-redemption-117021500045_1.html" }
+      ]
+    },
+    {
+      "id": "2026",
+      "name": "2026: the oil shock and the second FCNR(B) window",
+      "start": "2026-03-01", "window": ["2026-06-08", "2026-08-31"], "anchor": "2026-06-05",
+      "facts": [
+        { "text": "The RBI announced a concessional US dollar–rupee swap facility on 5 June 2026, operational from 8 June, for fresh FCNR(B) deposits of three to five years, external commercial borrowings and overseas foreign currency borrowings.", "source": "Cavalier, 24 Aug 2026; Finance Mantraa", "url": "https://www.cavalier.in/cds-ota-current-affairs/2026-08-24/rbi-usd-inr-swap-facility-2026" },
+        { "text": "On 14 August the RBI brought the FCNR(B) deadline forward from 30 September to 31 August; the ECB and overseas borrowing windows stay open until 31 December 2026.", "source": "Business Today, 17 Aug 2026", "url": "https://www.businesstoday.in/india/story/rbis-fcnr-b-swap-window-saw-strong-inflows-why-then-was-it-closed-early-549630-2026-08-17" },
+        { "text": "RBI provisional figures of 2 September: $127.23 billion of FCNR(B) deposits by 31 August, and $136.38 billion including ECBs ($3.89 billion) and overseas borrowing ($5.26 billion). Later RBI data (21 September) put FCNR(B) mobilisation at $132.98 billion.", "source": "Policy Circle; Investmates, citing RBI releases", "url": "https://www.policycircle.org/opinion/nri-deposits-forex-safety-net/" },
+        { "text": "That is roughly four times the 2013 window, with a much smaller interest-rate gap: the India–US five-year yield spread was about 720bp on 4 September 2013 and about 210bp on 4 August 2026.", "source": "CareEdge Ratings", "url": "https://www.careratings.com/uploads/newsfiles/1786696025_FCNR%20Deposits%20-%20Stabilising%20the%20Rupee%20and%20Easing%20Rates.pdf" }
+      ]
+    }
+  ]
+}

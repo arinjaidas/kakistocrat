@@ -11,7 +11,7 @@ Sources (all free, no keys):
 Incremental: index history is cached and only missing trading days are fetched.
 Usage: python3 scripts/fetch_markets.py [--years N]
 """
-import csv, io, json, os, sys, time, zipfile, datetime as dt, urllib.request, urllib.error, urllib.parse
+import csv, io, json, os, re, sys, time, zipfile, datetime as dt, urllib.request, urllib.error, urllib.parse
 
 OUT = 'data/markets'
 UA = {'User-Agent': 'Mozilla/5.0 (compatible; kakistocrat-data/1.0; +https://kakistocrat.pages.dev)', 'Accept': '*/*'}
@@ -192,7 +192,10 @@ IMF = {'NGDP_RPCH': ('Real GDP growth', '%'), 'PCPIPCH': ('Consumer price inflat
        'NGDPDPC': ('GDP per person, current prices', 'US$'), 'NGDPD': ('GDP, current prices', 'US$ billion'), 'PPPGDP': ('GDP at purchasing power parity', 'int$ billion')}
 WDI = {'FI.RES.TOTL.MO': ('Reserves in months of imports', 'months'), 'BX.TRF.PWKR.CD.DT': ('Personal remittances received', 'US$'),
        'BX.KLT.DINV.CD.WD': ('Foreign direct investment, net inflows', 'US$'), 'NE.EXP.GNFS.ZS': ('Exports of goods and services', '% of GDP'),
-       'NE.IMP.GNFS.ZS': ('Imports of goods and services', '% of GDP'), 'NE.GDI.TOTL.ZS': ('Gross capital formation', '% of GDP')}
+       'NE.IMP.GNFS.ZS': ('Imports of goods and services', '% of GDP'), 'NE.GDI.TOTL.ZS': ('Gross capital formation', '% of GDP'),
+       'BN.CAB.XOKA.GD.ZS': ('Current account balance (World Bank)', '% of GDP'), 'DT.DOD.DECT.GN.ZS': ('External debt stocks', '% of GNI'), 'DT.DOD.DSTC.IR.ZS': ('Short-term external debt', '% of total reserves'),
+       'DT.TDS.DECT.EX.ZS': ('External debt service', '% of exports and primary income'), 'BX.PEF.TOTL.CD.WD': ('Portfolio equity, net inflows', 'US$'), 'FI.RES.TOTL.CD': ('Total reserves including gold', 'US$'),
+       'BX.GSR.NFSV.CD': ('Service exports', 'US$')}
 def imf_wdi():
     out = {'imf': {}, 'wdi': {}, 'countries': PEERS}
     for code, (label, unit) in IMF.items():
@@ -200,8 +203,13 @@ def imf_wdi():
         vals = j.get('values', {}).get(code, {})
         out['imf'][code] = {'label': label, 'unit': unit, 'data': {c: {y: v for y, v in vals.get(c, {}).items() if int(y) >= 1990} for c in PEERS}}
         time.sleep(0.4)
+    prev = json.load(open(os.path.join(OUT, 'macro_world.json'))) if os.path.exists(os.path.join(OUT, 'macro_world.json')) else {}
     for code, (label, unit) in WDI.items():
-        j = json.loads(get(f'https://api.worldbank.org/v2/country/{";".join(PEERS)}/indicator/{code}?format=json&per_page=2000&date=1990:2030'))
+        try: j = json.loads(get(f'https://api.worldbank.org/v2/country/{";".join(PEERS)}/indicator/{code}?format=json&per_page=2000&date=1990:2030', timeout=120))
+        except Exception as e:
+            print('  WDI', code, 'failed, keeping cached:', e)
+            if code in prev.get('wdi', {}): out['wdi'][code] = prev['wdi'][code]
+            continue
         data = {}
         for r in (j[1] if len(j) > 1 and j[1] else []):
             if r['value'] is not None: data.setdefault(r['countryiso3code'], {})[r['date']] = r['value']
@@ -210,6 +218,126 @@ def imf_wdi():
     save('macro_world', out)
     print('IMF/WDI:', len(out['imf']), len(out['wdi']), 'India growth', {k: v for k, v in out['imf']['NGDP_RPCH']['data']['IND'].items() if k in ('2025', '2026')})
 
+
+# ------------------------------------------------------------------ RBI Weekly Statistical Supplement: foreign exchange reserves (weekly since the late 1990s)
+RBI = 'https://www.rbi.org.in/Scripts/'
+MONTHS = {m: i + 1 for i, m in enumerate(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'])}
+def _rbi_date(t):
+    m = re.search(r'As on\s+([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})', t) or re.search(r'As on\s+(\d{1,2})\s+([A-Za-z]+),?\s+(\d{4})', t)
+    if not m: return None
+    a, b, y = m.groups()
+    mon, day = (a, b) if a[:1].isalpha() else (b, a)
+    k = MONTHS.get(mon[:3].lower())
+    return f'{int(y):04d}-{k:02d}-{int(day):02d}' if k else None
+def _rbi_row(t, label):
+    m = re.search('(?:' + label + r')[^|]*\|\s*([-\d.,]+)\s*\|\s*([-\d.,]+)', t)
+    if not m: return None
+    try: return float(m.group(2).replace(',', ''))
+    except ValueError: return None
+def rbi_fx(limit=150):
+    path = os.path.join(OUT, 'rbi_fx.json')
+    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 2: Foreign Exchange Reserves (US$ million)', 'weeks': {}, 'seen': []}
+    seen = set(cache.get('seen', []))
+    idx = get(RBI + 'WSSViewDetail.aspx?TYPE=Section&PARAM1=2', timeout=90).decode('utf-8', 'replace')
+    ids = re.findall(r'WSSView.aspx\?Id=(\d+)>Foreign Exchange Reserves', idx)
+    todo = [i for i in ids if i not in seen][: limit or None]
+    for n, i in enumerate(todo):
+        try: h = get(RBI + f'WSSView.aspx?Id={i}', timeout=60).decode('utf-8', 'replace')
+        except Exception as e: print('  skip', i, e); continue
+        k = h.find('Foreign Exchange Reserves'); t = re.sub(r'<(td|th)[^>]*>', '|', h[k:k + 30000]); t = re.sub(r'<[^>]+>', ' ', t).replace('&nbsp;', ' ')
+        t = re.sub(r'[ \t\r\n]+', ' ', t)
+        d = _rbi_date(t)
+        if d:
+            row = {'total': _rbi_row(t, r'Total Reserves'), 'fca': _rbi_row(t, r'Foreign Currency Assets'), 'gold': _rbi_row(t, r'\|\s*1\.2\s*Gold|Gold'), 'sdr': _rbi_row(t, r'SDRs'), 'rtp': _rbi_row(t, r'Reserve (?:Tranche )?Position')}
+            if row['total']: cache['weeks'][d] = row
+        seen.add(i)
+        if n % 50 == 49: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_fx {n + 1}/{len(todo)}')
+        time.sleep(0.25)
+    cache['seen'] = sorted(seen); cache['weeks'] = dict(sorted(cache['weeks'].items()))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'))
+    w = cache['weeks']; print('RBI FX reserves:', len(w), 'weeks', (min(w), max(w)) if w else '')
+
+# RBI WSS Table 4 (Ratios and Rates): money-market and bond rates, the RBI/FBIL rupee reference rate and forward premia; we keep the latest week on each page
+RATE_ROWS = {'call': r'Call Money Rate[^|]*', 'tb91': r'91[- ]Day Treasury Bill[^|]*', 'tb364': r'364[- ]Day Treasury Bill[^|]*', 'gsec10': r'10[- ]Year (?:G-Sec|Government Securities)[^|]*',
+             'inr': r'INR[- ]US\$ Spot Rate[^|]*|Rupee[- ]US Dollar[^|]*|Reference Rate[^|]*US\$[^|]*', 'fwd1m': r'Forward Premia of US\$ 1-month', 'fwd3m': r'\|\s*3-month', 'fwd6m': r'\|\s*6-month', 'crr': r'Cash Reserve Ratio', 'repo': r'Policy Repo Rate|Repo Rate'}
+def _last_num(t, label):
+    m = re.search('(?:' + label + ')', t)
+    if not m: return None
+    vals = []
+    for cell in t[m.end():].split('|')[1:40]:
+        c = cell.strip()
+        if re.search(r'[A-Za-z]', c): break
+        if c: vals.append(c)
+    if not vals: return None
+    try: return float(vals[-1].split('/')[0].replace(',', ''))
+    except ValueError: return None
+def rbi_rates(limit=150):
+    path = os.path.join(OUT, 'rbi_rates.json')
+    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 4: Ratios and Rates (latest week on each issue)', 'weeks': {}, 'seen': []}
+    seen = set(cache.get('seen', []))
+    idx = get(RBI + 'WSSViewDetail.aspx?TYPE=Section&PARAM1=4', timeout=90).decode('utf-8', 'replace')
+    ids = re.findall(r'WSSView.aspx\?Id=(\d+)>', idx)
+    todo = [i for i in ids if i not in seen][: limit or None]
+    for n, i in enumerate(todo):
+        try: h = get(RBI + f'WSSView.aspx?Id={i}', timeout=60).decode('utf-8', 'replace')
+        except Exception as e: print('  skip', i, e); continue
+        k = h.find('Ratios and Rates'); t = re.sub(r'<(td|th)[^>]*>', '|', h[k:k + 40000]); t = re.sub(r'</tr>', '\n', t); t = re.sub(r'<[^>]+>', ' ', t).replace('&nbsp;', ' ').replace('&#8377;', '₹')
+        lines = [re.sub(r'[ \t\r]+', ' ', l) for l in t.split('\n')]
+        d = None
+        for j, l in enumerate(lines):
+            if re.search(r'Week Ended', l):
+                yrs = re.findall(r'(19\d\d|20\d\d)', l); ds = re.findall(r'([A-Z][a-z]{2})\.?\s*(\d{1,2})', lines[j + 1] if j + 1 < len(lines) else '')
+                if yrs and ds:
+                    mon, day = ds[-1]; kk = MONTHS.get(mon.lower())
+                    if kk: d = f'{int(yrs[-1]):04d}-{kk:02d}-{int(day):02d}'
+                break
+        body = ' '.join(lines)
+        if d:
+            row = {key: _last_num(body, rx_) for key, rx_ in RATE_ROWS.items()}
+            if any(v is not None for v in row.values()): cache['weeks'][d] = row
+        seen.add(i)
+        if n % 50 == 49: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_rates {n + 1}/{len(todo)}')
+        time.sleep(0.25)
+    cache['seen'] = sorted(seen); cache['weeks'] = dict(sorted(cache['weeks'].items()))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'))
+    w = cache['weeks']; print('RBI rates:', len(w), 'weeks', (min(w), max(w)) if w else '')
+
+# ------------------------------------------------------------------ UN Comtrade (public preview API): India's goods trade by partner and by HS chapter
+CT = 'https://comtradeapi.un.org/public/v1/preview/C/A/HS'
+def comtrade():
+    ref = json.loads(get('https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json', timeout=90))['results']
+    iso = {r['id']: (r.get('PartnerCodeIsoAlpha3'), r['text']) for r in ref}
+    hs = {r['id']: r['text'] for r in json.loads(get('https://comtradeapi.un.org/files/v1/app/reference/HS.json', timeout=120))['results'] if r.get('aggrLevel') == 2}
+    this = dt.date.today().year; years = list(range(2015, this))
+    out = {'source': 'UN Comtrade (reported by India), goods trade, US$', 'years': [], 'world': {'X': {}, 'M': {}}, 'partners': {}, 'chapters': {}, 'partnerChapters': {}}
+    def q(**kw):
+        u = CT + '?' + urllib.parse.urlencode({'reporterCode': 699, 'customsCode': 'C00', 'motCode': 0, 'partner2Code': 0, **kw})
+        for k in range(3):
+            try:
+                j = json.loads(get(u, timeout=90)); time.sleep(1.3); return j.get('data') or []
+            except Exception as e: print('  comtrade retry', kw, e); time.sleep(5)
+        return []
+    for y in years:
+        got = False
+        for fl in ('X', 'M'):
+            for r in q(period=y, flowCode=fl, cmdCode='TOTAL'):
+                v = r['primaryValue']; pc = r['partnerCode']
+                if pc == 0: out['world'][fl][str(y)] = v; got = True; continue
+                a3, name = iso.get(pc, (None, None))
+                if not a3 or a3.startswith('_') or a3 in ('W00', 'X1', 'XX'): continue
+                p = out['partners'].setdefault(a3, {'name': name, 'X': {}, 'M': {}}); p[fl][str(y)] = v
+        if got: out['years'].append(y)
+    ly = str(out['years'][-1]) if out['years'] else None
+    if ly:
+        for fl in ('X', 'M'):
+            out['chapters'][fl] = {r['cmdCode']: r['primaryValue'] for r in q(period=ly, partnerCode=0, flowCode=fl, cmdCode='AG2')}
+        out['chapterNames'] = {k: v.split(' - ', 1)[-1] for k, v in hs.items() if k in set(out['chapters'].get('X', {})) | set(out['chapters'].get('M', {}))}
+        top = sorted(out['partners'], key=lambda a: -(out['partners'][a]['X'].get(ly, 0) + out['partners'][a]['M'].get(ly, 0)))[:15]
+        inv = {v[0]: k for k, v in iso.items() if v[0]}
+        for a in top:
+            out['partnerChapters'][a] = {fl: {r['cmdCode']: r['primaryValue'] for r in q(period=ly, partnerCode=inv[a], flowCode=fl, cmdCode='AG2')} for fl in ('X', 'M')}
+    save('trade', out)
+    print('Comtrade:', out['years'], len(out['partners']), 'partners')
 
 # ------------------------------------------------------------------ IMF WEO for every country (India vs the world rankings)
 WORLD_IND = {'NGDPD': ('GDP', 'US$ billion'), 'PPPGDP': ('GDP at purchasing power parity', 'int$ billion'), 'NGDPDPC': ('GDP per person', 'US$'),
@@ -249,7 +377,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('comtrade', comtrade)]
     if '--only' in sys.argv:
         only = sys.argv[sys.argv.index('--only') + 1]; dict(steps)[only](); sys.exit(0)
     ok = True

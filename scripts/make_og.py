@@ -12,6 +12,8 @@ CARDS = [
  ('maps', 'India in maps', 'Inflation, income, debt and every state as a country', '#271C5E'),
  ('world', 'India against the world', 'Where India ranks among 197 economies', '#B42318'),
  ('hormuz', 'Chokepoint watch', 'Ships through Hormuz and the world’s shipping lanes', '#B42318'),
+ ('external', 'External sector lab', 'Reserves, the rupee and the price of dollars', '#1D4ED8'),
+ ('trade', 'India’s trade', 'Who India buys from and sells to, and what', '#0F6B3A'),
  ('charts', 'Chart workbench', 'Plot 300 Indian and global series against each other', '#0F766E'),
  ('infographics', 'India in pictures', 'The Budget rupee, the inflation basket, states as countries', '#7C3AED'),
  ('pump-price', 'Pump price', 'What’s in a litre of petrol', '#B45309'),
