@@ -9,14 +9,14 @@
    "unit": "%",
    "decimals": 2,
    "latest": {
-    "value": 5.54,
-    "period": "Sep 2026",
-    "released": "2026-10-12",
+    "value": 6.09,
+    "period": "Oct 2026",
+    "released": "2026-11-12",
     "status": "Provisional"
    },
    "previous": {
-    "value": 4.83,
-    "period": "Aug 2026",
+    "value": 5.54,
+    "period": "Sep 2026",
     "status": "Final"
    },
    "revisions": [
@@ -29,8 +29,8 @@
     }
    ],
    "next": {
-    "date": "2026-11-12",
-    "what": "October 2026 CPI"
+    "date": "2026-12-12",
+    "what": "November 2026 CPI (12 December or the next working day)"
    },
    "history": [
     {
@@ -48,21 +48,29 @@
     {
      "t": "Sep 2026",
      "v": 5.54
+    },
+    {
+     "t": "Oct 2026",
+     "v": 6.09
     }
    ],
    "definition": "Year-on-year change in the all-India Consumer Price Index (combined, base 2024=100) published by MoSPI's National Statistics Office.",
-   "context": "September's jump was led by food: the Consumer Food Price Index rose 7.74 per cent, up from 5.97 per cent in August. Rural inflation was 6.08 per cent against 4.88 per cent in cities.",
+   "context": "October's rise was again led by food: the Consumer Food Price Index rose 8.94 per cent, up from 7.74 per cent in September, with onion prices up 116 per cent on a year earlier. Rural inflation was 6.63 per cent against 5.41 per cent in cities. The headline rate is now above the top of the RBI's 2–6 per cent tolerance band. September's 5.54 per cent was confirmed unchanged in the final data.",
    "sources": [
     {
-     "name": "MoSPI CPI press release, September 2026",
-     "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf"
+     "name": "Reuters: India’s October retail inflation at 6.09% (government data, 12 Nov 2026)",
+     "url": "https://www.investing.com/news/economy-news/indias-october-retail-inflation-at-609-onyear-5020869"
     },
     {
-     "name": "MoSPI CPI press release, July 2026 (June final, July provisional)",
-     "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/aug/doc2026812951801.pdf"
+     "name": "ANI via The Tribune: rural, urban and food inflation for October 2026, citing MoSPI",
+     "url": "https://www.tribuneindia.com/news/business/retail-inflation-hits-24-month-high-of-6-09-in-october-crosses-rbis-upper-tolerance-limit-ahead-of-december-mpc-meet"
+    },
+    {
+     "name": "MoSPI CPI press release, September 2026 (for September figures)",
+     "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf"
     }
    ],
-   "checked": "2026-11-11",
+   "checked": "2026-11-12",
    "related": [
     "india-july-2026-inflation-gap",
     "india-new-inflation-basket",
