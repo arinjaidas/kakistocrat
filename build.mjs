@@ -75,14 +75,14 @@ const TOOLS = [
 ];
 // The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
 const SECTIONS = [
-  { name: 'Desk', url: '/desk/', blurb: 'Today in numbers and the big picture', tabs: [['/desk/', 'Today'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
-  { name: 'Markets', url: '/markets/', blurb: 'Equities, companies, commodities, the Terminal', tabs: [['/markets/', 'Equities'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
-  { name: 'Economy', url: '/economy/', blurb: 'Industry, credit, prices and the Budget', tabs: [['/economy/', 'Industry & credit'], ['/economy/prices/', 'Prices'], ['/economy/budget/', 'Budget']], match: ['/economy/'] },
-  { name: 'External', url: '/external/', blurb: 'The rupee, reserves, trade and shipping', tabs: [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], match: ['/external/', '/trade/', '/hormuz/'] },
-  { name: 'Places', url: '/states/', blurb: 'States, districts and the world', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
-  { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or rates', tabs: [['/what-if/', 'Scenario'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
+  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
+  { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Industry & credit'], ['/economy/prices/', 'Prices'], ['/economy/budget/', 'Budget']], match: ['/economy/'] },
+  { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], match: ['/external/', '/trade/', '/hormuz/'] },
+  { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
+  { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
   { name: 'Charts', url: '/charts/', blurb: 'Plot any series against any other', tabs: [], match: ['/charts/', '/s/'] },
-  { name: 'Explore', url: '/explore/', blurb: 'Search, directory and data API', tabs: [['/explore/', 'Directory'], ['/api/', 'Data API']], match: ['/explore/', '/api/'] },
+  { name: 'Explore', url: '/explore/', blurb: 'Search everything, browse the directory, download the data', tabs: [['/explore/', 'Directory'], ['/api/', 'Data API']], match: ['/explore/', '/api/'] },
 ];
 const sectionOf = path => SECTIONS.find(S => S.match.some(x => path.startsWith(x)));
 
@@ -214,7 +214,10 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <meta property="og:title" content="${esc(title || 'The Kakistocrat')}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="${type}"><meta property="og:url" content="${esc(BASE_URL + path)}"><meta property="og:image" content="${ogImage ? BASE_URL + ogImage : `${BASE_URL}/og/${ogSlug(path)}.png`}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${ogImage ? BASE_URL + ogImage : `${BASE_URL}/og/${ogSlug(path)}.png`}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=${BUILT.getTime()}"><link rel="alternate" type="application/rss+xml" title="The Kakistocrat" href="https://${SITE}/feed/">
+<link rel="stylesheet" href="/styles.css?v=${BUILT.getTime()}"><script>(function(){var M=null;function load(){return M||(M=fetch('/api/search.json').then(function(r){return r.json()}).then(function(s){var m={};s.forEach(function(x){if(/^(co|st|c|s)$/.test(x[0])){m[x[1].toLowerCase()]=x[2];if(x[0]==='co')m[x[1].replace(/ \([^)]*\)$/,'').toLowerCase()]=x[2];}});return m;}));}
+function wrap(e){var o=e.init;e.init=function(el){var c=o.apply(this,arguments);try{if(el&&el.closest&&el.closest('.wb,.term,#en-chart,#co-chart,#ds-map,#ex-net,[data-noclick]'))return c;c.on('click',function(p){if(p.componentType!=='series')return;if(p.data&&p.data.s&&/^[A-Z0-9&-]+$/.test(p.data.s)){location.href='/company/'+p.data.s.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-')+'/';return;}var keys=[p.data&&p.data.name,p.name,p.seriesName];if(p.seriesType==='heatmap'){var y=(c.getOption().yAxis||[])[0];if(y&&y.data&&p.value)keys.unshift(y.data[p.value[1]]);}load().then(function(m){for(var i=0;i<keys.length;i++){var k=keys[i];if(k&&m[String(k).toLowerCase()]){location.href=m[String(k).toLowerCase()];return;}}});});}catch(err){}return c;};}
+var _e;Object.defineProperty(window,'echarts',{configurable:true,get:function(){return _e},set:function(v){_e=v;Promise.resolve().then(function(){if(v&&v.init&&!v.__k){v.__k=1;wrap(v);}});}});
+document.addEventListener('click',function(ev){var t=ev.target.closest&&ev.target.closest('[data-href]');if(t){ev.preventDefault();location.href=t.getAttribute('data-href');}});})();</script><link rel="alternate" type="application/rss+xml" title="The Kakistocrat" href="https://${SITE}/feed/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2315171A'/%3E%3Ctext x='16' y='23' font-family='Georgia' font-size='20' fill='%23fff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 </head><body>
 <a class="sr" href="#main">Skip to content</a>
@@ -231,7 +234,7 @@ ${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; co
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
 <div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
-<div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a><small>${esc(S.blurb)}</small></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
+<div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
 <script src="/app.js?v=${BUILT.getTime()}" defer></script><script src="/search.js?v=${BUILT.getTime()}" defer></script>
@@ -274,13 +277,13 @@ ${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
 ${TOPIC_ORDER.slice(2).map(deskBlock).join('')}
 ${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/archive/#explainers">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
 </div>
-<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">The data</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Eight ways into the numbers</h2><div class="tools-grid sec-grid">${SECTIONS.map(S => `<a class="tool-card" href="${S.url}"><span class="kicker">${esc(S.name)}</span><h3>${esc(S.blurb)}</h3>${S.tabs.length > 1 ? `<p>${S.tabs.map(t => esc(t[1])).join(' · ')}</p>` : ''}</a>`).join('')}</div></div></section>`;
+<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">The data</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Eight ways into the numbers</h2><div class="tools-grid sec-grid">${SECTIONS.map(S => `<a class="tool-card" href="${S.url}"><span class="kicker">${esc(S.name)}</span><h3>${esc(S.blurb)}</h3></a>`).join('')}</div></div></section>`;
 }
 
 function articlePage(a, m) {
   const t = TOPICS[a.topic];
   const sameTopic = m.articles.filter(x => x.topic === a.topic && x.id !== a.id).slice(0, 5);
-  const seriesBoxes = a.series.map(s => { const S = m.series.find(x => x.slug === s.slug); if (!S) return ''; return `<aside class="series-box"><span class="kicker">Part of a series</span><h2 style="margin:6px 0 4px;font:500 24px/1.2 var(--serif)"><a href="/series/${S.slug}/">${esc(S.name)}</a></h2><p class="dek sm">${esc(S.description)}</p><ol>${S.items.map(x => `<li class="${x.id === a.id ? 'here' : ''}"><a href="${x.url}">${esc(x.title)}</a></li>`).join('')}</ol></aside>`; }).join('');
+  const seriesBoxes = a.series.map(s => { const S = m.series.find(x => x.slug === s.slug); if (!S) return ''; return `<aside class="series-box"><span class="kicker">Part of a series</span><h2 style="margin:6px 0 4px;font:500 24px/1.2 var(--serif)"><a href="/series/${S.slug}/">${esc(S.name)}</a></h2><p class="dek sm">${esc(S.description)}</p><ol>${S.items.map(x => `${x.id === a.id ? `<li class="here"><span>${esc(x.title)}</span> <small>(you are reading this)</small></li>` : `<li><a href="${x.url}">${esc(x.title)}</a></li>`}`).join('')}</ol></aside>`; }).join('');
   return `<div class="wrap"><article class="art">
 <div>
  <header class="art-head"><a href="/topic/${a.topic}/" class="kicker desk" style="--desk:${t.color}">${esc(t.name)}</a>${fmtBadge(a)}
@@ -655,7 +658,7 @@ async function main() {
   // chart images at fixed URLs for embedding in WordPress posts (redrawn on every build)
   try { execSync(`python3 scripts/render_cards.py ${OUT}`, { stdio: 'inherit', timeout: 300000 }); } catch (e) { console.warn('Social cards skipped:', e.message); }
   if (!process.env.SKIP_IMG) { try { execSync(`python3 scripts/render_charts.py ${OUT}`, { stdio: 'inherit', timeout: 900000 }); } catch (e) { console.warn('Chart images skipped:', e.message); } }
-  await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
+  await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage([...catalog, ...HIDDEN.map(c => ({ ...c, group: 'World: other countries (annual)' }))], { pageHead }) }));
   api['health'] = 'Site health from the last build: broken internal links, data series that have gone stale, pages missing a title or description';
   api['catalog'] = `Catalogue of ${catalog.length + HIDDEN.length} series (${HIDDEN.length} world series marked hidden have no page but can be charted); each is at /api/series/{id}.json`;
   if (MK) { await write('api/rupee.json', JSON.stringify(rupeeData(MK, tape))); api['rupee'] = 'Rupee page bundle: 15 currencies per US dollar (daily), US rates and dollar index, India repo and 10-year yield, external-sector indicators for India and 13 peers'; }
