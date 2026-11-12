@@ -385,6 +385,29 @@ def iip():
     if series: save('iip', {'source': 'MoSPI, Index of Industrial Production (eSankhyiki API); growth is year on year', 'series': series})
     print('IIP:', {k: list(v['pts'].items())[-1] for k, v in series.items() if k == 'General'}, len(series), 'series')
 
+# data.gov.in (needs DATA_GOV_IN_KEY, a GitHub secret the site owner creates; skipped without it).
+# Daily mandi prices: all-India average modal price, ₹ per quintal, for the vegetables that drive food inflation.
+MANDI_RES = '9ef84268-d588-465a-a308-a864a43d0070'   # "Current daily price of various commodities from various markets (Mandi)"
+def mandi():
+    key = os.environ.get('DATA_GOV_IN_KEY')
+    if not key: print('Mandi prices: no DATA_GOV_IN_KEY, skipped'); return
+    path = os.path.join(OUT, 'mandi.json'); cache = json.load(open(path)) if os.path.exists(path) else {'source': 'Agmarknet via data.gov.in; all-India mean of market modal prices, ₹/quintal', 'days': {}}
+    for com in ['Onion', 'Tomato', 'Potato']:
+        rows = []
+        for off in range(0, 5000, 1000):
+            j = json.loads(get('https://api.data.gov.in/resource/' + MANDI_RES + '?' + urllib.parse.urlencode({'api-key': key, 'format': 'json', 'limit': 1000, 'offset': off, 'filters[commodity]': com}), timeout=90))
+            rows += j.get('records') or []
+            if len(j.get('records') or []) < 1000: break
+        by = {}
+        for r in rows:
+            try: d = dt.datetime.strptime(r['arrival_date'], '%d/%m/%Y').date().isoformat(); by.setdefault(d, []).append(float(r['modal_price']))
+            except (KeyError, ValueError): pass
+        for d, v in by.items(): cache['days'].setdefault(d, {})[com.lower()] = {'price': round(sum(v) / len(v)), 'markets': len(v)}
+        time.sleep(0.5)
+    cache['days'] = dict(sorted(cache['days'].items()))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'))
+    print('Mandi prices:', list(cache['days'].items())[-1:] )
+
 # India monthly activity from FRED (OECD Main Economic Indicators, seasonally adjusted, US$)
 FRED_LONG = {'DEXINUS': 'inr_long'}  # long daily history for episode comparisons
 FRED_IN = {'XTEXVA01INM667S': ('India merchandise exports, monthly (seasonally adjusted)', 'US$'), 'XTIMVA01INM667S': ('India merchandise imports, monthly (seasonally adjusted)', 'US$')}
@@ -522,7 +545,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('mandi', mandi), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:

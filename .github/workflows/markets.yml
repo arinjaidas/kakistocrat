@@ -20,6 +20,8 @@ jobs:
         with: { python-version: '3.12' }
       - run: pip install openpyxl
       - run: python scripts/fetch_markets.py --years 3
+        env:
+          DATA_GOV_IN_KEY: ${{ secrets.DATA_GOV_IN_KEY }}
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Save today's Daily Desk
