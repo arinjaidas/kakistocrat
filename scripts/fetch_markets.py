@@ -382,6 +382,7 @@ def iip():
     print('IIP:', {k: list(v['pts'].items())[-1] for k, v in series.items() if k == 'General'}, len(series), 'series')
 
 # India monthly activity from FRED (OECD Main Economic Indicators, seasonally adjusted, US$)
+FRED_LONG = {'DEXINUS': 'inr_long'}  # long daily history for episode comparisons
 FRED_IN = {'XTEXVA01INM667S': ('India merchandise exports, monthly (seasonally adjusted)', 'US$'), 'XTIMVA01INM667S': ('India merchandise imports, monthly (seasonally adjusted)', 'US$')}
 def india_monthly():
     out = {}
@@ -391,6 +392,10 @@ def india_monthly():
         if pts: out[sid] = {'label': label, 'unit': unit, 'pts': pts}
         time.sleep(0.3)
     if out: save('india_monthly', out)
+    for sid, name in FRED_LONG.items():
+        raw = get(f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}&cosd=2005-01-01')
+        pts = [[r[0], num(r[1])] for r in csv.reader(io.StringIO(raw.decode())) if len(r) == 2 and r[0][:2] in ('19', '20') and num(r[1]) is not None]
+        if pts: save(name, {'source': f'FRED {sid}', 'pts': pts})
     print('India monthly (FRED):', {k: v['pts'][-1] for k, v in out.items()})
 
 # RBI WSS Table 4 (Ratios and Rates): money-market and bond rates, the RBI/FBIL rupee reference rate and forward premia; we keep the latest week on each page

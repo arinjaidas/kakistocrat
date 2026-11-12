@@ -27,7 +27,10 @@
       series: X.episodes.map(e => ({ name: e.id, type: 'line', showSymbol: false, lineStyle: { width: 2.4, color: COL[e.id] }, itemStyle: { color: COL[e.id] }, data: get(e.anchor),
         markLine: e.id === '2013' ? { symbol: 'none', silent: true, lineStyle: { color: MUTE, type: 'dotted' }, data: [{ xAxis: '0' }], label: { formatter: 'announced', color: MUTE, fontSize: 10 } } : undefined })) });
     ep(cs[1], a => rel(fd, d => F.weeks[d].total, a, true));
-    ep(cs[2], a => rel(rd, d => R.weeks[d].inr, a, true));
+    const L = await fetch('/api/markets/inr_long.json').then(r => r.json()).catch(() => null);
+    if (L?.pts) { const wk = {}; for (const [d, v] of L.pts) { const t = new Date(d + 'T00:00:00Z'), k = new Date(+t + ((5 - t.getUTCDay() + 7) % 7) * 864e5).toISOString().slice(0, 10); wk[k] = v; } // week ending Friday
+      const wd = Object.keys(wk).sort(); ep(cs[2], a => rel(wd, d => wk[d], a, true)); }
+    else ep(cs[2], a => rel(rd, d => R.weeks[d].inr, a, true));
     // rates
     const rates = r => { const i0 = cut(rd, r), d = rd.slice(i0);
       cs[3].setOption({ textStyle: { fontFamily: FONT }, grid: { left: 44, right: 20, top: 40, bottom: 60 }, tooltip: { ...tip, valueFormatter: v => v == null ? '—' : v.toFixed(2) + '%' }, legend: { top: 0, textStyle: { color: MUTE, fontSize: 11 } }, dataZoom: [{ type: 'inside' }, { type: 'slider', height: 16, bottom: 8, borderColor: RULE }],
