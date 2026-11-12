@@ -12,11 +12,18 @@ async def check_scenario(pg, base):
     initial = await delta.inner_text()
     if not initial.startswith('₹0.00 per litre'):
         return 'default calculation does not match the published baseline'
+    fx = pg.locator('#sx-inr')
+    baseline_fx = float(await fx.input_value())
     await pg.get_by_role('button', name='Rupee at 100', exact=True).click()
+    if float(await fx.input_value()) != 100:
+        return 'rupee preset did not set the exchange rate'
+    test_fx = 101 if abs(baseline_fx - 100) < 0.05 else 100
+    await fx.fill(str(test_fx))
     await pg.locator('#sx-pass').fill('50')
     shocked = await delta.inner_text()
-    if shocked == initial or await pg.locator('#sx-inr').input_value() != '100':
-        return 'rupee preset did not recalculate the scenario'
+    expected_sign = '+₹' if test_fx > baseline_fx else '−₹'
+    if not shocked.startswith(expected_sign):
+        return 'a change in the exchange rate moved the fuel price in the wrong direction'
     await pg.reload(wait_until='domcontentloaded')
     if await delta.inner_text() != shocked:
         return 'the shared URL did not restore the scenario'
