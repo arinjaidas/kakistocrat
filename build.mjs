@@ -25,6 +25,7 @@ import { mapsPage, mapPosters } from './lib/maps.mjs';
 import { scenarioPage } from './lib/scenario.mjs';
 import { externalPage } from './lib/external.mjs';
 import { tradePage, tradeBlock } from './lib/trade.mjs';
+import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
 let MK = null;
@@ -646,7 +647,8 @@ async function main() {
   if (false) await write('data/index.html', P({ title: 'India macro data', path: '/data/', description: 'CPI, repo rate, rupee, bond yields, Brent and the Nifty with sources.', body: dataHub(tape, m) }));
   if (false) for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
-  await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: forecastsPage(fc) }));
+  const FCS = scoreCalls(fc, SD, BUILT.toISOString().slice(0, 10)); await write('api/forecasts.json', JSON.stringify({ method: fc.method, calls: FCS.map(({ spark, ...c }) => c) }));
+  await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: fcPage(fc, FCS, { pageHead }) }));
   await write('tools/shock-lab/index.html', P({ title: 'Scenario engine: what if?', path: '/tools/shock-lab/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
   await write('tools/index.html', P({ title: 'Tools and data', path: '/tools/', description: 'Interactive tools on India’s economy built on official data.', body: toolsHub(HUBSTATS) }));
   await write('tools/budget-x-ray/index.html', P({ title: 'Budget X-Ray 2026-27', path: '/tools/budget-x-ray/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) }));
