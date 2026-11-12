@@ -3,6 +3,8 @@ on:
   schedule:
     - cron: '35 12 * * 1-5'   # 18:05 IST, after NSE publishes closing files
     - cron: '35 15 * * 1-5'   # 21:05 IST, catch late files
+    - cron: '17 14 * * 1-5'   # 19:47 IST, extra run in case GitHub skips one
+    - cron: '43 2 * * 2-6'    # 08:13 IST next morning, last catch-up
     - cron: '20 3 * * 0'      # Sunday: weekly refresh for monthly series
   workflow_dispatch: {}
 permissions:
