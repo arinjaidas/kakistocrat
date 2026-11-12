@@ -21,7 +21,8 @@ import { terminalPage } from './lib/terminal.mjs';
 import { pumpPage } from './lib/pump.mjs';
 import { hormuzPage } from './lib/hormuz.mjs';
 import { worldPage } from './lib/world.mjs';
-import { mapsPage } from './lib/maps.mjs';
+import { mapsPage, mapPosters } from './lib/maps.mjs';
+import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx } from './lib/entities.mjs';
 let MK = null;
 
 const SITE = 'thekakisto.wordpress.com';
@@ -40,6 +41,8 @@ const TOPICS = {
   'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#334155', blurb: 'Economies, conflicts and export controls beyond India.' },
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
+const MARKET_PATHS = ['/markets/', '/commodities/', '/rupee/', '/hormuz/', '/world/', '/terminal/', '/charts/'];
+export const TAPE_S = { cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' };
 const TOOLS = [
   { url: '/today/', kicker: 'India Today', title: 'The economy on one screen', blurb: 'Rule-based readings, from inflation and rates to the rupee, oil, Hormuz shipping, the Budget and growth.' },
   { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Indices, rates, currencies, commodities, movers, crypto and the data calendar in one dense dark screen, with a command bar that charts any series.' },
@@ -51,7 +54,6 @@ const TOOLS = [
   { url: '/charts/', kicker: 'Chart workbench', title: 'Plot anything against anything', blurb: 'A library of Indian and global series: overlay up to six, transform, zoom, share and download.' },
   { url: '/markets/', kicker: 'Markets', title: 'Indices, heatmap, rates and currencies', blurb: 'NSE closes for 28 indices, a Nifty 50 heatmap, valuations, yield curves, currency race charts and live crypto.' },
   { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges, a comparison chart and a year-on-year heat table.' },
-  { url: '/data/', kicker: 'India macro tape', title: 'Latest, previous, revised', blurb: 'CPI, repo, rupee, bond yields, Brent and the Nifty, each with its source and next release.' },
   { url: '/tools/budget-x-ray/', kicker: 'Budget X-Ray', title: 'Halfway through the Budget', blurb: 'Receipts, spending and the deficit against the full-year plan, with a year-end calculator.' },
   { url: '/tools/india-by-state/', kicker: 'India by State', title: 'Thirty-one states compared', blurb: 'Income, growth, inflation and state debt on a tile map, with any two measures plotted against each other.' },
   { url: '/infographics/', kicker: 'Infographics', title: 'India in pictures', blurb: 'The Budget rupee as a flow diagram, the inflation basket, a GDP race from 1990, and India against its peers.' },
@@ -168,16 +170,17 @@ function tapeHTML(tape) {
   let mticks = '';
   if (MK) {
     const L = MK.dates.length - 1;
-    const idx = (k, n, href = '/markets/') => { const a = MK.series[n]; if (!a) return ''; const v = a[L], p = a[L - 1], c = p ? (v / p - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${v.toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
-    const fr = (k, id, unit, dec = 2, href = '/markets/') => { const x = MK.fredLast?.[id]; if (!x) return ''; const c = x.prev ? (x.last[1] / x.prev[1] - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${unit === '$' ? '$' : ''}${x.last[1].toFixed(dec)}${unit === '%' ? '%' : ''}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
+    const nseS = n => '/s/nse-' + n.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '/';
+    const idx = (k, n, href = nseS(n)) => { const a = MK.series[n]; if (!a) return ''; const v = a[L], p = a[L - 1], c = p ? (v / p - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${v.toLocaleString('en-IN', { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
+    const fr = (k, id, unit, dec = 2, href = `/s/fred-${id.toLowerCase()}/`) => { const x = MK.fredLast?.[id]; if (!x) return ''; const c = x.prev ? (x.last[1] / x.prev[1] - 1) * 100 : 0; return `<a class="tick" href="${href}"><span class="k">${k}</span><span class="v">${unit === '$' ? '$' : ''}${x.last[1].toFixed(dec)}${unit === '%' ? '%' : ''}</span><span class="d ${c > 0 ? 'up' : c < 0 ? 'dn' : 'flat'}">${c > 0 ? '+' : c < 0 ? '−' : ''}${Math.abs(c).toFixed(2)}%</span></a>`; };
     const inr = MK.fxOut?.table.find(t => t.c === 'INR');
     const g = MK.comm?.items.find(i => i.id === 'gold');
     mticks = idx('Nifty 50', 'Nifty 50') + idx('Bank Nifty', 'Nifty Bank') + idx('Midcap 100', 'NIFTY Midcap 100') + idx('India VIX', 'India VIX') +
-      (inr ? `<a class="tick" href="/rupee/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span></a>` : '') +
-      fr('Brent', 'DCOILBRENTEU', '$', 2, '/commodities/') + fr('WTI', 'DCOILWTICO', '$', 2, '/commodities/') +
-      (g ? `<a class="tick" href="/commodities/"><span class="k">Gold</span><span class="v">$${Math.round(g.cur).toLocaleString('en-IN')}</span><span class="d ${g.mm > 0 ? 'up' : 'dn'}">${g.mm > 0 ? '+' : '−'}${Math.abs(g.mm).toFixed(1)}% m/m</span></a>` : '') +
+      (inr ? `<a class="tick" href="/s/fx-usdinr/"><span class="k">₹/$</span><span class="v">${inr.last.toFixed(2)}</span><span class="d ${inr.d1 > 0 ? 'dn' : inr.d1 < 0 ? 'up' : 'flat'}">${inr.d1 > 0 ? '+' : inr.d1 < 0 ? '−' : ''}${Math.abs(inr.d1 || 0).toFixed(2)}%</span></a>` : '') +
+      fr('Brent', 'DCOILBRENTEU', '$', 2) + fr('WTI', 'DCOILWTICO', '$', 2) +
+      (g ? `<a class="tick" href="/s/wb-gold/"><span class="k">Gold</span><span class="v">$${Math.round(g.cur).toLocaleString('en-IN')}</span><span class="d ${g.mm > 0 ? 'up' : 'dn'}">${g.mm > 0 ? '+' : '−'}${Math.abs(g.mm).toFixed(1)}% m/m</span></a>` : '') +
       fr('US 10Y', 'DGS10', '%') + fr('US 2Y', 'DGS2', '%') + fr('Dollar idx', 'DTWEXBGS', '', 1) +
-      `<a class="tick" href="/markets/#mk-btc"><span class="k">BTC</span><span class="v" data-live="btc">${(MK.crypto?.bitcoin?.at(-1)?.[1] || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span><span class="d" data-live="btc-c">live</span></a>`;
+      `<a class="tick" href="/s/crypto-bitcoin/"><span class="k">BTC</span><span class="v" data-live="btc">${(MK.crypto?.bitcoin?.at(-1)?.[1] || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span><span class="d" data-live="btc-c">live</span></a>`;
   }
   return `<div class="tape" role="region" aria-label="India markets and macro tape"><div class="wrap tape-wrap"><span class="tape-label">India tape</span><div class="tape-viewport"><div class="tape-track">${ticks}${mticks}<span class="tape-gap"></span><span class="tape-dup" aria-hidden="true" inert>${ticks}${mticks}</span><span class="tape-gap"></span></div></div><a class="tape-more" href="/markets/">Markets →</a></div></div>`;
 }
@@ -199,9 +202,10 @@ function layout({ title, description = '', path = '/', body, canonical, tape, ac
 <a class="brand" href="/">The Kakistocrat<small>Economics · Politics · Policy</small></a>
 <button class="menu-btn" aria-expanded="false" aria-controls="nav">Sections</button>
 <nav class="nav" id="nav" aria-label="Topics">${nav}</nav>
-<nav class="toolsnav" aria-label="Tools"><a href="/today/">Today</a><a href="/terminal/">Terminal</a><a href="/markets/">Markets</a><a href="/commodities/">Commodities</a><a href="/rupee/">Rupee</a><a href="/maps/">Maps</a><a href="/charts/">Charts</a><a href="/tools/">Tools</a><a href="/archive/">Search</a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
+<nav class="toolsnav" aria-label="Tools">${[["/today/", "Today"], ["/terminal/", "Terminal"], ["/markets/", "Markets"], ["/maps/", "Maps"], ["/charts/", "Charts"], ["/explore/", "Explore"], ["/tools/", "Tools"]].map(([u, t]) => `<a href="${u}"${path.startsWith(u) || (u === "/markets/" && MARKET_PATHS.some(x => path.startsWith(x))) ? ' aria-current="page"' : ""}>${t}</a>`).join("")}<a href="/explore/" data-qs class="qs-btn" title="Search everything (/ or ⌘K)">Search <kbd>/</kbd></a><a class="cta" href="https://${SITE}/#subscribe">Subscribe</a></nav>
 </div></header>
 ${tapeHTML(tape)}
+${MARKET_PATHS.some(x => path.startsWith(x)) || path.startsWith('/s/') ? `<nav class="subnav" aria-label="Markets"><div class="wrap">${[['/terminal/', 'Terminal'], ['/markets/', 'Equities'], ['/commodities/', 'Commodities'], ['/rupee/', 'Rupee & rates'], ['/hormuz/', 'Shipping'], ['/world/', 'World'], ['/charts/', 'Workbench']].map(([u, t]) => `<a href="${u}"${path.startsWith(u) ? ' aria-current="page"' : ''}>${t}</a>`).join('')}<span class="sub-hint">Every name is a link · press / to search</span></div></nav>` : ''}
 <main id="main">${body}</main>
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
@@ -210,7 +214,7 @@ ${tapeHTML(tape)}
 <div><h4>Tools</h4><ul>${TOOLS.map(t => `<li><a href="${t.url}">${esc(t.kicker)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
-<script src="/app.js?v=${BUILT.getTime()}" defer></script>
+<script src="/app.js?v=${BUILT.getTime()}" defer></script><script src="/search.js?v=${BUILT.getTime()}" defer></script>
 </body></html>`;
 }
 
@@ -242,7 +246,7 @@ function home(m, tape, ledger) {
  <div class="col rail-col">
   <div class="module dark"><span class="kicker" style="color:#F0A39B">Shock Lab</span><h3>What does a $10 oil spike cost?</h3><p>Move oil and the rupee, see the bill for an importer, the pump and a household.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open the calculator</a></div>
   <div class="module"><span class="kicker">Policy Ledger</span><h3>From promise to proof</h3><ul class="mini-ledger">${ledger.items.slice(0, 4).map(i => `<li><a href="/ledger/#${i.id}"><b style="font:500 14.5px/1.3 var(--serif)">${esc(i.title)}</b></a>${pips(i)}<div class="meta" style="margin-top:4px">${stagesDone(i)}/5 · next check ${esc(isoOrMonth(i.nextCheck))}</div></li>`).join('')}</ul><p style="margin:8px 0 0"><a href="/ledger/" class="meta" style="color:var(--accent)">All tracked policies →</a></p></div>
-  <div class="module"><span class="kicker">Data</span><h3>India at a glance</h3>${tape.indicators.slice(0, 4).map(i => `<a href="/data/${i.id}/" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--rule);font:500 13px var(--mono)"><span>${esc(i.label)}</span><b>${esc(tapeVal(i, i.latest.value))}</b></a>`).join('')}<p style="margin:8px 0 0"><a href="/data/" class="meta" style="color:var(--accent)">Data hub →</a></p></div>
+  <div class="module"><span class="kicker">Data</span><h3>India at a glance</h3>${tape.indicators.slice(0, 4).map(i => `<a href="/s/${TAPE_S[i.id]}/" style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--rule);font:500 13px var(--mono)"><span>${esc(i.label)}</span><b>${esc(tapeVal(i, i.latest.value))}</b></a>`).join('')}<p style="margin:8px 0 0"><a href="/data/" class="meta" style="color:var(--accent)">Data hub →</a></p></div>
  </div>
 </div>
 ${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
@@ -268,6 +272,7 @@ function articlePage(a, m) {
  <p class="origin-note">First published on <a href="${esc(a.wpLink)}" style="text-decoration:underline">thekakisto.wordpress.com</a>. Figures are as cited at the time of publication; check the linked sources for later revisions.</p>
 </div>
 <aside class="rail"><div class="sticky">
+ ${(m.storyData?.[a.id] || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${m.storyData[a.id].map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
  <div class="module"><span class="kicker desk" style="--desk:${t.color}">More in ${esc(t.short)}</span><div class="rule-list" style="margin-top:8px">${sameTopic.map(x => `<a class="story" href="${x.url}"><h3 class="h-4">${esc(x.title)}</h3><div class="meta">${esc(shortDate(x.date))}</div></a>`).join('')}</div></div>
  <div class="module dark"><span class="kicker" style="color:#F0A39B">Shock Lab</span><h3>Run your own scenario</h3><p>Oil, the rupee and who pays.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/tools/shock-lab/">Open</a></div>
 </div></aside>
@@ -310,7 +315,7 @@ function explainersPage(m) {
 
 function dataHub(tape, m) {
   return pageHead('Data', 'India macro data', `The figures on the tape, each with its source, the date it was checked, what changed and when the next release is due. ${esc(tape.note)}`) +
-  `<div class="wrap"><div class="data-grid">${tape.indicators.map(i => { const d = i.latest.value - i.previous.value; return `<a class="ind-card" href="/data/${i.id}/"><span class="kicker">${esc(i.label)}</span><span class="v">${esc(tapeVal(i, i.latest.value))}</span><span class="chg" style="color:${d > 0 ? 'var(--up)' : d < 0 ? 'var(--down)' : 'var(--mute)'}">${d > 0 ? '▲' : d < 0 ? '▼' : '■'} from ${esc(tapeVal(i, i.previous.value))} · ${esc(i.previous.period)}</span><div class="spark" data-chart='${esc(JSON.stringify({ pts: i.history, spark: true, decimals: i.decimals, label: i.label }))}'></div><span class="meta">${esc(i.latest.period)} · next: ${esc(isoOrMonth(i.next.date))}</span></a>`; }).join('')}</div>
+  `<div class="wrap"><div class="data-grid">${tape.indicators.map(i => { const d = i.latest.value - i.previous.value; return `<a class="ind-card" href="/s/${TAPE_S[i.id]}/"><span class="kicker">${esc(i.label)}</span><span class="v">${esc(tapeVal(i, i.latest.value))}</span><span class="chg" style="color:${d > 0 ? 'var(--up)' : d < 0 ? 'var(--down)' : 'var(--mute)'}">${d > 0 ? '▲' : d < 0 ? '▼' : '■'} from ${esc(tapeVal(i, i.previous.value))} · ${esc(i.previous.period)}</span><div class="spark" data-chart='${esc(JSON.stringify({ pts: i.history, spark: true, decimals: i.decimals, label: i.label }))}'></div><span class="meta">${esc(i.latest.period)} · next: ${esc(isoOrMonth(i.next.date))}</span></a>`; }).join('')}</div>
   <p class="meta" style="margin-top:18px">Tape last updated ${esc(longDate(tape.updated + 'T00:00:00Z'))}. Market levels are closing values, not live prices.</p></div>`;
 }
 
@@ -330,7 +335,7 @@ function indicatorPage(i, m) {
   </div><aside class="rail">${rel.length ? `<div class="module"><span class="kicker">Our analysis</span><div class="rule-list" style="margin-top:8px">${rel.map(a => `<a class="story" href="${a.url}"><h3 class="h-4">${esc(a.title)}</h3><div class="meta">${esc(shortDate(a.date))}</div></a>`).join('')}</div></div>` : ''}
   <div class="module"><span class="kicker">Other indicators</span><div class="rule-list" style="margin-top:8px">${window_tape_others(i)}</div></div></aside></div>`;
 }
-let __tapeRef = null; function window_tape_others(i) { return __tapeRef.indicators.filter(x => x.id !== i.id).map(x => `<a class="story" href="/data/${x.id}/" style="display:flex;justify-content:space-between"><span>${esc(x.label)}</span><b class="meta" style="color:var(--ink)">${esc(tapeVal(x, x.latest.value))}</b></a>`).join(''); }
+let __tapeRef = null; function window_tape_others(i) { return __tapeRef.indicators.filter(x => x.id !== i.id).map(x => `<a class="story" href="/s/${TAPE_S[x.id]}/" style="display:flex;justify-content:space-between"><span>${esc(x.label)}</span><b class="meta" style="color:var(--ink)">${esc(tapeVal(x, x.latest.value))}</b></a>`).join(''); }
 
 function ledgerPage(ledger, m) {
   const arts = Object.fromEntries(m.articles.map(a => [a.slug, a]));
@@ -432,6 +437,8 @@ async function main() {
   await cp('src/hormuz.js', join(OUT, 'hormuz.js'));
   await cp('src/world.js', join(OUT, 'world.js'));
   await cp('src/maps.js', join(OUT, 'maps.js'));
+  await cp('src/entity.js', join(OUT, 'entity.js'));
+  await cp('src/search.js', join(OUT, 'search.js'));
   if (existsSync('static')) await cp('static', OUT, { recursive: true });
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
@@ -448,11 +455,11 @@ async function main() {
   for (const f of ['tape', 'ledger', 'budget', 'states', 'exposure', 'twocharts', 'forecasts', 'infographics', 'cpi_basket', 'pump', 'states_countries']) { await write(`api/${f}.json`, await readFile(`data/${f}.json`, 'utf8')); }
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
   // ---- series catalogue for the chart workbench
-  const catalog = [];
+  const catalog = [], SD = {};
   const addSeries = async (id, name, group, unit, freq, source, dates, values) => {
     const pts = dates.map((d, i) => [d, values[i]]).filter(p => p[1] != null && Number.isFinite(p[1]));
     if (pts.length < 3) return;
-    catalog.push({ id, name, group, unit, freq, source, first: pts[0][0], last: pts.at(-1)[0], n: pts.length });
+    catalog.push({ id, name, group, unit, freq, source, first: pts[0][0], last: pts.at(-1)[0], n: pts.length }); SD[id] = { d: pts.map(p => p[0]), v: pts.map(p => p[1]) };
     await write(`api/series/${id}.json`, JSON.stringify({ id, name, unit, freq, source, d: pts.map(p => p[0]), v: pts.map(p => p[1]) }));
   };
   const slug = t => t.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -477,6 +484,61 @@ async function main() {
       }
     }
   }
+  // India macro releases from the tape (CPI, repo) join the catalogue, so they chart, correlate and link like everything else
+  const MON = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
+  for (const [tid, sid, name] of [['cpi', 'india-cpi', 'CPI inflation, India'], ['repo', 'india-repo', 'RBI repo rate']]) {
+    const i = tape.indicators.find(x => x.id === tid); if (!i) continue;
+    const pts = [...(i.history || []), { t: i.latest.period, v: i.latest.value }].map(h => { const [mo, y] = h.t.split(' '); return MON[mo] ? [`${y}-${MON[mo]}`, h.v] : null; }).filter(Boolean);
+    const uniq = [...new Map(pts.map(p => [p[0], p])).values()].sort((a, b) => a[0].localeCompare(b[0]));
+    await addSeries(sid, name, 'India: macro releases', i.unit === '%' ? '%' : i.unit, 'monthly', i.sources?.[0]?.name?.split(',')[0] || 'Official release', uniq.map(p => p[0]), uniq.map(p => p[1]));
+  }
+  // ---- the connected layer
+  const byId = Object.fromEntries(catalog.map(c => [c.id, c]));
+  const corr = correlations(SD, catalog);
+  const SC = JSON.parse(await readFile('data/states_countries.json', 'utf8'));
+  const W = MK?.imfWorld;
+  const ents = [
+    ...Object.entries(SERIES_KW).filter(([id]) => byId[id]).map(([id, re]) => ({ key: id, re, min: /^(imf|fx-usdinr)/.test(id) ? 2 : 1 })),
+    ...states.states.map(st => ({ key: 'state:' + st.name, re: rx(STATE_ALIAS[st.name] || [st.name]) })),
+    ...(W ? Object.entries(W.countries).map(([iso, n]) => [iso, cleanCountry(n)]).filter(([, n]) => !SKIP_COUNTRY.has(n)).map(([iso, n]) => ({ key: 'country:' + iso, re: rx(COUNTRY_ALIAS[n] || [n]), min: (COUNTRY_ALIAS[n] || [n]).length > 1 ? 2 : 1 })) : []),
+  ];
+  const ment = mentions(m.articles, ents);
+  ment['india-cpi'] = ment['imf-pcpipch-ind']; ment['fred-dexinus'] = ment['fx-usdinr']; ment['wb-brent'] = ment['fred-dcoilbrenteu']; ment['india-repo'] = mentions(m.articles, [{ key: 'r', re: /\brepo rate\b|\bMPC\b|\bmonetary policy\b/gi }]).r;
+  const entUrl = k => k.startsWith('state:') ? `/state/${slugify(k.slice(6))}/` : k.startsWith('country:') ? `/country/${slugify(cleanCountry(W.countries[k.slice(8)]))}/` : `/s/${k}/`;
+  const SHORTN = { 'imf-ngdp-rpch-ind': 'GDP growth', 'imf-pcpipch-ind': 'Inflation', 'imf-bca-ngdpd-ind': 'Current account', 'imf-ggxwdg-ngdp-ind': 'Government debt', 'imf-ggxcnl-ngdp-ind': 'Fiscal deficit', 'fx-usdinr': 'Rupee', 'fred-dcoilbrenteu': 'Brent crude', 'pw-strait-of-hormuz': 'Hormuz shipping', 'fred-dff': 'Fed funds rate', 'fx-usdcny': 'Yuan', 'fx-usdeur': 'Euro', 'india-repo': 'Repo rate', 'fred-dgs10': 'US 10-year yield' };
+  const entName = k => k.startsWith('state:') ? k.slice(6) : k.startsWith('country:') ? cleanCountry(W.countries[k.slice(8)]) : SHORTN[k] || (byId[k]?.name || k).replace(/, US\$$|: India$/, '');
+  // article -> data it mentions (for "Data in this story")
+  m.storyData = {};
+  for (const [k, hits] of Object.entries(ment)) for (const h of hits || []) (m.storyData[h.a.id] ||= []).push({ k, u: entUrl(k), t: entName(k), n: h.n, type: k.startsWith('state:') ? 'state' : k.startsWith('country:') ? 'country' : 'series' });
+  for (const id in m.storyData) m.storyData[id] = [...new Map(m.storyData[id].map(x => [x.u, x])).values()].sort((a, b) => b.n - a.n).slice(0, 12);
+  // network of co-mentions
+  const nodeKeys = Object.entries(ment).filter(([k, h]) => h && h.length >= 2 && !/^(fred-dexinus|wb-brent|india-cpi)$/.test(k)).map(([k]) => k);
+  const pair = {};
+  for (const a of m.articles) { const ks = (m.storyData[a.id] || []).map(x => x.k).filter(k => nodeKeys.includes(k)); for (let i = 0; i < ks.length; i++) for (let j = i + 1; j < ks.length; j++) { const key = [ks[i], ks[j]].sort().join('|'); pair[key] = (pair[key] || 0) + 1; } }
+  const net = { nodes: nodeKeys.map(k => ({ id: k, name: entName(k), value: ment[k].length, url: entUrl(k), t: k.startsWith('state:') ? 'state' : k.startsWith('country:') ? 'country' : 'series' })),
+    links: Object.entries(pair).filter(([, v]) => v >= 1).map(([k, v]) => { const [a, b] = k.split('|'); return { source: a, target: b, value: v }; }) };
+  const posters = mapPosters(states, SC);
+  const tapeBy = Object.fromEntries(tape.indicators.map(i => [TAPE_S[i.id], i]));
+  const crumbsFor = c => `<a href="/explore/">Explore</a> › <a href="/explore/#series">${esc(c.group)}</a>`;
+  for (const c of catalog) await write(`s/${c.id}/index.html`, P({ title: c.name, path: `/s/${c.id}/`, description: `${c.name}: ${c.unit}, ${c.freq}, ${c.first} to ${c.last}. Chart, history, what moves with it, and the articles that mention it.`, body: entitySeriesPage(c, SD[c.id], { catalog, corr, ment, byId, crumbsFor, tapeBy }) }));
+  for (const st of states.states) await write(`state/${slugify(st.name)}/index.html`, P({ title: st.name, path: `/state/${slugify(st.name)}/`, description: `${st.name}: income, growth, inflation, debt and finances, ranked against every state, with similar states and related articles.`, body: statePage(st, { S: states, SC, ment, posters }) }));
+  if (W) { const fxCodes = new Set(Object.keys(MK.fx?.rates || {}));
+    for (const iso of Object.keys(W.countries)) { const n = cleanCountry(W.countries[iso]); await write(`country/${slugify(n)}/index.html`, P({ title: n, path: `/country/${slugify(n)}/`, description: `${n}: GDP, income per person, growth, inflation and debt, ranked among every economy, with India alongside.`, body: countryPage(iso, { W, SC, ment, year: BUILT.getUTCFullYear(), catalog, fxCodes }) })); }
+    await write('explore/index.html', P({ title: 'Explore', path: '/explore/', description: 'Every series, state, country and article on the site, connected.', body: explorePage({ catalog, S: states, W, ment, articles: m.articles, net }) })); }
+  // site-wide search index: [type, name, url, extra]
+  const searchIdx = [
+    ...TOOLS.map(t => ['t', t.kicker, t.url, t.title]),
+    ...posters.map(p => ['m', `Map: ${p.kicker}`, `/maps/#${p.id}`, p.title]),
+    ...catalog.map(c => ['s', c.name, `/s/${c.id}/`, c.group]),
+    ...states.states.map(st => ['st', st.name, `/state/${slugify(st.name)}/`, 'State']),
+    ...(W ? Object.values(W.countries).map(n => ['c', cleanCountry(n), `/country/${slugify(cleanCountry(n))}/`, 'Country']) : []),
+    ...m.articles.map(a => ['a', a.title, a.url, `${TOPICS[a.topic].short} · ${a.date.slice(0, 10)}`]),
+    ...TOPIC_ORDER.map(t => ['p', TOPICS[t].name, `/topic/${t}/`, 'Topic']), ['p', 'Explore everything', '/explore/', 'Directory and network'], ['p', 'Data API', '/api/', 'Download'],
+  ];
+  await write('api/search.json', JSON.stringify(searchIdx));
+  api['search'] = 'Site-wide search index: [type, name, url, detail]';
+  await write('api/graph.json', JSON.stringify({ correlations: corr, network: net }));
+  api['graph'] = 'How the site connects: correlation of monthly changes between every pair of series, and the network of subjects the articles discuss together';
   await write('api/catalog.json', JSON.stringify(catalog));
   await write('charts/index.html', P({ title: 'Chart workbench', path: '/charts/', description: `Plot any of ${catalog.length} series on Indian markets, currencies, commodities, rates and the world economy.`, body: workbenchPage(catalog, { pageHead }) }));
   api['catalog'] = `Catalogue of ${catalog.length} series; each is at /api/series/{id}.json`;
@@ -491,8 +553,8 @@ async function main() {
   for (const s of m.series) await write(`series/${s.slug}/index.html`, P({ title: s.name, path: `/series/${s.slug}/`, description: s.description, body: seriesPage(s) }));
   await write('explainers/index.html', P({ title: 'Explainers', path: '/explainers/', description: 'Primers on Indian economics and policy.', body: explainersPage(m) }));
   await write('archive/index.html', P({ title: 'Archive and search', path: '/archive/', description: 'Search every article.', body: archivePage(m) }));
-  await write('data/index.html', P({ title: 'India macro data', path: '/data/', description: 'CPI, repo rate, rupee, bond yields, Brent and the Nifty with sources.', body: dataHub(tape, m) }));
-  for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
+  if (false) await write('data/index.html', P({ title: 'India macro data', path: '/data/', description: 'CPI, repo rate, rupee, bond yields, Brent and the Nifty with sources.', body: dataHub(tape, m) }));
+  if (false) for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
   await write('ledger/index.html', P({ title: 'Policy Ledger', path: '/ledger/', description: 'Policies tracked from announcement to measured outcome.', body: ledgerPage(ledger, m) }));
   await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: forecastsPage(fc) }));
   await write('tools/shock-lab/index.html', P({ title: 'Shock Lab: oil and the rupee', path: '/tools/shock-lab/', description: 'Calculate what an oil or rupee shock does to an importer, the pump and a household.', body: shockLab(tape) }));
@@ -522,9 +584,10 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/explainers/', '/archive/', '/data/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
+  const urls = ['/', '/series/', '/explainers/', '/archive/', '/explore/', '/ledger/', '/forecasts/', '/tools/', '/today/', '/markets/', '/commodities/', '/rupee/', '/terminal/', '/hormuz/', '/world/', '/maps/', '/charts/', '/api/', '/tools/emi/', '/tools/pump-price/', '/chartle/', '/infographics/', '/tools/shock-lab/', '/tools/budget-x-ray/', '/tools/india-by-state/', '/tools/two-chart-test/', '/tools/exposure/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...tape.indicators.map(i => `/data/${i.id}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
+  await write('_redirects', ['/data/ /today/ 301', ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k}/ /s/${v}/ 301`), ...Object.entries(TAPE_S).map(([k, v]) => `/data/${k} /s/${v}/ 301`)].join('\n') + '\n');
   await write('_headers', `/api/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=900\n/wp-kit/*\n  Access-Control-Allow-Origin: https://thekakisto.wordpress.com\n  Cache-Control: no-store\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/styles.css\n  Cache-Control: public, max-age=3600\n/app.js\n  Cache-Control: public, max-age=3600\n`);
   console.log(`Built ${m.articles.length} articles, ${m.series.length} series → ${OUT}/`);
 }

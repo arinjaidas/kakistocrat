@@ -104,7 +104,7 @@
       const s0 = range === 'All' ? 0 : Math.max(0, W.months.length - 12 * parseInt(range)), rb = $('#cm-rebase').checked;
       ch.setOption({ ...base(), legend: { top: 0, textStyle: { fontFamily: FONT } }, xAxis: { type: 'category', data: W.months.slice(s0), boundaryGap: false, ...axis() }, yAxis: { type: 'value', scale: true, ...axis() }, dataZoom: [{ type: 'inside' }, { type: 'slider', height: 22, bottom: 8 }],
         series: picked.map((id, k) => { const s = W.series[id], a = s.v.slice(s0), f = a.find(v => v != null); return { name: `${s.name} (${s.unit})`, type: 'line', showSymbol: false, data: rb ? a.map(v => v == null ? null : +(v / f * 100).toFixed(1)) : a, lineStyle: { width: 2, color: PAL[k % PAL.length] }, itemStyle: { color: PAL[k % PAL.length] } }; }) }, true);
-      $('#cm-picked').textContent = picked.map(id => W.series[id].name).join(' · ');
+      $('#cm-picked').innerHTML = picked.map(id => `<a href="/s/wb-${id}/" title="Full page">${W.series[id].name} ↗</a>`).join(' · ');
       $$('.cm-tile').forEach(t => t.classList.toggle('on', picked.includes(t.dataset.c)));
     };
     $$('.cm-tile').forEach(t => t.addEventListener('click', () => { const id = t.dataset.c; picked = picked.includes(id) ? picked.filter(x => x !== id) : [...picked, id].slice(-6); if (!picked.length) picked = [id]; draw(); $('#cm-chart-sec').scrollIntoView({ behavior: 'smooth', block: 'start' }); }));

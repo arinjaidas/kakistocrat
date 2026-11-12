@@ -31,7 +31,7 @@
     const first = v.find(x => x != null), last = v.filter(x => x != null).at(-1), chg = first ? (last / first - 1) * 100 : null;
     const col = chg == null || chg >= 0 ? '#22C55E' : '#EF4444';
     $('#t-ct').textContent = (meta.name || cur).toUpperCase();
-    $('#t-cs').innerHTML = `${meta.unit || ''} · ${meta.freq || ''} · ${meta.source || ''} · last ${nf(last)}${chg != null && meta.freq !== 'annual' ? ` · <span class="${chg >= 0 ? 't-up' : 't-dn'}">${chg >= 0 ? '+' : '−'}${Math.abs(chg).toFixed(2)}% over ${range}</span>` : ''}${proj > 0 ? ' · dashed = projection' : ''} · <a href="/charts/#s=${cur}:lvl">open in workbench →</a>`;
+    $('#t-cs').innerHTML = `${meta.unit || ''} · ${meta.freq || ''} · ${meta.source || ''} · last ${nf(last)}${chg != null && meta.freq !== 'annual' ? ` · <span class="${chg >= 0 ? 't-up' : 't-dn'}">${chg >= 0 ? '+' : '−'}${Math.abs(chg).toFixed(2)}% over ${range}</span>` : ''}${proj > 0 ? ' · dashed = projection' : ''} · <a href="/s/${cur}/">full page →</a> · <a href="/charts/#s=${cur}:lvl">workbench →</a>`;
     const lbl = meta.freq === 'annual' ? d.map(x => x.slice(0, 4)) : meta.freq === 'monthly' ? d.map(x => x.slice(0, 7)) : d;
     const split = proj > 0 ? [v.map((x, i) => i < proj ? x : null), v.map((x, i) => i >= proj - 1 ? x : null)] : [v];
     chart.setOption({ backgroundColor: 'transparent', animationDuration: 300, grid: { left: 58, right: 16, top: 12, bottom: 28 },

@@ -56,7 +56,7 @@
         ${rev ? `<tr><th colspan="2">Revised</th></tr>${rev}` : ''}
         <tr><td>Next release</td><td>${dateFmt(ind.next.date)}</td></tr></table>
       <div class="meta" style="text-transform:none;letter-spacing:0">${esc(ind.next.what)}</div>
-      <div class="links"><a href="/data/${ind.id}/">Full data page →</a><a href="${esc(ind.sources[0].url)}" rel="noopener">Source</a></div>`;
+      <div class="links"><a href="/s/${({ cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' })[ind.id]}/">Full data page →</a><a href="${esc(ind.sources[0].url)}" rel="noopener">Source</a></div>`;
     document.body.appendChild(pop);
     const r = btn.getBoundingClientRect();
     pop.style.top = (window.scrollY + r.bottom + 6) + 'px';

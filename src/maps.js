@@ -56,6 +56,7 @@
     const w = el.clientWidth || 540; el.style.height = (w * H / W) + 'px';
     const c = charts[p.id] || (charts[p.id] = echarts.init(el, null, { renderer: 'canvas' }));
     c.resize(); c.setOption(option(p, w / W), true);
+    if (!c.__clk) { c.__clk = 1; c.on('click', q => { if (q.name && p.values[q.name] != null) location.href = '/state/' + q.name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '/'; }); }
   }
   const boot = async () => {
     if (!window.echarts) return setTimeout(boot, 60);
