@@ -1,0 +1,14 @@
+{
+  "checked": "2026-11-12",
+  "note": "RBI policy repo rate, effective date of each change. 2022 onward checked against published decision lists; earlier changes are the RBI's announced decisions.",
+  "start": { "date": "2019-01-01", "rate": 6.50 },
+  "changes": [
+    ["2019-02-07", 6.25], ["2019-04-04", 6.00], ["2019-06-06", 5.75], ["2019-08-07", 5.40], ["2019-10-04", 5.15], ["2020-03-27", 4.40], ["2020-05-22", 4.00],
+    ["2022-05-04", 4.40], ["2022-06-08", 4.90], ["2022-08-05", 5.40], ["2022-09-30", 5.90], ["2022-12-07", 6.25], ["2023-02-08", 6.50],
+    ["2025-02-07", 6.25], ["2025-04-09", 6.00], ["2025-06-06", 5.50], ["2025-12-05", 5.25], ["2026-10-07", 5.50]
+  ],
+  "sources": [
+    { "name": "RBI repo rate decisions since 2018 (decision list)", "url": "https://www.stage2stocks.com/market-timing/macro/repo-rate" },
+    { "name": "MPC decisions in 2025 and 2026", "url": "https://indiainflation.com/rbi/repo-rate" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "checked": "2026-11-12",
+  "note": "Dated events drawn on charts across the site. 'series' lists the series ids (a trailing * matches a prefix) the event is drawn on; an empty list means every chart.",
+  "events": [
+    { "date": "2025-02-01", "short": "Budget 25-26", "label": "Union Budget 2025-26 presented", "series": ["nse-*", "nse-nifty-10-yr-benchmark-g-sec"], "source": "Ministry of Finance" },
+    { "date": "2025-02-07", "short": "RBI −25bp", "label": "RBI cuts the repo rate to 6.25%, its first cut since 2020", "series": ["india-repo", "nse-*", "fx-usdinr", "fred-dexinus"], "source": "https://indiainflation.com/rbi/repo-rate" },
+    { "date": "2025-04-09", "short": "RBI −25bp", "label": "RBI cuts the repo rate to 6.00%", "series": ["india-repo", "nse-*", "fx-usdinr", "fred-dexinus"], "source": "https://indiainflation.com/rbi/repo-rate" },
+    { "date": "2025-06-06", "short": "RBI −50bp", "label": "RBI cuts the repo rate by 50bp to 5.50% and announces a CRR cut to 3%", "series": ["india-repo", "nse-*", "fx-usdinr", "fred-dexinus"], "source": "https://indiainflation.com/rbi/repo-rate" },
+    { "date": "2025-08-27", "short": "US 50% tariff", "label": "An extra 25% US tariff on most Indian goods takes effect, taking the total to 50%", "series": ["fx-usdinr", "fred-dexinus", "nse-*"], "source": "https://www.india-briefing.com/news/us-india-tariff-50-percent-new-rules-impact-exporters-39458.html/" },
+    { "date": "2025-09-22", "short": "GST cuts", "label": "GST rate cuts take effect: two main slabs of 5% and 18%", "series": ["india-cpi", "nse-nifty-auto", "nse-nifty-fmcg", "nse-nifty-50", "nse-nifty-consumer-durables"], "source": "https://continuumeconomics.com/a/b085bcf0/new-gst-slabs-to-boost-demand-as-india-faces-50-us-tariffs" },
+    { "date": "2025-12-05", "short": "RBI −25bp", "label": "RBI cuts the repo rate to 5.25%", "series": ["india-repo", "nse-*", "fx-usdinr", "fred-dexinus"], "source": "https://indiainflation.com/rbi/repo-rate" },
+    { "date": "2026-02-01", "short": "Budget 26-27", "label": "Union Budget 2026-27 presented, the first on a Sunday", "series": ["nse-*", "nse-nifty-10-yr-benchmark-g-sec"], "source": "https://www.thestatesman.com/business/union-budget-speech-live-budget-2026-1503549630.html" },
+    { "date": "2026-02-12", "short": "New CPI", "label": "First CPI release on the new 2024=100 base", "series": ["india-cpi"], "source": "https://www.insightsonindia.com/2026/02/13/consumer-price-index-cpi-base-2024100/" },
+    { "date": "2026-03-01", "short": "Hormuz shut", "label": "Ship transits through the Strait of Hormuz collapse (IMF PortWatch: 57 on 28 Feb, 4 on 2 Mar)", "series": ["fred-dcoil*", "fred-dhhngsp", "wb-*", "pw-*", "fx-usdinr", "fred-dexinus", "nse-nifty-50", "nse-nifty-energy", "nse-nifty-oil-and-gas", "india-cpi"], "source": "https://portwatch.imf.org/" },
+    { "date": "2026-10-07", "short": "RBI +25bp", "label": "RBI raises the repo rate to 5.50%, its first hike since February 2023", "series": ["india-repo", "nse-*", "fx-usdinr", "fred-dexinus", "nse-nifty-10-yr-benchmark-g-sec"], "source": "https://www.business-standard.com/finance/news/rbi-mpc-repo-rate-october-2026-last-hikes-sanjay-malhotra-gdp-inflation-126100700290_1.html" }
+  ]
+}

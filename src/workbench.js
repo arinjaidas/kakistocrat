@@ -3,7 +3,7 @@
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const PAL = ['#15171A', '#B42318', '#1D4ED8', '#0F766E', '#B45309', '#7C3AED'];
   const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', MUTE = '#6B7078', RULE = '#E2DFD8';
-  const EVENTS = [['2026-02-01', 'Union Budget 2026-27'], ['2026-03-01', 'Hormuz disruption (Mar 2026)'], ['2026-10-07', 'RBI hikes repo to 5.50%'], ['2026-11-03', 'US midterm elections']];
+  let EVENTS = []; fetch('/api/events.json').then(r => r.json()).then(j => { EVENTS = j.events.map(e => [e.date, e.short]); }).catch(() => {});
   const TF = { lvl: 'Level', yoy: 'Change on a year earlier, %', rb: 'Rebased, start = 100' };
   let CAT = [], byId = {}, cache = {}, sel = [], range = '3Y', chart;
   const wait = fn => window.echarts ? fn() : setTimeout(() => wait(fn), 60);

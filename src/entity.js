@@ -12,7 +12,8 @@
   if (window.__EN) ready(async () => {
     const E = window.__EN, el = $('#en-chart'), c = echarts.init(el); addEventListener('resize', () => c.resize());
     const get = id => fetch(`/api/series/${id}.json`).then(r => r.json());
-    const main = await get(E.id); let cmp = null, range = E.annual ? 'All' : '3Y';
+    const [main, EV] = await Promise.all([get(E.id), fetch('/api/events.json').then(r => r.json()).then(j => j.events.filter(e => !e.series.length || e.series.some(t => t.endsWith('*') ? E.id.startsWith(t.slice(0, -1)) : t === E.id))).catch(() => [])]); let cmp = null, range = E.annual ? 'All' : '3Y';
+    const evLine = dates => { const xs = EV.map(e => [e, dates.find(d => d >= e.date.slice(0, dates[0].length))]).filter(x => x[1] && x[1] !== dates[0]); return xs.length ? { symbol: 'none', silent: false, lineStyle: { color: INK, type: 'dashed', opacity: 0.35 }, label: { formatter: p => p.name, position: 'insideEndTop', color: INK, fontFamily: MONO, fontSize: 10 }, tooltip: { formatter: p => p.data.full }, data: xs.map(([e, d]) => ({ xAxis: d, name: e.short, full: `${e.date}: ${e.label}` })) } : undefined; };
     const start = (d, r) => { if (r === 'All') return d[0]; const t = new Date(d.at(-1)); t.setFullYear(t.getFullYear() - parseInt(r)); return t.toISOString().slice(0, 10); };
     const draw = () => {
       const s0 = start(main.d, range), idx = main.d.map((x, i) => x >= s0 ? i : -1).filter(i => i >= 0);
@@ -21,7 +22,7 @@
         const proj = E.annual ? dates.findIndex(x => x > E.today) : -1;
         c.setOption({ textStyle: { fontFamily: FONT }, animationDuration: 300, grid: { left: 60, right: 20, top: 20, bottom: 40 }, tooltip: { trigger: 'axis', valueFormatter: v => nf(v) },
           xAxis: axis({ type: 'category', data: dates, boundaryGap: false }), yAxis: axis({ type: 'value', scale: true, name: E.unit, nameTextStyle: { color: MUTE } }),
-          series: (proj > 0 ? [vals.map((v, i) => i < proj ? v : null), vals.map((v, i) => i >= proj - 1 ? v : null)] : [vals]).map((data, k) => ({ type: 'line', data, showSymbol: E.annual, symbolSize: 4, lineStyle: { color: RED, width: 2.2, type: k ? 'dashed' : 'solid' }, itemStyle: { color: RED },
+          series: (proj > 0 ? [vals.map((v, i) => i < proj ? v : null), vals.map((v, i) => i >= proj - 1 ? v : null)] : [vals]).map((data, k) => ({ type: 'line', data, showSymbol: E.annual, symbolSize: 4, markLine: k ? undefined : evLine(dates), step: E.id === 'india-repo' ? 'end' : false, lineStyle: { color: RED, width: 2.2, type: k ? 'dashed' : 'solid' }, itemStyle: { color: RED },
             areaStyle: k ? undefined : { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(180,35,24,.16)' }, { offset: 1, color: 'rgba(180,35,24,0)' }] } } })) }, true);
         $('#en-ct').textContent = E.name; return;
       }

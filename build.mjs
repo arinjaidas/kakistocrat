@@ -468,7 +468,7 @@ async function main() {
     for (const [f, d] of [['stocks', 'nse_stocks'], ['fred', 'fred'], ['fx', 'fx'], ['worldbank', 'worldbank'], ['crypto', 'crypto'], ['world', 'macro_world']]) { await write(`api/markets/${f}.json`, await readFile(`data/markets/${d}.json`, 'utf8')); }
     Object.assign(api, { 'markets/stocks': 'Nifty 50 constituents: close, change, market cap; NSE breadth', 'markets/fred': 'US Treasury yields, fed funds, breakeven inflation, broad dollar index, EIA oil and gas spot prices (FRED)', 'markets/fx': '15 currencies per US dollar, ECB reference rates, daily', 'markets/worldbank': '35 commodity prices, monthly, World Bank Pink Sheet', 'markets/crypto': 'Bitcoin and ether, daily USD, CoinGecko', 'markets/world': 'IMF World Economic Outlook and World Bank indicators for India and 13 peers, annual' });
   }
-  for (const f of ['tape', 'ledger', 'budget', 'states', 'exposure', 'twocharts', 'forecasts', 'infographics', 'cpi_basket', 'pump', 'states_countries']) { await write(`api/${f}.json`, await readFile(`data/${f}.json`, 'utf8')); }
+  for (const f of ['tape', 'ledger', 'budget', 'states', 'exposure', 'twocharts', 'forecasts', 'infographics', 'cpi_basket', 'pump', 'states_countries', 'events', 'repo_history']) { await write(`api/${f}.json`, await readFile(`data/${f}.json`, 'utf8')); }
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
   // ---- series catalogue for the chart workbench
   const catalog = [], SD = {};
@@ -502,7 +502,11 @@ async function main() {
   }
   // India macro releases from the tape (CPI, repo) join the catalogue, so they chart, correlate and link like everything else
   const MON = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
-  for (const [tid, sid, name] of [['cpi', 'india-cpi', 'CPI inflation, India'], ['repo', 'india-repo', 'RBI repo rate']]) {
+  // the repo rate as a full monthly step series since 2019 from the decision history
+  { const RH = JSON.parse(await readFile('data/repo_history.json', 'utf8')); const ds = [], vs = []; let r = RH.start.rate;
+    for (let t = new Date(RH.start.date + 'T00:00:00Z'); t <= BUILT; t.setUTCMonth(t.getUTCMonth() + 1)) { const me = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).toISOString().slice(0, 10); for (const [d, x] of RH.changes) if (d <= me) r = x; ds.push(me.slice(0, 7)); vs.push(r); }
+    await addSeries('india-repo', 'RBI repo rate', 'India: macro releases', '%', 'monthly', 'RBI monetary policy decisions', ds, vs); }
+  for (const [tid, sid, name] of [['cpi', 'india-cpi', 'CPI inflation, India']]) {
     const i = tape.indicators.find(x => x.id === tid); if (!i) continue;
     const pts = [...(i.history || []), { t: i.latest.period, v: i.latest.value }].map(h => { const [mo, y] = h.t.split(' '); return MON[mo] ? [`${y}-${MON[mo]}`, h.v] : null; }).filter(Boolean);
     const uniq = [...new Map(pts.map(p => [p[0], p])).values()].sort((a, b) => a[0].localeCompare(b[0]));

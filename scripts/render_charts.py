@@ -56,15 +56,22 @@ def main():
             ax.plot(x, y, color=RED, lw=2.2 if not annual else 2.6)
             ax.fill_between(x, y, min(y), color=RED, alpha=0.06)
         lo, hi = min(y), max(y); pad = (hi - lo) * 0.08 or abs(hi) * 0.05 or 1
-        ax.set_ylim(lo - pad, hi + pad * 1.6)
+        ax.set_ylim(lo - pad, hi + pad * 1.7)
         # events that fall in range and are tagged for this series (or for everything)
-        for e in events:
+        placed = []; span = (x[-1] - x[0]).days or 1
+        for e in sorted(events, key=lambda e: e['date']):
             ed = parse(e['date'])
-            if ed < x[0] or ed > x[-1]: continue
+            if ed <= x[0] or ed > x[-1]: continue
             tags = e.get('series', [])
             if tags and c['id'] not in tags and not any(c['id'].startswith(t.rstrip('*')) for t in tags if t.endswith('*')): continue
-            ax.axvline(ed, color=INK, lw=0.8, alpha=0.35, ls=(0, (2, 2)))
-            ax.text(ed, hi + pad * 1.45, ' ' + e['short'], fontsize=9, color=INK, alpha=0.75, va='top', ha='left', family=MONO, rotation=0)
+            level = 0
+            while any(abs((ed - p).days) < span * 0.11 and l == level for p, l in placed): level += 1
+            if level > 3: continue
+            placed.append((ed, level))
+            ax.axvline(ed, color=INK, lw=0.8, alpha=0.3, ls=(0, (2, 2)))
+            right = (x[-1] - ed).days < span * 0.12
+            ax.text(ed, hi + pad * 1.5 - level * pad * 0.62, (e['short'] + ' ') if right else (' ' + e['short']), fontsize=9, color=INK, alpha=0.8, va='top', ha='right' if right else 'left', family=MONO,
+                    bbox=dict(facecolor=BG, edgecolor='none', pad=0.6, alpha=0.85))
         ax.annotate(fmt(y[-1]), xy=(x[-1], y[-1]), xytext=(6, 0), textcoords='offset points', va='center', fontsize=13, fontweight='bold', color=RED, family=MONO)
         for side in ('top', 'right', 'left'): ax.spines[side].set_visible(False)
         ax.grid(axis='y', color='#ECE8DF', lw=1); ax.tick_params(length=0, labelsize=11)

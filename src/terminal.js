@@ -4,7 +4,7 @@
   const MONO = '"IBM Plex Mono", ui-monospace, monospace';
   const nf = (v, d = 2) => v == null ? '—' : Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
   let CAT = [], byId = {}, cur = 'nse-nifty-50', range = '1Y', chart;
-  const cache = {};
+  const cache = {}; let EVT = []; fetch('/api/events.json').then(r => r.json()).then(j => { EVT = j.events; }).catch(() => {});
   const getS = id => cache[id] ? Promise.resolve(cache[id]) : fetch(`/api/series/${id}.json`).then(r => r.json()).then(d => (cache[id] = d));
 
   /* clock */
@@ -38,7 +38,7 @@
       tooltip: { trigger: 'axis', backgroundColor: '#0B0D10', borderColor: '#F59E0B', textStyle: { color: '#E5E7EB', fontFamily: MONO, fontSize: 12 }, valueFormatter: x => nf(x) },
       xAxis: { type: 'category', data: lbl, boundaryGap: false, axisLine: { lineStyle: { color: '#374151' } }, axisLabel: { color: '#9CA3AF', fontFamily: MONO, fontSize: 10 }, axisTick: { show: false } },
       yAxis: { type: 'value', scale: true, axisLabel: { color: '#9CA3AF', fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#1F2937' } } },
-      series: split.map((data, k) => ({ type: 'line', data, showSymbol: false, connectNulls: false, lineStyle: { color: col, width: 1.8, type: k ? 'dashed' : 'solid' }, itemStyle: { color: col },
+      series: split.map((data, k) => ({ type: 'line', data, showSymbol: false, connectNulls: false, markLine: k ? undefined : (() => { const ev = EVT.filter(e => !e.series.length || e.series.some(t => t.endsWith('*') ? cur.startsWith(t.slice(0, -1)) : t === cur)).map(e => [e, lbl.find(x => x >= e.date.slice(0, lbl[0].length))]).filter(x => x[1] && x[1] !== lbl[0]); return ev.length ? { symbol: 'none', lineStyle: { color: '#F59E0B', type: 'dashed', opacity: 0.5 }, label: { formatter: p => p.name, color: '#F59E0B', fontFamily: MONO, fontSize: 10, position: 'insideEndTop' }, data: ev.map(([e, x]) => ({ xAxis: x, name: e.short })) } : undefined; })(), lineStyle: { color: col, width: 1.8, type: k ? 'dashed' : 'solid' }, itemStyle: { color: col },
         areaStyle: k ? undefined : { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: col + '44' }, { offset: 1, color: col + '00' }] } } })) }, true);
     $$('tr[data-s]').forEach(r => r.classList.toggle('on', r.dataset.s === cur));
   };
