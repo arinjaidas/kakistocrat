@@ -682,6 +682,42 @@ def _last_num(t, label):
     if not vals: return None
     try: return float(vals[-1].split('/')[0].replace(',', ''))
     except ValueError: return None
+def fbil(days=None):
+    """FBIL G-Sec par yields (the official benchmark curve), one Excel file per business day; public files appear with a lag of about a week.
+    Direct from fbil.org.in, else through this site's Mumbai relay. Stores semi-annual YTM by tenor."""
+    import io, datetime as dt, openpyxl
+    path = os.path.join(OUT, 'fbil.json')
+    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'FBIL G-Sec Base/Par Yield (semi-annual YTM, % a year), Financial Benchmarks India', 'days': {}}
+    today = dt.date.today(); start = today - dt.timedelta(days=days or (30 if cache['days'] else 730))
+    def fetch(direct, relay, binary=False):
+        for u in (direct, relay):
+            try:
+                b = get(u, timeout=60)
+                if binary and not b.startswith(b'PK'): continue
+                return b
+            except Exception as e: last = e
+        return None
+    have = set(cache['days']); n = 0; a = start
+    while a < today:
+        b = min(a + dt.timedelta(days=90), today)
+        lst = fetch(f'https://www.fbil.org.in/wasdm/gsec/fetchfiltered?fromDate={a}&toDate={b}&authenticated=false', f'https://kakistocrat.pages.dev/api/in/fbil-list?y={a},{b}')
+        a = b + dt.timedelta(days=1)
+        if not lst: print('  FBIL list unavailable'); continue
+        for d in sorted({x['processRunDate'] for x in json.loads(lst)} - have):
+            x = fetch(f'https://www.fbil.org.in/wasdm/gsec/downloadPublished?date={d}', f'https://kakistocrat.pages.dev/api/in/fbil-day?y={d}', binary=True)
+            if not x: continue
+            try: ws = openpyxl.load_workbook(io.BytesIO(x), read_only=True, data_only=True)['Par Yield']
+            except Exception as e: print('  FBIL', d, e); continue
+            row = {}
+            for r in ws.iter_rows(values_only=True):
+                r = [c for c in r if c is not None]
+                if len(r) >= 2 and isinstance(r[0], (int, float)) and isinstance(r[1], (int, float)) and r[0] in (0.25, 0.5, 1, 2, 3, 5, 7, 10, 14, 20, 30, 40): row[str(r[0])] = r[1]
+            if row.get('10'): cache['days'][d] = row; have.add(d); n += 1
+            if n % 40 == 0: json.dump(cache, open(path, 'w'))
+            time.sleep(0.3)
+    cache['days'] = dict(sorted(cache['days'].items()))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'))
+    ds = list(cache['days']); print('FBIL par yields:', len(ds), 'days', ds[0] if ds else '', '-', ds[-1] if ds else '', f'(+{n})')
 def rbi_rates(limit=150):
     path = os.path.join(OUT, 'rbi_rates.json')
     cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 4: Ratios and Rates (latest week on each issue)', 'weeks': {}, 'seen': []}
@@ -788,7 +824,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('amfi', amfi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('fbil', fbil), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('amfi', amfi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:

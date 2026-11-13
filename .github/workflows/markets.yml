@@ -5,6 +5,8 @@ on:
     - cron: '35 15 * * 1-5'   # 21:05 IST, catch late files
     - cron: '17 14 * * 1-5'   # 19:47 IST, extra run in case GitHub skips one
     - cron: '43 2 * * 2-6'    # 08:13 IST next morning, last catch-up
+    - cron: '52 6 * * 1-5'    # 12:22 IST, midday: picks up morning releases (CPI, IIP, WPI days) and covers a skipped night run
+    - cron: '28 17 * * 1-5'   # 22:58 IST, another late slot: GitHub can start scheduled runs hours late or skip them
     - cron: '20 3 * * 0'      # Sunday: weekly refresh for monthly series
   workflow_dispatch: {}
 permissions:
@@ -18,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pip install openpyxl xlrd
+      - run: pip install openpyxl xlrd matplotlib
       - run: python scripts/fetch_markets.py --years 3
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
@@ -31,7 +33,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       - name: Commit if data changed
         run: |
-          git add data/markets data/desk data/ogd data/repo_history.json data/notified.json 2>/dev/null; git add data/markets data/desk data/ogd data/repo_history.json
+          for p in data/markets data/desk data/ogd data/repo_history.json data/notified.json; do [ -e "$p" ] && git add "$p"; done
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git config user.name "kakistocrat-data"
           git config user.email "actions@users.noreply.github.com"

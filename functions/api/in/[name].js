@@ -7,13 +7,16 @@ const SRC = {
   'mospi-cal': 'https://www.mospi.gov.in/advance-release-calendar',
 };
 const YR = /^20\d\d-\d\d$/;
-const DYN = { 'npci-upi-month': y => YR.test(y) && `https://www.npci.org.in/api/product-statistic/tab/detail?product_name=upi&tab_name=product-statistics-upi&year_range=${y}&excel_type=monthly&page_no=1&page_size=20&locale=en` };
+const DAY = /^20\d\d-\d\d-\d\d$/;
+const DYN = { 'fbil-list': y => { const [a, b] = y.split(','); return DAY.test(a) && DAY.test(b) && `https://www.fbil.org.in/wasdm/gsec/fetchfiltered?fromDate=${a}&toDate=${b}&authenticated=false`; },
+  'fbil-day': y => DAY.test(y) && `https://www.fbil.org.in/wasdm/gsec/downloadPublished?date=${y}`, 'npci-upi-month': y => YR.test(y) && `https://www.npci.org.in/api/product-statistic/tab/detail?product_name=upi&tab_name=product-statistics-upi&year_range=${y}&excel_type=monthly&page_no=1&page_size=20&locale=en` };
 export async function onRequestGet({ params, env, request }) {
   const y = new URL(request.url).searchParams.get('y') || '';
   const u = SRC[params.name] || (DYN[params.name] && DYN[params.name](y)); if (!u) return new Response(JSON.stringify({ error: 'unknown', known: Object.keys(SRC) }), { status: 404 });
   const k = `in:${params.name}:${y}`, fresh = new URL(request.url).searchParams.has('fresh');
   if (env.OGD && !fresh) { const c = await env.OGD.get(k); if (c) return new Response(c, { headers: { 'content-type': 'text/plain; charset=utf-8', 'x-cache': 'kv' } }); }
   let r; try { r = await fetch(u, { headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', accept: 'text/html,application/json;q=0.9,*/*;q=0.8', 'accept-language': 'en-IN,en;q=0.9' } }); } catch (e) { return new Response('fetch failed: ' + e, { status: 502 }); }
+  if (params.name === 'fbil-day') { const b = await r.arrayBuffer(); return new Response(b, { status: r.status, headers: { 'content-type': 'application/octet-stream', 'x-upstream-status': String(r.status) } }); }
   const t = await r.text();
   if (r.ok && env.OGD) await env.OGD.put(k, t, { expirationTtl: 6 * 3600 });
   return new Response(t, { status: r.status, headers: { 'content-type': 'text/plain; charset=utf-8', 'x-upstream-status': String(r.status) } });

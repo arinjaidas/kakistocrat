@@ -552,6 +552,12 @@ async function main() {
     // real economy: IIP (MoSPI), bank credit, deposits and money (RBI fortnightly), monthly trade (OECD via FRED)
     for (const n of IIP_ORDER) { const sr = MK.iip?.series?.[n]; if (!sr) continue; const P8 = Object.entries(sr.pts);
       await addSeries(iipId(n), `IIP: ${n.replace('Infrastructure/construction Goods', 'Infrastructure & construction goods')}, growth`, 'India: industry (IIP, monthly)', '% y/y', 'monthly', 'MoSPI', P8.map(x => x[0]), P8.map(x => x[1].growth)); }
+    if (existsSync('data/markets/fbil.json')) { const FB = JSON.parse(await readFile('data/markets/fbil.json', 'utf8')), ds = Object.keys(FB.days).sort();
+      for (const [t, nm] of [['0.25', '3-month'], ['1', '1-year'], ['2', '2-year'], ['5', '5-year'], ['10', '10-year'], ['30', '30-year']]) {
+        const dd = ds.filter(d => FB.days[d][t] != null); if (dd.length < 20) continue;
+        await addSeries(`fbil-par-${t === '0.25' ? '3m' : t}`, `G-Sec par yield, ${nm} (FBIL, daily)`, 'India: rates', '%', 'daily', 'FBIL G-Sec Base/Par Yield', dd, dd.map(d => FB.days[d][t]), { short: `${nm[0].toUpperCase() + nm.slice(1)} G-Sec par yield` }); }
+      if (SD['fbil-par-10'] && SD['fbil-par-1']) { const B = new Map(SD['fbil-par-1'].d.map((d, k) => [d, SD['fbil-par-1'].v[k]])), pts = SD['fbil-par-10'].d.map((d, k) => B.has(d) ? [d, +(SD['fbil-par-10'].v[k] - B.get(d)).toFixed(2)] : null).filter(Boolean);
+        await addSeries('fbil-slope-10-1', 'Yield-curve slope: 10-year minus 1-year par yield (FBIL, daily)', 'India: rates', 'pts', 'daily', 'Derived from FBIL par yields', pts.map(x => x[0]), pts.map(x => x[1]), { short: '10-year minus 1-year' }); } }
     if (MK.rbiMoney?.fortnights) { const F8 = Object.entries(MK.rbiMoney.fortnights), d = F8.map(x => x[0]);
       // Validate parsed RBI tables. Levels: drop a point more than 8% from the median of its neighbours.
       // Growth rates: keep a published y/y only where it matches the change in that item's own published level over a year (±1.5 pts).
@@ -690,6 +696,7 @@ async function main() {
     auto('inr', 'fx-usdinr', 'Reference,', 'Reference rate', 'Updated automatically from the daily reference rate');
     auto('brent', 'fred-dcoilbrenteu', 'Close,', 'Spot', 'Updated automatically from FRED (EIA Brent spot)');
     auto('g10', 'rbi-gsec10', 'Week to', 'FBIL par yield', 'Updated automatically from the RBI Weekly Statistical Supplement');
+    auto('g10', 'fbil-par-10', 'Par yield,', 'FBIL par yield', 'Updated automatically from FBIL’s daily G-Sec par yields');
     await write('api/tape.json', JSON.stringify(tape)); }
   const HIDDEN = catalog.filter(c => c.group === 'World economy: annual'); for (let i = catalog.length - 1; i >= 0; i--) if (catalog[i].group === 'World economy: annual') catalog.splice(i, 1);
   const byId = Object.fromEntries(catalog.map(c => [c.id, c]));
@@ -819,10 +826,12 @@ async function main() {
       related: [['/economy/industry/', 'Industrial production'], ['/world/', 'India against other economies'], ['/states/', 'Growth by state']] },
     { path: '/economy/rates/', title: 'Interest rates and yields', kicker: 'Economy · Rates', desc: 'India’s repo rate, money-market rates, Treasury bill and 10-year G-Sec yields, the term spread and the gap over US Treasuries.',
       dek: 'The policy rate, where overnight and short-term money trades against it, the 10-year sovereign yield, and the two spreads that matter for the curve and for capital flows.',
-      key: ['india-repo', 'rbi-call', 'rbi-gsec10', 'spread-in-us-10y'],
+      key: ['india-repo', 'rbi-call', 'fbil-par-10', 'spread-in-us-10y'],
       panels: [
         { anchor: 'policy', title: 'Policy rate and the money market', ids: ['india-repo', 'rbi-call', 'rbi-tb91', 'rbi-tb364'], range: '5Y', note: 'Repo rate from MPC decisions; call money (weighted average) and Treasury bill yields from the RBI Weekly Statistical Supplement.' },
-        { anchor: 'gsec', title: 'The 10-year G-Sec', ids: ['rbi-gsec10', 'fred-dgs10'], range: '5Y', note: 'FBIL 10-year par yield (weekly) against the US 10-year Treasury (daily).' },
+        { anchor: 'gsec', title: 'The 10-year G-Sec', ids: ['rbi-gsec10', 'fred-dgs10'], range: '5Y', note: 'FBIL 10-year par yield (weekly, from the RBI supplement) against the US 10-year Treasury (daily).' },
+        { anchor: 'curve', title: 'The sovereign curve, daily', ids: ['fbil-par-3m', 'fbil-par-1', 'fbil-par-5', 'fbil-par-10', 'fbil-par-30'], range: '1Y', note: 'FBIL par yields, semi-annual, for each business day. FBIL’s free public files appear about a week after the date they value.' },
+        { anchor: 'slope', title: 'Curve slope', ids: ['fbil-slope-10-1'], range: 'All', line: 0, note: 'Percentage points. A falling slope means short yields are rising towards long ones, typically when policy tightens.' },
         { anchor: 'spreads', title: 'Spreads', ids: ['spread-10y-tb91', 'spread-in-us-10y'], range: '5Y', note: 'Percentage points. Term spread: 10-year minus 91-day. Cross-border: India 10-year minus US 10-year, on matching weekly dates.' },
         { anchor: 'crr', title: 'Cash reserve ratio', ids: ['rbi-crr'] },
       ],
