@@ -551,7 +551,14 @@ async function main() {
   // India macro releases from the tape (CPI, repo) join the catalogue, so they chart, correlate and link like everything else
   const MON = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
   // the repo rate as a full monthly step series since 2019 from the decision history
-  { const RH = JSON.parse(await readFile('data/repo_history.json', 'utf8')); const ds = [], vs = []; let r = RH.start.rate;
+  { const RHf = JSON.parse(await readFile('data/repo_history.json', 'utf8'));
+    if (existsSync('data/markets/rbi_rates.json')) { const W = JSON.parse(await readFile('data/markets/rbi_rates.json', 'utf8')).weeks, wk = Object.keys(W).sort().filter(d => W[d].repo != null);
+      let cur = RHf.changes.at(-1)?.[1] ?? RHf.start.rate; const lastChange = RHf.changes.at(-1)?.[0] || RHf.start.date;
+      for (const d of wk) if (d > lastChange && W[d].repo !== cur) { RHf.changes.push([d, W[d].repo]); cur = W[d].repo; RHf.autoDetected = [...(RHf.autoDetected || []), d]; }
+      if (RHf.autoDetected?.length) await writeFile('data/repo_history.json', JSON.stringify(RHf, null, 1));
+      const ri = tape.indicators.find(x => x.id === 'repo'), lc = RHf.changes.at(-1);
+      if (ri && lc && lc[0] > (ri.latest.released || '')) { ri.previous = { value: ri.latest.value, period: ri.latest.period, status: 'Policy rate' }; ri.latest = { value: lc[1], period: `Since ${new Date(lc[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}`, released: lc[0], status: 'Policy rate (from the RBI weekly statistical supplement)' }; } }
+    const RH = RHf; const ds = [], vs = []; let r = RH.start.rate;
     for (let t = new Date(RH.start.date + 'T00:00:00Z'); t <= BUILT; t.setUTCMonth(t.getUTCMonth() + 1)) { const me = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).toISOString().slice(0, 10); for (const [d, x] of RH.changes) if (d <= me) r = x; ds.push(me.slice(0, 7)); vs.push(r); }
     await addSeries('india-repo', 'RBI repo rate', 'India: macro releases', '%', 'monthly', 'RBI monetary policy decisions', ds, vs); }
   // CPI: the 2012-base history from MoSPI's API (to Dec 2025) linked to the 2024-base releases from Jan 2026
@@ -614,8 +621,15 @@ async function main() {
     await spread('spread-10y-tb91', 'Term spread: 10-year G-Sec minus 91-day T-bill (RBI, weekly)', '10-year minus 91-day', 'rbi-gsec10', 'rbi-tb91'); }
   // ---- the connected layer
   // World annual series for other countries live on the country pages and in the API, not as pages of their own
-  { const N = SD['nse-nifty-50'], i = tape.indicators.find(x => x.id === 'nifty'); if (N && i && N.d.at(-1) > (i.latest.released || '')) { const L = N.d.length - 1, fmt = d => new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
-    i.previous = { value: N.v[L - 1], period: `Close, ${fmt(N.d[L - 1])}`, status: 'Close' }; i.latest = { value: N.v[L], period: `Close, ${fmt(N.d[L])}`, released: N.d[L], status: 'Close' }; i.checked = N.d[L]; i.auto = 'Updated automatically from the NSE closing file'; await write('api/tape.json', JSON.stringify(tape)); } }
+  // the tape updates itself from the data feeds: Nifty (NSE close), rupee (reference rate), Brent (FRED), 10-year G-Sec (FBIL, weekly)
+  { const fmt = d => new Date(d.slice(0, 10) + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    const auto = (tid, sid, label, status, note, dec = 2) => { const N = SD[sid], i = tape.indicators.find(x => x.id === tid); if (!N || !i) return; const L = N.d.length - 1; if (N.d[L] < (i.latest.released || '')) return;
+      i.previous = { value: +N.v[L - 1].toFixed(dec), period: `${label} ${fmt(N.d[L - 1])}`, status }; i.latest = { value: +N.v[L].toFixed(dec), period: `${label} ${fmt(N.d[L])}`, released: N.d[L].slice(0, 10), status }; i.checked = N.d[L].slice(0, 10); i.auto = note; };
+    auto('nifty', 'nse-nifty-50', 'Close,', 'Close', 'Updated automatically from the NSE closing file');
+    auto('inr', 'fx-usdinr', 'Reference,', 'Reference rate', 'Updated automatically from the daily reference rate');
+    auto('brent', 'fred-dcoilbrenteu', 'Close,', 'Spot', 'Updated automatically from FRED (EIA Brent spot)');
+    auto('g10', 'rbi-gsec10', 'Week to', 'FBIL par yield', 'Updated automatically from the RBI Weekly Statistical Supplement');
+    await write('api/tape.json', JSON.stringify(tape)); }
   const HIDDEN = catalog.filter(c => c.group === 'World economy: annual'); for (let i = catalog.length - 1; i >= 0; i--) if (catalog[i].group === 'World economy: annual') catalog.splice(i, 1);
   const byId = Object.fromEntries(catalog.map(c => [c.id, c]));
   const corr = correlations(SD, catalog);
@@ -702,7 +716,7 @@ async function main() {
   const crumbsFor = c => `<a href="/explore/">Explore</a> › <a href="/explore/#series">${esc(c.group)}</a>`;
   const TAPE_INV = Object.fromEntries(Object.entries(TAPE_S).map(([k, v]) => [v, k]));
   // ---- concept pages: one page per economic question; series pages for India macro data redirect into them
-  const SHORT = { 'imf-ngdp-rpch-ind': 'Real GDP growth', 'imf-pcpipch-ind': 'CPI inflation, annual average (IMF)', 'imf-bca-ngdpd-ind': 'Current account balance (IMF)', 'wdi-bn-cab-xoka-gd-zs-ind': 'Current account balance (World Bank)',
+  const SHORT = { 'fx-usdinr': 'Rupee per US dollar', 'fred-dexinus': 'Rupee per US dollar, long history (FRED)', 'rbi-fx-total': 'Foreign exchange reserves', 'rbi-fx-fca': 'Foreign currency assets', 'rbi-fx-gold': 'Gold', 'rbi-fx-sdr': 'SDRs', 'rbi-fwd1m': 'Forward premium, 1 month', 'rbi-fwd3m': 'Forward premium, 3 months', 'rbi-fwd6m': 'Forward premium, 6 months', 'imf-ngdp-rpch-ind': 'Real GDP growth', 'imf-pcpipch-ind': 'CPI inflation, annual average (IMF)', 'imf-bca-ngdpd-ind': 'Current account balance (IMF)', 'wdi-bn-cab-xoka-gd-zs-ind': 'Current account balance (World Bank)',
     'imf-ggxwdg-ngdp-ind': 'General government debt', 'imf-ggxcnl-ngdp-ind': 'General government net lending', 'imf-ngdpd-ind': 'Nominal GDP, US$', 'imf-pppgdp-ind': 'GDP at PPP', 'imf-ngdpdpc-ind': 'GDP per person, US$',
     'wdi-ne-gdi-totl-zs-ind': 'Gross capital formation', 'iip-general': 'Industrial production (IIP)', 'india-repo': 'Repo rate', 'rbi-call': 'Call money rate', 'rbi-tb91': '91-day T-bill', 'rbi-tb364': '364-day T-bill',
     'rbi-gsec10': '10-year G-Sec yield', 'rbi-crr': 'Cash reserve ratio', 'fred-dgs10': 'US 10-year Treasury', 'in-exports': 'Merchandise exports', 'in-imports': 'Merchandise imports', 'wdi-bx-gsr-nfsv-cd-ind': 'Service exports',
@@ -774,6 +788,15 @@ async function main() {
       ],
       method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li></ul>',
       related: [['/economy/rates/', 'Interest rates and yields'], ['/economy/prices/', 'Inflation'], ['/markets/', 'Bank shares']] },
+    { path: '/external/', defer: true, title: 'Rupee and reserves', kicker: 'External · Rupee and reserves', desc: 'The rupee against the dollar since 2005, India’s foreign exchange reserves every week since 1998, the cost of hedging dollars, reserve cover, and the 2013 and 2026 FCNR(B) episodes side by side.',
+      dek: 'The exchange rate, the reserves the RBI holds to defend it, and the forward premium that prices the cost of hedging. The episode comparison sets the 2026 defence against the 2013 one.',
+      key: ['fx-usdinr', 'rbi-fx-total', 'rbi-fwd3m', 'wdi-fi-res-totl-mo-ind'], alsoTable: ['fred-dexinus', 'rbi-fx-fca', 'rbi-fx-gold', 'rbi-fx-sdr'],
+      panels: [
+        { anchor: 'forwards', title: 'Forward premium on the dollar', ids: ['rbi-fwd1m', 'rbi-fwd3m', 'rbi-fwd6m'], range: '5Y', note: 'Annualised, per cent (FBIL). Roughly the interest-rate gap between India and the US; spikes mark hedging stress.' },
+        { anchor: 'cover', title: 'Reserve cover', ids: ['wdi-fi-res-totl-mo-ind'], note: 'Months of imports covered by reserves (World Bank, annual).' },
+      ],
+      method: '<ul><li>The weekly reserves figure includes foreign currency assets, gold, SDRs and the reserve tranche position at the IMF; it is gross and does not net off the RBI’s forward book.</li></ul>',
+      related: [['/external/balance-of-payments/', 'Balance of payments'], ['/economy/rates/', 'Interest rates and yields'], ['/what-if/', 'Rupee shock scenarios'], ['/external/data/', 'Data appendix']] },
     { path: '/external/balance-of-payments/', title: 'Balance of payments', kicker: 'External · Balance of payments', desc: 'India’s current account from the IMF and the World Bank, monthly merchandise trade, services, remittances, FDI and portfolio flows, and external debt.',
       dek: 'How India pays its way: the current account, the trade in goods and services that drives it, the capital that finances it, and the debt it leaves behind.',
       key: ['imf-bca-ngdpd-ind', 'in-exports', 'wdi-bx-trf-pwkr-cd-dt-ind', 'wdi-dt-dod-dect-gn-zs-ind'],
@@ -786,7 +809,6 @@ async function main() {
         { anchor: 'invisibles', title: 'Services and remittances', ids: ['wdi-bx-gsr-nfsv-cd-ind', 'wdi-bx-trf-pwkr-cd-dt-ind'], note: 'US$, annual (World Bank).' },
         { anchor: 'capital', title: 'Capital flows', ids: ['wdi-bx-klt-dinv-cd-wd-ind', 'wdi-bx-pef-totl-cd-wd-ind'], line: 0, note: 'Net inflows, US$ (World Bank).' },
         { anchor: 'debt', title: 'External debt', ids: ['wdi-dt-dod-dect-gn-zs-ind', 'wdi-dt-dod-dstc-ir-zs-ind', 'wdi-dt-tds-dect-ex-zs-ind'], note: 'Total external debt (% of GNI), short-term debt (% of reserves) and debt service (% of exports of goods, services and primary income).' },
-        { anchor: 'cover', title: 'Reserve cover', ids: ['wdi-fi-res-totl-mo-ind'], note: 'Months of imports covered by reserves. Weekly reserves are on <a href="/external/">Rupee and reserves</a>.' },
       ],
       method: '<ul><li>Quarterly balance-of-payments data from the RBI are not yet on the site; annual figures here come from the IMF and the World Bank, monthly trade from the OECD via FRED.</li></ul>',
       related: [['/external/', 'Rupee and reserves'], ['/trade/', 'Trade by partner'], ['/hormuz/', 'Shipping and oil']] },
@@ -797,10 +819,12 @@ async function main() {
   for (const id of ['iip-general', 'iip-manufacturing']) if (byId[id]) CONCEPT_OF[id] = '/economy/industry/#sectors';
   for (const c of catalog) { if (CONCEPT_OF[c.id]) continue;
     if (/^(rbi-fx-|rbi-inr|rbi-fwd)/.test(c.id)) CONCEPT_OF[c.id] = '/external/';
-    else if (/^wdi-fi-res/.test(c.id)) CONCEPT_OF[c.id] = '/external/balance-of-payments/#cover'; }
+    else if (/^wdi-fi-res/.test(c.id)) CONCEPT_OF[c.id] = '/external/#cover';
+    else if (/^(fx-usdinr|fred-dexinus)$/.test(c.id)) CONCEPT_OF[c.id] = '/external/#rp-main'; }
   const conceptUrl = id => CONCEPT_OF[id] || `/s/${id}/`;
   globalThis.__CONCEPT_OF = CONCEPT_OF;
-  for (const C of CONCEPTS) {
+  globalThis.__CONCEPTS = CONCEPTS;
+  for (const C of CONCEPTS) { if (C.defer) continue;
     const mandiHTML = await (async () => { if (C.path !== '/economy/prices/' || !existsSync('data/markets/mandi.json')) return '';
       const M = JSON.parse(await readFile('data/markets/mandi.json', 'utf8')), days = Object.keys(M.days).sort(), d = days.at(-1), p = days.at(-2); if (!d) return '';
       const nice = c => c.replace(/\(.*?\)/g, m => ' ' + m).replace(/\s+/g, ' ').replace(/^./, x => x.toUpperCase());
@@ -863,7 +887,14 @@ async function main() {
   if (HAS_CALLS) await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: fcPage(fc, FCS, { pageHead }) }));
   await write('what-if/index.html', P({ title: 'What if? The scenario engine', path: '/what-if/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
   await write('economy/budget/index.html', P({ title: 'The Union Budget 2026-27, line by line', path: '/economy/budget/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['rupee'], head: false }) + conceptPage({ bare: true, panels: [{ anchor: 'fiscal', title: 'General government debt and deficit, per cent of GDP', ids: ['imf-ggxwdg-ngdp-ind', 'imf-ggxcnl-ngdp-ind'], line: 0, note: 'Centre plus states, IMF World Economic Outlook, fiscal year. Net lending is the overall balance (negative: deficit). Dashed: IMF projections.' }] }, { SD, byId }) }));
-  await write('states/index.html', P({ title: 'India’s states compared', path: '/states/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, and each state’s economy set beside a country of the same size.', body: statesPage(states, { pageHead }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), sc: JSON.parse(await readFile('data/states_countries.json', 'utf8')), statePos: states.states, only: ['sc'], head: false }) }));
+  const msmeHTML = await (async () => { if (!existsSync('data/ogd/msme.json')) return ''; const M = JSON.parse(await readFile('data/ogd/msme.json', 'utf8')); const st = {};
+    for (const r of M.rows) { const k = r.state_name.replace(/\b\w+/g, w => w[0] + w.slice(1).toLowerCase()).replace(/\bAnd\b/g, 'and'); const a = st[k] ||= { micro: 0, small: 0, medium: 0, total: 0, districts: 0 }; for (const f of ['micro', 'small', 'medium', 'total']) a[f] += +r[f] || 0; a.districts++; }
+    const rows = Object.entries(st).sort((a, b) => b[1].total - a[1].total), all = rows.reduce((s, [, a]) => s + a.total, 0);
+    const top = M.rows.slice().sort((a, b) => b.total - a.total).slice(0, 10);
+    return `<div class="wrap"><section class="xr-sec" id="msme"><h2 class="col-title">Small business registrations (Udyam)</h2><p class="meta">Enterprises registered on the Udyam portal, cumulative, by state, from the Ministry of MSME via data.gov.in (fetched ${esc(M.fetched.slice(0, 10))}). ${all.toLocaleString('en-IN')} enterprises in all. Registration is voluntary and counts firms, not jobs or output, so it measures formalisation as much as activity.</p>
+      <div class="ip-tw"><table class="ip-t"><thead><tr><th>State</th><th>Total</th><th>Share of India</th><th>Micro</th><th>Small</th><th>Medium</th><th>Districts</th></tr></thead><tbody>${rows.map(([k, a]) => `<tr><th>${esc(k)}</th><td><b>${a.total.toLocaleString('en-IN')}</b></td><td>${(a.total / all * 100).toFixed(1)}%</td><td>${a.micro.toLocaleString('en-IN')}</td><td>${a.small.toLocaleString('en-IN')}</td><td>${a.medium.toLocaleString('en-IN')}</td><td>${a.districts}</td></tr>`).join('')}</tbody></table></div>
+      <h3 class="sub-h" style="margin-top:16px">The ten districts with the most registrations</h3><p class="chips">${top.map(r => `<span class="chip">${esc(r.district_name)}, ${esc(r.state_name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()))}: ${(+r.total).toLocaleString('en-IN')}</span>`).join('')}</p></section></div>`; })();
+  await write('states/index.html', P({ title: 'India’s states compared', path: '/states/', description: 'Indian states compared on income per person, growth, inflation, debt and interest burden, and each state’s economy set beside a country of the same size.', body: statesPage(states, { pageHead }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), sc: JSON.parse(await readFile('data/states_countries.json', 'utf8')), statePos: states.states, only: ['sc'], head: false }) + msmeHTML }));
   if (false) await write('tools/two-chart-test/index.html', P({ title: 'The Two-Chart Test', path: '/tools/two-chart-test/', description: 'Common claims about India’s economy tested against two charts side by side.', body: twoChartPage(twocharts, { pageHead }) }));
   if (false) await write('tools/exposure/index.html', P({ title: 'Geoeconomics Exposure Map', path: '/tools/exposure/', description: 'India’s dependence on foreign suppliers for oil, fertiliser and China-sourced electronics, with a disruption calculator.', body: exposurePage(exposure, { pageHead, inrRate: tape.indicators.find(i => i.id === 'inr').latest.value }) }));
   if (MK) {
@@ -895,7 +926,14 @@ async function main() {
       body: `<div class="mk-top"><div class="wrap"><div class="mk-head"><div><span class="kicker">Economy</span><h1>India macro dashboard</h1><p class="dek sm">Every headline indicator in one table, each against its own history: the previous reading, a year earlier, the five-year average and where it sits in the last ten years. Click an indicator for its full page. Statistics use published figures only; IMF projections are listed separately.</p></div></div></div></div>
       <div class="wrap"><section class="xr-sec">${dashboardPage(G, { SD, byId })}</section><section class="xr-sec"><h2 class="col-title">Pages</h2><p class="chips">${[['/economy/growth/', 'Growth and output'], ['/economy/industry/', 'Industrial production'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money and credit'], ['/economy/rates/', 'Interest rates and yields'], ['/economy/budget/', 'Budget and debt'], ['/external/balance-of-payments/', 'Balance of payments'], ['/external/', 'Rupee and reserves']].map(([u, t]) => `<a class="chip" href="${u}">${t}</a>`).join('')}</p></section></div>` })); }
   if (MK?.trade) { const cs = {}, cn = {}; for (const iso of Object.keys(W.countries)) { cn[iso] = cleanCountry(W.countries[iso]); cs[iso] = slugify(cn[iso]); } await write('trade/index.html', P({ title: 'India’s trade: who buys, who sells, and what', path: '/trade/', description: 'India’s goods exports and imports by partner and product since 2015, from UN Comtrade, with surpluses, deficits and every partner linked to its country page.', body: tradePage(MK.trade, { pageHead, countrySlug: cs, countryName: cn }) })); }
-  if (MK?.rbiFx) await write('external/index.html', P({ title: 'External sector lab: reserves, the rupee and the price of dollars', path: '/external/', description: 'India’s foreign exchange reserves every week since 1998, money-market rates, forward premia and external sustainability indicators, with the 2013 and 2026 FCNR(B) episodes side by side.', body: externalPage(MK, { pageHead, episodes: JSON.parse(await readFile('data/episodes.json', 'utf8')), rupee: rupeePage(MK, tape, { pageHead, embed: true }) }) }));
+  if (MK?.rbiFx) { const C = globalThis.__CONCEPTS.find(c => c.path === '/external/');
+    const full = externalPage(MK, { pageHead, episodes: JSON.parse(await readFile('data/episodes.json', 'utf8')), rupee: rupeePage(MK, tape, { pageHead, embed: true }) });
+    // keep the rupee lab, the stacked reserves with the FCNR(B) windows and the episode comparison; drop the money-market and annual sections (now on Rates and Balance of payments)
+    const w1 = full.indexOf('<div class="wrap">'), w2 = full.indexOf('<div class="wrap">', w1 + 5), body = full.slice(w2 + '<div class="wrap">'.length);
+    const parts = body.split('<section '), keep = [parts[0]];
+    for (const pc of parts.slice(1)) { if (/id="xt-rates"|id="xt-annual"|>Use the data</.test(pc)) { const k = pc.lastIndexOf('</section>'); keep.push('<!--x-->' + pc.slice(k + 10)); } else keep.push('<section ' + pc); }
+    const lab = keep.join('').replace(/<!--x-->/g, '').replace(/<\/div>\s*(<script>window.__XT)/, '$1');
+    await write('external/index.html', P({ title: C.title, path: '/external/', description: C.desc, body: conceptPage({ ...C, extraTop: `<div class="xt-lab">${lab}</div>` }, { SD, byId }) })); }
   if (MK?.imfWorld) await write('world/index.html', P({ title: 'India against the world', path: '/world/', description: 'Where India ranks among every economy in the IMF World Economic Outlook: GDP, income per person, growth, inflation, debt and the current account.', body: worldPage(MK.imfWorld, { pageHead, year: BUILT.getUTCFullYear() }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['race', 'bub', 'debt'], head: false }) }));
   if (MK) { const AF = appendixFiles(MK, SD, byId); for (const [n, f] of Object.entries(AF)) await write(`api/csv/${n}`, f.csv);
     await write('external/data/index.html', P({ title: 'External sector data appendix', path: '/external/data/', description: 'India’s weekly reserves, money-market rates, fortnightly money and credit, the daily rupee, annual external accounts and trade by partner, as CSV files with sources.', body: appendixPage(AF, JSON.parse(await readFile('data/episodes.json', 'utf8')), { pageHead }) })); }

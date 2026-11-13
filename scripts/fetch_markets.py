@@ -460,7 +460,7 @@ def ogd():
             if not r.get('due'): break
         except Exception as e: print('  ogd refresh error', e); break
     got = {}
-    for name in ['mandi', 'aqi', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'steel', 'msme', 'fci']:
+    for name in ['mandi', 'aqi', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'msme']:
         try: meta, rows = _ogd_rows(name)
         except Exception as e: print('  ogd', name, 'error', e); continue
         if rows is None: print('  ogd', name, 'not fetched yet'); continue

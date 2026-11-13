@@ -8,8 +8,6 @@ export const DATASETS = {
   pettrade:  { rid: '518e560e-7fa7-4f5b-8aed-3b90323ed965', ttlH: 24,  pages: 4,  note: 'PPAC crude and product imports/exports, monthly' },
   crudeprod: { rid: '7932c3ed-c88d-4e0c-bc39-17e3e3170483', ttlH: 24,  pages: 2,  note: 'PPAC domestic crude oil production, monthly' },
   refprod:   { rid: '8b75d7c2-814b-4eb2-9698-c96d69e5f128', ttlH: 24,  pages: 3,  note: 'PPAC refinery product output, monthly' },
-  steel:     { rid: '829137af-5e90-4400-bffe-5d65b66e5956', ttlH: 48,  pages: 1,  note: 'Steel production, consumption, trade, monthly' },
   msme:      { rid: 'f8cd85a1-f9b8-4ff1-b195-9f75c10eb338', ttlH: 72,  pages: 1,  note: 'Udyam MSME registrations by district' },
-  fci:       { rid: '60eed46c-190a-45e1-9807-c5b37f960fff', ttlH: 24,  pages: 5,  q: { 'sort[Date]': 'desc' }, note: 'FCI daily stock position, latest rows' },
 };
 export const PAGE = 1000;

@@ -26,7 +26,7 @@ jobs:
         run: SKIP_IMG=1 node build.mjs >/dev/null || echo "build failed; desk not saved"
       - name: Commit if data changed
         run: |
-          git add data/markets data/desk data/ogd
+          git add data/markets data/desk data/ogd data/repo_history.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git config user.name "kakistocrat-data"
           git config user.email "actions@users.noreply.github.com"
