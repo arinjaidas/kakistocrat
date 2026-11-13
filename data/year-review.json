@@ -142,7 +142,12 @@
       "detail": "US reciprocal tariff announcement. Compare Indian exporters with competing suppliers and check exclusions and original Annex I.",
       "priority": 1,
       "source": "https://www.whitehouse.gov/presidential-actions/2025/04/regulating-imports-with-a-reciprocal-tariff-to-rectify-trade-practices-that-contribute-to-large-and-persistent-annual-united-states-goods-trade-deficits/",
-      "articles": []
+      "articles": [
+        {
+          "id": 1793,
+          "url": "https://thekakisto.wordpress.com/2025/04/03/india-tariff-april-2025-reciprocal-order/"
+        }
+      ]
     },
     {
       "id": "S02",
