@@ -6,6 +6,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { budgetPage } from './lib/budget.mjs';
+import { mpcPage, mpcData } from './lib/mpc.mjs';
 import { statesPage } from './lib/states.mjs';
 import { twoChartPage } from './lib/twochart.mjs';
 import { exposurePage } from './lib/exposure.mjs';
@@ -83,7 +84,7 @@ const TOOLS = [
 const SECTIONS = [
   { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
-  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/budget/', 'Budget & debt']], match: ['/economy/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt']], match: ['/economy/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix']], match: ['/external/', '/trade/', '/hormuz/'] },
   { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
   { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/my-inflation/', 'Your inflation'], ['/what-if/rupee-value/', 'Rupee value'], ['/what-if/policy-rule/', 'Policy rule'], ['/what-if/debt-path/', 'Debt path'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
@@ -215,6 +216,10 @@ function tapeHTML(tape) {
 }
 
 function layout({ title, description = '', path = '/', body, canonical, tape, active = '', type = 'website', ogImage, jsonld }) {
+  // Older pages (pageHead) get the same 'Section · Tab' label as the indicator pages, from the page's place in SECTIONS.
+  if (body && body.includes('<div class="mk-top"><div class="wrap">')) body = body.replace('<div class="mk-top"><div class="wrap">', `<div class="mk-top ip-top ph-top">${ribbon({ cls: 'ip-rib' })}<div class="wrap">`);
+  if (body && body.includes('ph-top')) { const S = sectionOf(path), tab = S && S.tabs.filter(([h]) => path === h || (h !== S.url && path.startsWith(h))).sort((a, b) => b[0].length - a[0].length)[0];
+    if (S && tab) body = body.replace(/(<div class="mk-top ip-top ph-top">[\s\S]*?<span class="kicker">)[\s\S]*?(<\/span>)/, `$1${S.name} · ${tab[1].replace(/&/g, '&amp;')}$2`); }
   const full = title ? `${title} · The Kakistocrat` : 'The Kakistocrat · A deeper look at economics and politics';
   const nav = TOPIC_ORDER.map(s => `<a href="/topic/${s}/"${active === s ? ' aria-current="page"' : ''}>${esc(TOPICS[s].short)}</a>`).join('');
   return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -836,7 +841,7 @@ async function main() {
         { anchor: 'crr', title: 'Cash reserve ratio', ids: ['rbi-crr'] },
       ],
       method: '<ul><li>The repo rate is shown as a month-end step series built from each MPC decision.</li><li>Spreads are computed on dates where both series have an observation; no interpolation.</li></ul>',
-      related: [['/economy/prices/', 'Inflation'], ['/external/', 'Rupee, reserves and forward premia'], ['/markets/', 'Bond and equity markets']] },
+      related: [['/economy/mpc/', 'How the MPC voted'], ['/economy/prices/', 'Inflation'], ['/external/', 'Rupee, reserves and forward premia'], ['/markets/', 'Bond and equity markets']] },
     { path: '/economy/activity/', title: 'Activity tracker', kicker: 'Economy · Activity', desc: 'India’s economy month by month before GDP arrives: UPI payments, fuel demand, industrial production, bank credit and trade, with a composite activity index.',
       dek: 'GDP arrives two months after a quarter ends. These monthly signals arrive sooner: digital payments, fuel use, factory output, lending and trade. The composite puts them on one scale.',
       key: ['activity-index', 'upi-value-yoy', 'oil-consumption-yoy', 'iip-general'],
@@ -1028,6 +1033,9 @@ async function main() {
   const FCS = scoreCalls(fc, SD, BUILT.toISOString().slice(0, 10)); await write('api/forecasts.json', JSON.stringify({ method: fc.method, calls: FCS.map(({ spark, ...c }) => c) }));
   if (HAS_CALLS) await write('forecasts/index.html', P({ title: 'Forecast Book', path: '/forecasts/', description: 'Testable calls with probabilities, revisions and results.', body: fcPage(fc, FCS, { pageHead }) }));
   await write('what-if/index.html', P({ title: 'What if? The scenario engine', path: '/what-if/', description: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, India’s import bill, the current account and your EMI change together.', body: scenarioPage({ MK, tape, pump: JSON.parse(await readFile('data/pump.json', 'utf8')), sc: JSON.parse(await readFile('data/scenario.json', 'utf8')), pageHead }) }));
+  if (existsSync('data/markets/mpc.json')) { const MR = JSON.parse(await readFile('data/markets/mpc.json', 'utf8')), MD = mpcData(MR);
+    await write('economy/mpc/index.html', P({ title: 'How the RBI’s Monetary Policy Committee voted, meeting by meeting', path: '/economy/mpc/', description: `Every vote by every MPC member since October 2016, from the RBI’s minutes: ${MD.meetings.length} meetings, split decisions and each member’s dissents.`, body: mpcPage(MR, { pageHead }) }));
+    await write('api/mpc.json', JSON.stringify({ source: MR.source, meetings: MD.meetings.map(m => ({ meeting: m.date, minutes_released: m.released, minutes: m.url, resolution: m.rate, decision: m.move, votes: m.votes.map(x => [x.name, x.v]), other_resolutions: m.other })) })); }
   await write('economy/budget/index.html', P({ title: 'The Union Budget 2026-27, line by line', path: '/economy/budget/', description: 'How far the Centre has got through its 2026-27 Budget: receipts, spending and the fiscal deficit against the full-year plan.', body: budgetPage(budget, { pageHead, findRelated, articles: m.articles }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['rupee'], head: false }) + conceptPage({ bare: true, panels: [{ anchor: 'fiscal', title: 'General government debt and deficit, per cent of GDP', ids: ['imf-ggxwdg-ngdp-ind', 'imf-ggxcnl-ngdp-ind'], line: 0, note: 'Centre plus states, IMF World Economic Outlook, fiscal year. Net lending is the overall balance (negative: deficit). Dashed: IMF projections.' }] }, { SD, byId }) }));
   const msmeHTML = await (async () => { if (!existsSync('data/ogd/msme.json')) return ''; const M = JSON.parse(await readFile('data/ogd/msme.json', 'utf8')); const st = {};
     for (const r of M.rows) { const k = r.state_name.replace(/\b\w+/g, w => w[0] + w.slice(1).toLowerCase()).replace(/\bAnd\b/g, 'and'); const a = st[k] ||= { micro: 0, small: 0, medium: 0, total: 0, districts: 0 }; for (const f of ['micro', 'small', 'medium', 'total']) a[f] += +r[f] || 0; a.districts++; }

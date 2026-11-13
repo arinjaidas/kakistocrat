@@ -3,7 +3,7 @@
   const T = window.__T; if (!T) return;
   const $ = s => document.querySelector(s), num = el => parseFloat(el.value);
   const fmt = (v, d = 2) => Number.isFinite(v) ? v.toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
-  const C = ['#B5367A', '#1C7C99', '#c98a1b', '#5F7F14'];
+  const C = [getComputedStyle(document.body).getPropertyValue('--sec').trim() || '#6D5BA8', '#1C7C99', '#B87708', '#5F7F14'];
   const chart = id => { const el = document.getElementById(id); if (!el || !window.echarts) return null; const c = echarts.init(el); addEventListener('resize', () => c.resize()); return c; };
   const ready = f => window.echarts ? f() : addEventListener('load', f);
 
@@ -24,6 +24,7 @@
     ins.forEach(i => i.addEventListener('input', run));
     $('#tl-official').addEventListener('click', () => { ins.forEach((i, k) => i.value = Math.round(T.divisions[k].weight * 1000)); run(); });
     $('#tl-clear').addEventListener('click', () => { ins.forEach(i => i.value = ''); run(); });
+    if (ins.every(i => !i.value)) $('#tl-official').click(); else run();  // open on the official basket, so the chart is drawn; edit from there
   });
 
   if (T.tool === 'rupee-value') ready(() => {

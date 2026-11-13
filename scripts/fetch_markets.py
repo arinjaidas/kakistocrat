@@ -676,10 +676,11 @@ def _last_num(t, label):
     if not m: return None
     vals = []
     for cell in t[m.end():].split('|')[1:40]:
-        c = cell.strip()
+        c = cell.strip().replace('&ndash;', '-').replace('&minus;', '-').replace('\u2013', '-').replace('\u2212', '-')
+        if c in ('-', '--', '..', 'NA', 'n.a.'): vals.append(None); continue  # a dash marks a week with no figure: keep its column
         if re.search(r'[A-Za-z]', c): break
         if c: vals.append(c)
-    if not vals: return None
+    if not vals or vals[-1] is None: return None
     try: return float(vals[-1].split('/')[0].replace(',', ''))
     except ValueError: return None
 def fbil(days=None):
@@ -718,6 +719,55 @@ def fbil(days=None):
     cache['days'] = dict(sorted(cache['days'].items()))
     json.dump(cache, open(path, 'w'), separators=(',', ':'))
     ds = list(cache['days']); print('FBIL par yields:', len(ds), 'days', ds[0] if ds else '', '-', ds[-1] if ds else '', f'(+{n})')
+# MPC votes: every set of minutes since the first meeting (October 2016), from the RBI press-release archive.
+MON = {m: i for i, m in enumerate(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], 1)}
+def _rbi_text(h):
+    h = re.sub(r'(?is)<(script|style)[^>]*>.*?</\1>', ' ', h); h = re.sub(r'(?i)</(tr|p|div|h\d|li)>|<br\s*/?>', '\n', h); h = re.sub(r'(?i)<t[dh][^>]*>', ' | ', h)
+    h = re.sub(r'<[^>]+>', ' ', h).replace('&nbsp;', ' ').replace('&amp;', '&').replace('&#39;', "'").replace('&rsquo;', '’')
+    return '\n'.join(re.sub(r'\s+', ' ', l).strip() for l in h.split('\n') if l.strip())
+def mpc():
+    path = os.path.join(OUT, 'mpc.json')
+    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI, Minutes of the Monetary Policy Committee meetings (press releases under Section 45ZL of the RBI Act)', 'months': [], 'meetings': {}}
+    U = RBI + 'BS_PressReleaseDisplay.aspx'
+    h = get(U, timeout=60).decode('utf-8', 'replace')
+    hid = dict(re.findall(r'<input type="hidden" name="([^"]+)" id="[^"]*" value="([^"]*)"', h))
+    today = dt.date.today(); recent = {f'{(today.replace(day=1) - dt.timedelta(days=31 * k)).strftime("%Y-%m")}' for k in range(3)}
+    months = [f'{y}-{m:02d}' for y in range(2016, today.year + 1) for m in range(1, 13) if '2016-10' <= f'{y}-{m:02d}' <= today.strftime('%Y-%m')]
+    for ym in months:
+        redo = any(m.get('released', '')[:7] == ym and (not m['resolutions'] or len(m['resolutions'][0]['votes']) < 6) for m in cache['meetings'].values())
+        if ym in cache['months'] and ym not in recent and not redo: continue
+        y, m = ym.split('-')
+        body = urllib.parse.urlencode({**hid, 'hdnYear': y, 'hdnMonth': str(int(m)), 'btn': ''}).encode()
+        try: t = urllib.request.urlopen(urllib.request.Request(U, data=body, headers={**UA, 'Content-Type': 'application/x-www-form-urlencoded'}), timeout=60).read().decode('utf-8', 'replace')
+        except Exception as e: print('  mpc month', ym, e); continue
+        for prid, title in re.findall(r'prid=(\d+)[^>]*>([^<]{0,200})', t):
+            title = re.sub(r'\s+', ' ', title).strip()
+            if not re.match(r'Minutes of the Monetary Policy Committee', title): continue
+            old = cache['meetings'].get(prid)
+            if old and old['resolutions'] and len(old['resolutions'][0]['votes']) >= 6: continue
+            try: x = _rbi_text(get(f'{U}?prid={prid}', timeout=60).decode('utf-8', 'replace'))
+            except Exception as e: print('  mpc page', prid, e); continue
+            rel = re.search(r'Date\s*:\s*([A-Z][a-z]{2})\.?\s*(\d{1,2}),\s*(\d{4})', x)
+            released = f'{rel.group(3)}-{list(MON).index(next(k for k in MON if k.startswith(rel.group(1)))) + 1:02d}-{int(rel.group(2)):02d}' if rel else None
+            tm = re.findall(r'(January|February|March|April|May|June|July|August|September|October|November|December)', title); yr = re.findall(r'(20\d\d)', title); dd = re.findall(r'\b(\d{1,2})\b', re.sub(r'20\d\d', '', title))
+            met = f'{yr[-1]}-{MON[tm[-1]]:02d}-{int(dd[-1]):02d}' if tm and yr and dd else None
+            res = []
+            for blk in re.split(r'\n\|?\s*(?=Voting on )', x)[1:]:
+                lines = blk.split('\n'); head = lines[0].strip(' |'); votes = []
+                for l in lines[1:16]:
+                    mm = re.match(r'\|\s*((?:Dr|Shri|Smt|Prof|Ms|Mr)\.?\s*[^|]+?)\s*\|\s*(Yes|No)\b', l)
+                    if mm: votes.append([re.sub(r'^(Dr|Shri|Smt|Prof|Ms|Mr)\.?\s*', r'\1. ', re.sub(r'\s+', ' ', mm.group(1)).strip()), mm.group(2)])
+                    elif votes and not l.startswith('|'): break
+                if votes: res.append({'resolution': re.sub(r'^Voting on (the )?[Rr]esolution (to )?', '', head).strip(), 'votes': votes})
+            nm = re.search(r'The (\w[\w -]*?) meeting of the Monetary Policy Committee', x)
+            cache['meetings'][prid] = {'title': title, 'meeting': met, 'released': released, 'ordinal': nm.group(1) if nm else None, 'resolutions': res, 'url': f'{U}?prid={prid}'}
+            print('  MPC', met, len(res), 'resolutions', sum(len(r['votes']) for r in res), 'votes')
+            time.sleep(0.4)
+        if ym not in cache['months']: cache['months'].append(ym)
+        json.dump(cache, open(path, 'w')); time.sleep(0.3)
+    cache['months'] = sorted(set(cache['months']))
+    json.dump(cache, open(path, 'w'), separators=(',', ':'), ensure_ascii=False)
+    print('MPC minutes:', len(cache['meetings']), 'meetings')
 def rbi_rates(limit=150):
     path = os.path.join(OUT, 'rbi_rates.json')
     cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 4: Ratios and Rates (latest week on each issue)', 'weeks': {}, 'seen': []}
@@ -824,7 +874,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('fbil', fbil), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('amfi', amfi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('fbil', fbil), ('mpc', mpc), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('amfi', amfi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:
