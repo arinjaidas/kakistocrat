@@ -100,7 +100,7 @@ const shortDate = iso => { const d = new Date(iso); return `${d.getUTCDate()} ${
 const isoOrMonth = s => { if (!s) return '—'; const p = s.split('-'); return p.length === 2 ? `${MONTHS[+p[1]-1]} ${p[0]}` : longDate(s + 'T00:00:00Z'); };
 const words = h => strip(h).split(' ').filter(Boolean).length;
 const mins = h => Math.max(1, Math.round(words(h) / 230));
-async function write(path, html) { const CO = globalThis.__CONCEPT_OF; if (CO && typeof html === 'string' && !path.startsWith('api/series/')) html = html.replace(/\/s\/([a-z0-9-]+)\//g, (m, id) => CO[id] || m); const f = join(OUT, path); await mkdir(dirname(f), { recursive: true }); await writeFile(f, html); }
+async function write(path, html) { const CO = globalThis.__CONCEPT_OF; if (CO && typeof html === 'string' && !path.startsWith('api/series/') && path !== '_redirects') html = html.replace(/\/s\/([a-z0-9-]+)\//g, (m, id) => CO[id] || m); const f = join(OUT, path); await mkdir(dirname(f), { recursive: true }); await writeFile(f, html); }
 
 async function getAll(path) {
   const out = [];
