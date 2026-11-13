@@ -403,7 +403,8 @@ def wpi_mospi():
     years = {k[:4] for v in have['series'].values() for k, _ in v}
     now = dt.date.today().year
     mi = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
-    todo = [yr for yr in range(now, 2012, -1) if yr == now or str(yr) not in years][:4]   # current year plus up to three missing years a run, newest first
+    ended = any(k >= '2026-04' for v in have['series'].values() for k, _ in v)   # the 2011-12 base ended with April 2026
+    todo = [] if ended else [yr for yr in range(now, 2012, -1) if yr == now or str(yr) not in years][:4]   # current year plus up to three missing years a run, newest first
     for yr in todo:
         try: rows = mospi_pages('wpi/getWpiRecords', {'year': yr, 'Format': 'JSON'})
         except Exception as e: print('  WPI', yr, e); continue
@@ -419,6 +420,25 @@ def wpi_mospi():
     have['source'] = 'MoSPI WPI (base 2011-12=100) via api.mospi.gov.in'
     json.dump(have, open(path, 'w'), separators=(',', ':'))
     print('WPI history:', len(have['series']), 'series')
+    # the 2022-23 base (from June 2026; indices from April 2023): same API with base_year, different field names
+    p2 = os.path.join(OUT, 'wpi22_hist.json')
+    h2 = json.load(open(p2)) if os.path.exists(p2) else {'series': {}}
+    yrs2 = {k[:4] for v in h2['series'].values() for k, _ in v}
+    last2 = max((v[-1][0] for v in h2['series'].values() if v), default='')
+    due = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).strftime('%Y-%m')   # last month: WPI for it is released mid-month
+    for yr in [y for y in range(now, 2022, -1) if (y == now and last2 < due) or str(y) not in yrs2][:4]:  # the API serves a whole year at a time (slow): only when a month is due
+        try: rows = mospi_pages('wpi/getWpiRecords', {'year': yr, 'base_year': '2022-23', 'Format': 'JSON'})
+        except Exception as e: print('  WPI 2022-23', yr, e); continue
+        for r in rows:
+            if r.get('sub_group') or r.get('item') or r.get('month') not in mi: continue
+            v = num(str(r.get('index_value')))
+            if v is None: continue
+            k = (r.get('major_group') or '') + '|' + (r.get('group') or '')
+            ser = dict(h2['series'].get(k, [])); ser[f"{yr}-{mi[r['month']]:02d}"] = v; h2['series'][k] = sorted(ser.items())
+        print('  WPI 2022-23', yr, len(rows), 'rows')
+    h2['source'] = 'MoSPI WPI (base 2022-23=100) via api.mospi.gov.in'
+    json.dump(h2, open(p2, 'w'), separators=(',', ':'))
+    print('WPI 2022-23:', len(h2['series']), 'series', max((v[-1][0] for v in h2['series'].values() if v), default=''))
 
 def upi():
     """UPI monthly volume and value from NPCI's statistics API, through the site's Mumbai relay (NPCI refuses non-Indian IPs)."""
