@@ -58,23 +58,19 @@
    "context": "October's rise was again led by food: the Consumer Food Price Index rose 8.94 per cent, up from 7.74 per cent in September, with onion prices up 116 per cent on a year earlier. Rural inflation was 6.63 per cent against 5.41 per cent in cities. The headline rate is now above the top of the RBI's 2–6 per cent tolerance band. September's 5.54 per cent was confirmed unchanged in the final data.",
    "sources": [
     {
+     "name": "MoSPI CPI press release for October 2026 (PIB, 12 Nov 2026), as reproduced by indiangovtscheme.com",
+     "url": "https://www.indiangovtscheme.com/indias-cpi-inflation-rises-to-6-09-in-october-2026-rural-inflation-at-6-63-urban-at-5-41/"
+    },
+    {
      "name": "MoSPI, October 2026 CPI release (12 November 2026)",
      "url": "https://mospi.gov.in/uploads/latestreleasesfiles/1794480048335-Press%20Release%20of%20CPI%20for%20October%202026%20.pdf"
     },
     {
      "name": "Reuters: India’s October retail inflation at 6.09% (government data, 12 Nov 2026)",
      "url": "https://www.investing.com/news/economy-news/indias-october-retail-inflation-at-609-onyear-5020869"
-    },
-    {
-     "name": "ANI via The Tribune: rural, urban and food inflation for October 2026, citing MoSPI",
-     "url": "https://www.tribuneindia.com/news/business/retail-inflation-hits-24-month-high-of-6-09-in-october-crosses-rbis-upper-tolerance-limit-ahead-of-december-mpc-meet"
-    },
-    {
-     "name": "MoSPI CPI press release, September 2026 (for September figures)",
-     "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf"
     }
    ],
-   "checked": "2026-11-12",
+   "checked": "2026-11-13",
    "related": [
     "india-july-2026-inflation-gap",
     "india-new-inflation-basket",

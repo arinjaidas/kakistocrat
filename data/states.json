@@ -3,7 +3,7 @@
  "allIndia": {
   "pcIncome": 205324,
   "pcIncome26": 219575,
-  "cpi": 5.54,
+  "cpi": 6.09,
   "debt": 29.2,
   "interest": 12.0,
   "ownRev": 57.3
@@ -37,9 +37,9 @@
    "short": "Inflation",
    "unit": "%",
    "fmt": "pct2",
-   "year": "Sep 2026",
+   "year": "Oct 2026",
    "higherIs": "bad",
-   "def": "Year-on-year CPI (combined) inflation, September 2026, provisional. Base 2024=100.",
+   "def": "Year-on-year CPI (combined) inflation, October 2026, provisional. Base 2024=100.",
    "src": 2
   },
   {
@@ -86,8 +86,8 @@
    "url": "https://www.rbi.org.in/Scripts/PublicationsView.aspx?id=23831"
   },
   {
-   "name": "MoSPI, CPI press release for September 2026, Annexure III (12 Oct 2026)",
-   "url": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1791801549227-Press%20Release%20for%20the%20month%20of%20September,%202026.pdf"
+   "name": "MoSPI, CPI press release for October 2026, Annexure III (PIB, 12 Nov 2026), as reproduced by indiangovtscheme.com",
+   "url": "https://www.indiangovtscheme.com/indias-cpi-inflation-rises-to-6-09-in-october-2026-rural-inflation-at-6-63-urban-at-5-41/"
   },
   {
    "name": "RBI, State Finances: A Study of Budgets of 2025-26, Statement 20",
@@ -108,7 +108,7 @@
    "pcIncome26": 294507,
    "growth": 8.3,
    "size": 1425452,
-   "cpi": 6.29,
+   "cpi": 7.25,
    "debt": 35.4,
    "interest": 13.9,
    "ownRev": 51.0
@@ -122,7 +122,7 @@
    "pcIncome26": 276325,
    "growth": 14.8,
    "size": 39429,
-   "cpi": 3.7,
+   "cpi": 4.33,
    "debt": 59.8,
    "interest": 3.3,
    "ownRev": 15.4
@@ -136,7 +136,7 @@
    "pcIncome26": null,
    "growth": 8.4,
    "size": 576920,
-   "cpi": 4.62,
+   "cpi": 4.59,
    "debt": 27.9,
    "interest": 9.4,
    "ownRev": 36.8
@@ -150,7 +150,7 @@
    "pcIncome26": 76300,
    "growth": 8.3,
    "size": 897595,
-   "cpi": 5.48,
+   "cpi": 5.71,
    "debt": 36.8,
    "interest": 9.1,
    "ownRev": 26.9
@@ -164,7 +164,7 @@
    "pcIncome26": 179244,
    "growth": 5.8,
    "size": 500335,
-   "cpi": 5.0,
+   "cpi": 5.99,
    "debt": 29.8,
    "interest": 6.9,
    "ownRev": 55.0
@@ -178,7 +178,7 @@
    "pcIncome26": null,
    "growth": 6.4,
    "size": 1082815,
-   "cpi": 3.4,
+   "cpi": 3.8,
    "debt": 1.5,
    "interest": 3.1,
    "ownRev": 96.6
@@ -192,7 +192,7 @@
    "pcIncome26": null,
    "growth": 12.4,
    "size": 101045,
-   "cpi": 3.92,
+   "cpi": 4.58,
    "debt": 25.7,
    "interest": 11.4,
    "ownRev": 78.4
@@ -206,7 +206,7 @@
    "pcIncome26": 357531,
    "growth": 7.6,
    "size": 2384203,
-   "cpi": 5.11,
+   "cpi": 5.71,
    "debt": 17.9,
    "interest": 13.5,
    "ownRev": 78.5
@@ -220,7 +220,7 @@
    "pcIncome26": null,
    "growth": 7.5,
    "size": 1087269,
-   "cpi": 4.37,
+   "cpi": 4.38,
    "debt": 29.9,
    "interest": 17.7,
    "ownRev": 69.0
@@ -234,7 +234,7 @@
    "pcIncome26": null,
    "growth": 6.7,
    "size": 194344,
-   "cpi": 4.02,
+   "cpi": 4.27,
    "debt": 42.8,
    "interest": 13.8,
    "ownRev": 41.6
@@ -248,7 +248,7 @@
    "pcIncome26": 168243,
    "growth": 7.1,
    "size": 213797,
-   "cpi": 4.27,
+   "cpi": 4.88,
    "debt": 33.7,
    "interest": 14.5,
    "ownRev": 40.0
@@ -262,7 +262,7 @@
    "pcIncome26": null,
    "growth": 7.6,
    "size": 469605,
-   "cpi": 5.02,
+   "cpi": 5.9,
    "debt": 25.4,
    "interest": 5.7,
    "ownRev": 55.2
@@ -276,7 +276,7 @@
    "pcIncome26": 433326,
    "growth": 7.3,
    "size": 2639837,
-   "cpi": 5.86,
+   "cpi": 7.07,
    "debt": 26.5,
    "interest": 14.6,
    "ownRev": 72.0
@@ -290,7 +290,7 @@
    "pcIncome26": null,
    "growth": 5.5,
    "size": 1111229,
-   "cpi": 5.26,
+   "cpi": 6.22,
    "debt": 35.5,
    "interest": 17.7,
    "ownRev": 61.7
@@ -304,7 +304,7 @@
    "pcIncome26": 169050,
    "growth": 7.0,
    "size": 1359561,
-   "cpi": 6.68,
+   "cpi": 7.19,
    "debt": 31.3,
    "interest": 9.9,
    "ownRev": 45.0
@@ -318,7 +318,7 @@
    "pcIncome26": 347903,
    "growth": 7.3,
    "size": 4065565,
-   "cpi": 5.18,
+   "cpi": 5.85,
    "debt": 19.0,
    "interest": 10.7,
    "ownRev": 69.3
@@ -332,7 +332,7 @@
    "pcIncome26": null,
    "growth": 10.8,
    "size": 45260,
-   "cpi": 5.1,
+   "cpi": 4.91,
    "debt": 39.2,
    "interest": 6.2,
    "ownRev": 11.4
@@ -346,7 +346,7 @@
    "pcIncome26": null,
    "growth": 8.9,
    "size": 53821,
-   "cpi": 3.59,
+   "cpi": 3.63,
    "debt": 39.1,
    "interest": 6.6,
    "ownRev": 24.4
@@ -374,7 +374,7 @@
    "pcIncome26": null,
    "growth": null,
    "size": null,
-   "cpi": 3.22,
+   "cpi": 3.66,
    "debt": 47.0,
    "interest": 7.7,
    "ownRev": 14.4
@@ -388,7 +388,7 @@
    "pcIncome26": 186761,
    "growth": 7.5,
    "size": 799301,
-   "cpi": 6.7,
+   "cpi": 7.17,
    "debt": 20.3,
    "interest": 3.2,
    "ownRev": 62.9
@@ -402,7 +402,7 @@
    "pcIncome26": null,
    "growth": 9.9,
    "size": 47964,
-   "cpi": 6.86,
+   "cpi": 7.96,
    "debt": 25.9,
    "interest": 7.1,
    "ownRev": 65.7
@@ -416,7 +416,7 @@
    "pcIncome26": null,
    "growth": 6.4,
    "size": 717056,
-   "cpi": 5.27,
+   "cpi": 5.6,
    "debt": 46.4,
    "interest": 18.4,
    "ownRev": 55.6
@@ -430,7 +430,7 @@
    "pcIncome26": 202349,
    "growth": 8.9,
    "size": 1525291,
-   "cpi": 5.71,
+   "cpi": 5.89,
    "debt": 35.9,
    "interest": 12.3,
    "ownRev": 52.1
@@ -444,7 +444,7 @@
    "pcIncome26": null,
    "growth": 6.6,
    "size": 45129,
-   "cpi": 4.83,
+   "cpi": 5.25,
    "debt": 38.6,
    "interest": 9.7,
    "ownRev": 28.0
@@ -458,7 +458,7 @@
    "pcIncome26": 408027,
    "growth": 11.1,
    "size": 2792496,
-   "cpi": 6.81,
+   "cpi": 7.29,
    "debt": 29.2,
    "interest": 18.5,
    "ownRev": 66.9
@@ -472,7 +472,7 @@
    "pcIncome26": 418931,
    "growth": 6.0,
    "size": 1457913,
-   "cpi": 6.64,
+   "cpi": 7.26,
    "debt": 27.5,
    "interest": 8.5,
    "ownRev": 78.0
@@ -486,7 +486,7 @@
    "pcIncome26": null,
    "growth": 8.9,
    "size": 78617,
-   "cpi": 3.96,
+   "cpi": 4.8,
    "debt": 30.5,
    "interest": 5.9,
    "ownRev": 16.8
@@ -500,7 +500,7 @@
    "pcIncome26": null,
    "growth": 10.7,
    "size": 2630445,
-   "cpi": 6.08,
+   "cpi": 6.47,
    "debt": 28.7,
    "interest": 11.0,
    "ownRev": 54.8
@@ -514,7 +514,7 @@
    "pcIncome26": 273921,
    "growth": 6.3,
    "size": 296470,
-   "cpi": 5.47,
+   "cpi": 5.41,
    "debt": 25.3,
    "interest": 11.7,
    "ownRev": 47.4
@@ -528,7 +528,7 @@
    "pcIncome26": 179389,
    "growth": 6.9,
    "size": 1638832,
-   "cpi": 4.04,
+   "cpi": 4.66,
    "debt": 38.9,
    "interest": 16.2,
    "ownRev": 40.4
