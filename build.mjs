@@ -30,7 +30,7 @@ import { economyPage, IIP_ORDER, iipId } from './lib/economy.mjs';
 import { loadCompanies, companyPage, companiesHub } from './lib/companies.mjs';
 import { districtsPage } from './lib/districts.mjs';
 import { hormuzStory } from './lib/story.mjs';
-import { indicatorPage as conceptPage, heatTable, dashboardPage } from './lib/indicators.mjs';
+import { indicatorPage as conceptPage, heatTable, dashboardPage, readings, actuals, period } from './lib/indicators.mjs';
 import { appendixFiles, appendixPage } from './lib/appendix.mjs';
 import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
@@ -263,32 +263,45 @@ const ogSlug = path => { const seg = (path || '/').split('/').filter(Boolean).po
 const pageHead = (kick, title, p) => `<div class="wrap"><header class="page-head"><span class="kicker">${kick}</span><h1>${esc(title)}</h1>${p ? `<p>${p}</p>` : ''}</header></div>`;
 
 // ---------------------------------------------------------------- pages
-function home(m, tape, ledger) {
-  const A = m.articles; const lead = A[0], sub = A.slice(1, 3), latest = A.slice(3, 11);
+function home(m, tape, ledger, X = {}) {
+  const { SD = {}, byId = {} } = X, CO = globalThis.__CONCEPT_OF || {}, url = id => CO[id] || `/s/${id}/`;
+  const A = m.articles, lead = A[0], latest = A.slice(1, 7);
   const byTopic = Object.fromEntries(TOPIC_ORDER.map(t => [t, A.filter(a => a.topic === t)]));
-  const used = new Set([lead, ...sub, ...latest].map(a => a.id));
-  const deskBlock = t => { const items = byTopic[t].filter(a => !used.has(a.id)).slice(0, 5); if (!items.length) return ''; return `<section><div class="sec-head" style="--desk:${TOPICS[t].color}"><h2><span class="dot"></span>${esc(TOPICS[t].name)}</h2><a href="/topic/${t}/">More →</a></div><div class="desk-grid">${items.map((a, i) => i === 0 ? `<div class="first">${card(a, 'h-2', true)}</div>` : `<div>${card(a, 'h-4', i < 3)}</div>`).join('')}</div></section>`; };
-  const explainers = A.filter(a => a.format === 'Explainer' && !used.has(a.id) && !A.slice(0, 11).includes(a)).slice(0, 4);
+  const spark = (v, up) => { const s = v.slice(-60), lo = Math.min(...s), hi = Math.max(...s), W = 100, H = 28; return `<svg class="hn-sp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${s.map((x, i) => `${i ? 'L' : 'M'}${(i / Math.max(1, s.length - 1) * W).toFixed(1)},${(H - 2 - (hi === lo ? .5 : (x - lo) / (hi - lo)) * (H - 4)).toFixed(1)}`).join('')}" fill="none" stroke="#15171a" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>`; };
+  const NUMS = [['india-cpi', 'Inflation (CPI)', '%', '/economy/prices/'], ['india-repo', 'Repo rate', '%', '/economy/rates/'], ['rbi-gsec10', '10-year G-Sec', '%', '/economy/rates/#gsec'], ['fx-usdinr', 'Rupee per dollar', '', '/external/', -1],
+    ['nse-nifty-50', 'Nifty 50', '', '/markets/', 1], ['rbi-fx-total', 'FX reserves', 'bn', '/external/#xt-res', 1], ['iip-general', 'Industrial output', '%', '/economy/industry/'], ['fred-dcoilbrenteu', 'Brent crude', '$', url('fred-dcoilbrenteu'), -1]];
+  const nums = NUMS.filter(([id]) => SD[id] && byId[id]).map(([id, label, u, href, inverse]) => {
+    const meta = byId[id], r = readings(meta, SD[id]); if (!r) return ''; const A_ = actuals(meta, SD[id]);
+    const v = u === 'bn' ? `$${(r.last / 1000).toFixed(1)}bn` : u === '$' ? `$${r.last.toFixed(2)}` : r.last >= 1000 ? Math.round(r.last).toLocaleString('en-IN') : r.last.toFixed(2) + (u === '%' ? '%' : '');
+    const ch = r.dPrev == null ? '' : r.rate ? `${r.dPrev > 0 ? '+' : r.dPrev < 0 ? '−' : '±'}${Math.round(Math.abs(r.dPrev) * 100)}bp` : `${r.dPrev > 0 ? '+' : r.dPrev < 0 ? '−' : '±'}${Math.abs(r.dPrev).toFixed(1)}%`;
+    const good = (r.dPrev ?? 0) * (inverse || 0) > 0, bad = (r.dPrev ?? 0) * (inverse || 0) < 0;
+    return `<a class="hn" href="${href}"><span class="hn-l">${esc(label)}</span><span class="hn-v">${v}</span><span class="hn-c ${good ? 'up' : bad ? 'dn' : ''}">${ch}<em>${esc(period(r.at, meta.freq))}</em></span>${spark(A_.v, A_.v.at(-1) >= A_.v.at(-Math.min(A_.v.length, 60)))}</a>`; }).join('');
+  const REL = ['india-cpi', 'wpi', 'iip-general', 'rbi-credit-yoy', 'rbi-m3-yoy', 'in-exports', 'in-imports', 'oil-crude-bill', 'oil-consumption-yoy', 'rbi-cd-ratio', 'rbi-call'].filter(id => SD[id] && byId[id])
+    .map(id => ({ id, m: byId[id], r: readings(byId[id], SD[id]) })).filter(x => x.r).sort((a, b) => b.r.at.localeCompare(a.r.at)).slice(0, 8);
+  const fv = (x, mm) => x == null ? '—' : mm.unit === 'US$ mn' ? `$${(x / 1000).toFixed(1)}bn` : /^US\$ bn/.test(mm.unit) ? `$${x.toFixed(1)}bn` : (Math.abs(x) >= 1000 ? Math.round(x).toLocaleString('en-IN') : x.toFixed(2)) + (/%/.test(mm.unit) ? '%' : '');
+  const rel = REL.map(({ id, m: mm, r }) => `<a class="hr" href="${url(id)}"><span class="hr-n">${esc(mm.short || mm.name)}</span><span class="hr-p">${esc(period(r.at, mm.freq))}</span><span class="hr-v">${fv(r.last, mm)}</span><span class="hr-o">${fv(r.prev, mm)}</span></a>`).join('');
+  const topics = TOPIC_ORDER.map(t => { const it = byTopic[t].filter(a => a !== lead && !latest.includes(a)).slice(0, 3); if (!it.length) return ''; return `<div class="ht" style="--desk:${TOPICS[t].color}"><a class="ht-h" href="/topic/${t}/"><span class="dot"></span>${esc(TOPICS[t].name)}<b>→</b></a>${it.map(a => `<a class="ht-a" href="${a.url}">${esc(a.title)}<span>${esc(shortDate(a.date))}</span></a>`).join('')}</div>`; }).join('');
   const featured = FEATURED_SERIES.map(slug => m.series.find(s => s.slug === slug)).filter(Boolean);
-  return pageHead('The Kakistocrat', 'India’s economy, in data', 'Track the releases behind the headlines, compare series and test what a change in oil, the rupee or interest rates could mean.') + `<div class="wrap">
-<div class="front">
- <div class="col">
-  <a class="story" href="${lead.url}">${kicker(lead)}${fmtBadge(lead)}<h2 class="h-lead">${esc(lead.title)}</h2><p class="dek">${esc(lead.excerpt)}</p><div class="meta" style="margin-top:10px">Arinjai Das · ${esc(longDate(lead.date))} · ${lead.minutes} min read</div></a>
-  <div class="lead-sub">${sub.map(a => card(a, 'h-2', true)).join('')}</div>
- </div>
- <div class="col"><h2 class="col-title">Latest</h2><div class="latest-list">${latest.map(a => `<a class="story" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h3 class="h-4">${esc(a.title)}</h3><div class="meta">${esc(shortDate(a.date))}</div></a>`).join('')}</div><p style="margin-top:12px"><a href="/archive/" class="meta" style="color:var(--accent)">Full archive →</a></p></div>
- <div class="col rail-col">
-  <div class="module dark home-desk"><span class="kicker" style="color:#F0A39B">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><h3>Today in numbers</h3>${DESK ? DESK.lines.filter(l => ['nse-nifty-50', 'fx-usdinr', 'fred-dcoilbrenteu', 'nse-india-vix', 'rbi-fx-total'].includes(l.id)).map(l => `<a href="/s/${l.id}/" class="hd-row"><span>${esc(l.label)}</span><b>${l.unit === 'US$ million' ? '$' + (l.last / 1000).toFixed(1) + 'bn' : l.last >= 1000 ? Math.round(l.last).toLocaleString('en-IN') : l.last.toFixed(2)}</b><i class="${(l.id === 'fx-usdinr' || l.id === 'nse-india-vix' ? -l.d1 : l.d1) > 0 ? 'up' : (l.id === 'fx-usdinr' || l.id === 'nse-india-vix' ? -l.d1 : l.d1) < 0 ? 'dn' : ''}">${l.d1 == null ? '' : (l.d1 > 0 ? '+' : l.d1 < 0 ? '−' : '') + (l.rate ? Math.abs(Math.round(l.d1 * 100)) + 'bp' : Math.abs(l.d1).toFixed(2) + '%')}</i></a>`).join('') : ''}<a class="btn" style="background:#fff;color:var(--ink);margin-top:12px" href="/desk/">Read today’s Desk</a></div>
+  const upd = BUILT.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+  return `<div class="hp">
+<section class="hp-top"><div class="wrap"><div class="hp-head"><h1>India’s economy, in data</h1><p>Every headline number, updated from the RBI, MoSPI, NSE and the government’s open-data platform as it is released, with analysis of what it means. <span class="meta">Updated ${esc(upd)} IST</span></p></div>
+  <div class="hn-grid">${nums}</div>
+  <p class="hp-more"><a href="/economy/">All indicators on the macro dashboard →</a></p></div></section>
+<div class="wrap hp-main">
+ <section class="hp-col hp-analysis"><h2 class="hp-h">Analysis</h2>
+  <a class="hp-lead" href="${lead.url}">${kicker(lead)}${fmtBadge(lead)}<h3>${esc(lead.title)}</h3><p>${esc(lead.excerpt)}</p><span class="meta">Arinjai Das · ${esc(longDate(lead.date))} · ${lead.minutes} min read</span></a>
+  <div class="hp-list">${latest.map(a => `<a class="hp-li" href="${a.url}">${kicker(a)}${fmtBadge(a)}<h4>${esc(a.title)}</h4><span class="meta">${esc(shortDate(a.date))} · ${a.minutes} min</span></a>`).join('')}</div>
+  <p class="hp-more"><a href="/archive/">Every article →</a></p></section>
+ <aside class="hp-col hp-rail">
+  <section><h2 class="hp-h">Latest data</h2><div class="hr-t"><div class="hr hr-hd"><span class="hr-n">Indicator</span><span class="hr-p">Period</span><span class="hr-v">Latest</span><span class="hr-o">Prior</span></div>${rel}</div></section>
+  <a class="hp-desk" href="/desk/"><span class="kicker" style="color:#F0A39B">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><b>What moved today, and why</b><span>Markets, rates and the releases of the day, written up every evening →</span></a>
   ${MK?.unusual?.length ? `<div class="module"><span class="kicker">Unusual moves</span><h3>What just moved more than usual</h3><ul class="mini-moves">${MK.unusual.slice(0, 6).map(u => `<li><a href="/s/${u.id}/">${esc(u.name)}</a><span class="${u.ch > 0 ? 'up' : 'dn'}">${u.ch > 0 ? '+' : '−'}${Math.abs(u.ch).toFixed(u.rate ? 2 : 1)}${u.rate ? ' pts' : '%'}</span></li>`).join('')}</ul><a class="more" href="/explore/">Explore everything →</a></div>` : ''}
- </div>
+ </aside>
 </div>
-${TOPIC_ORDER.slice(0, 2).map(deskBlock).join('')}
-<div class="sec-head"><h2>Series</h2><a href="/series/">All series →</a></div>
-<div class="series-strip">${featured.map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · latest ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div>
-${TOPIC_ORDER.slice(2).map(deskBlock).join('')}
-${explainers.length ? `<div class="sec-head"><h2>Explainers</h2><a href="/archive/#explainers">All explainers →</a></div><div class="desk-grid">${explainers.map(a => `<div>${card(a, 'h-3', true)}</div>`).join('')}</div>` : ''}
-</div>
-<section class="tools-band"><div class="wrap"><span class="kicker" style="color:#F0A39B">The data</span><h2 style="margin:6px 0 18px;font:500 30px/1.1 var(--serif)">Eight ways into the numbers</h2><div class="tools-grid sec-grid">${SECTIONS.map(S => `<a class="tool-card" href="${S.url}"><span class="kicker">${esc(S.name)}</span><h3>${esc(S.blurb)}</h3></a>`).join('')}</div></div></section>`;
+<div class="wrap"><section class="hp-sec"><h2 class="hp-h">By topic</h2><div class="ht-grid">${topics}</div></section>
+ <section class="hp-sec"><h2 class="hp-h">Series <a href="/series/">All series →</a></h2><div class="series-strip hp-strip">${featured.map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · latest ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div></section></div>
+<section class="tools-band"><div class="wrap"><h2 class="hp-h" style="color:#fff">Find your way into the data</h2><div class="hp-secs">${SECTIONS.map(S => `<a href="${S.url}"><b>${esc(S.name)}</b><span>${esc(S.blurb)}</span></a>`).join('')}</div></div></section>
+</div>`;
 }
 
 function articlePage(a, m) {
@@ -869,7 +882,7 @@ async function main() {
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
 
-  await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger) }));
+  await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
   const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
   const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
   await write('research/oil-rupee/index.html', P({ title: 'Who pays when the rupee falls?', path: rupeeStressPath, description: 'A reproducible stress test of the rupee, India’s crude imports and household petrol bills.', ogImage: '/research/oil-rupee/pass-through.png', body: stress.body }));
