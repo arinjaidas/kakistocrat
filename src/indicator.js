@@ -27,7 +27,7 @@
           if (cfg.line != null) ml.push({ yAxis: cfg.line, lineStyle: { color: '#333', type: 'dashed', width: 1 }, label: { show: !!cfg.lineLabel, formatter: cfg.lineLabel || '', position: 'insideEndTop', color: '#333', fontSize: 11 } });
           (cfg.breaks || []).forEach(b => ml.push({ xAxis: ts(b.at), lineStyle: { color: '#777', type: 'dotted' }, label: { formatter: b.label, position: 'insideEndTop', color: '#555', fontSize: 11 } }));
           if (ml.length) s1.markLine = { silent: true, symbol: 'none', data: ml };
-          if (cfg.band) s1.markArea = { silent: true, itemStyle: { color: 'rgba(46,125,91,.08)' }, data: [[{ yAxis: cfg.band[0] }, { yAxis: cfg.band[1] }]] };
+          if (cfg.band) s1.markArea = { silent: true, itemStyle: { color: 'rgba(95,127,20,.08)' }, data: [[{ yAxis: cfg.band[0] }, { yAxis: cfg.band[1] }]] };
         }
         series.push(s1);
         if (proj.length) { if (base.type === 'bar') proj.shift(); series.push({ ...base, name: name + ' (IMF projection)', data: proj, lineStyle: { width: 1.6, type: 'dashed' }, showSymbol: true, itemStyle: base.type === 'bar' ? { color: 'transparent', borderColor: color, borderWidth: 1.5, borderType: 'dashed' } : undefined }); }

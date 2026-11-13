@@ -23,7 +23,7 @@
         c.setOption({ textStyle: { fontFamily: FONT }, animationDuration: 300, grid: { left: 60, right: 20, top: 20, bottom: 40 }, tooltip: { trigger: 'axis', valueFormatter: v => nf(v) },
           xAxis: axis({ type: 'category', data: dates, boundaryGap: false }), yAxis: axis({ type: 'value', scale: true, name: E.unit, nameTextStyle: { color: MUTE } }),
           series: (proj > 0 ? [vals.map((v, i) => i < proj ? v : null), vals.map((v, i) => i >= proj - 1 ? v : null)] : [vals]).map((data, k) => ({ type: 'line', data, showSymbol: E.annual, symbolSize: 4, markLine: k ? undefined : evLine(dates), step: E.id === 'india-repo' ? 'end' : false, lineStyle: { color: RED, width: 2.2, type: k ? 'dashed' : 'solid' }, itemStyle: { color: RED },
-            areaStyle: k ? undefined : { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(180,35,24,.16)' }, { offset: 1, color: 'rgba(180,35,24,0)' }] } } })) }, true);
+            areaStyle: k ? undefined : { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(181,54,122,.16)' }, { offset: 1, color: 'rgba(181,54,122,0)' }] } } })) }, true);
         $('#en-ct').textContent = E.name; return;
       }
       // compare: rebase both to 100 at the first common date in range (monthly for mixed frequencies)
@@ -58,12 +58,12 @@
   /* ---- explore: network of co-mentions ---- */
   if (window.__NET) ready(() => {
     const N = window.__NET, c = echarts.init($('#ex-net')); addEventListener('resize', () => c.resize());
-    const COL = { state: '#D4A03A', country: '#60A5FA', series: '#F87171' };
+    const COL = { state: '#7B4B2A', country: '#1C7C99', series: '#B87708' };
     c.setOption({ tooltip: { formatter: p => p.dataType === 'node' ? `<b>${p.data.name}</b><br>${p.data.value} articles` : `${p.data.source} — ${p.data.target}: ${p.data.value} articles together` },
-      legend: { data: ['state', 'country', 'series'].map(n => ({ name: n })), formatter: n => ({ state: 'States', country: 'Countries', series: 'Commodities and indicators' }[n]), textStyle: { color: '#D1D5DB' }, top: 10 },
+      legend: { data: ['state', 'country', 'series'].map(n => ({ name: n })), formatter: n => ({ state: 'States', country: 'Countries', series: 'Commodities and indicators' }[n]), textStyle: { color: '#3A3E44' }, top: 10 },
       series: [{ type: 'graph', layout: 'force', roam: true, draggable: true, categories: ['state', 'country', 'series'].map(n => ({ name: n, itemStyle: { color: COL[n] } })),
-        force: { repulsion: 140, edgeLength: [40, 180], gravity: 0.08 }, label: { show: true, color: '#E5E7EB', fontFamily: FONT, fontSize: 11, position: 'right' }, labelLayout: { hideOverlap: true },
-        lineStyle: { color: 'source', opacity: 0.25, curveness: 0.1 }, emphasis: { focus: 'adjacency', lineStyle: { opacity: 0.9 } },
+        force: { repulsion: 140, edgeLength: [40, 180], gravity: 0.08 }, label: { show: true, color: '#17202C', fontFamily: FONT, fontSize: 11, position: 'right' }, labelLayout: { hideOverlap: true },
+        lineStyle: { color: 'source', opacity: 0.35, curveness: 0.1 }, emphasis: { focus: 'adjacency', lineStyle: { opacity: 0.9 } },
         data: N.nodes.map(n => ({ ...n, category: ['state', 'country', 'series'].indexOf(n.t), symbolSize: 6 + Math.sqrt(n.value) * 5 })),
         links: N.links.map(l => ({ ...l, lineStyle: { width: Math.min(6, 0.5 + l.value * 0.6) } })) }] });
     c.on('click', p => { if (p.dataType === 'node' && p.data.url) location.href = p.data.url; });

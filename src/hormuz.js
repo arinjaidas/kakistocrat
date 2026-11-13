@@ -46,7 +46,7 @@
     if (h) cap.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 56, right: 20, top: 16, bottom: 56 }, tooltip: { ...tip, valueFormatter: v => v == null ? '—' : Math.round(v).toLocaleString('en-IN') + ' thousand t' },
       dataZoom: [{ type: 'inside' }, { type: 'slider', height: 18, bottom: 8, borderColor: RULE }],
       xAxis: axis({ type: 'category', data: h.d, boundaryGap: false }), yAxis: axis({ type: 'value' }),
-      series: [{ name: 'Tanker deadweight, 7-day avg', type: 'line', data: ma(h.capT.map(v => v == null ? null : v / 1000)), showSymbol: false, lineStyle: { color: '#B5367A', width: 1.8 }, itemStyle: { color: '#B5367A' }, areaStyle: { color: 'rgba(180,35,24,.12)' } }] });
+      series: [{ name: 'Tanker deadweight, 7-day avg', type: 'line', data: ma(h.capT.map(v => v == null ? null : v / 1000)), showSymbol: false, lineStyle: { color: '#B5367A', width: 1.8 }, itemStyle: { color: '#B5367A' }, areaStyle: { color: 'rgba(181,54,122,.12)' } }] });
   };
   go();
 })();

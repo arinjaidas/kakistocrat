@@ -10,6 +10,7 @@ const walk = d => readdirSync(d).flatMap(f => { const p = join(d, f); return sta
 const files = walk(OUT), pages = files.filter(f => f.endsWith('.html'));
 const have = new Set(files.map(f => '/' + f.slice(OUT.length + 1).replace(/\\/g, '/')));
 have.add('/api/health.json'); // written by this script
+const scriptSeen = new Set(), badScripts = [];
 const redirects = new Set(existsSync(join(OUT, '_redirects')) ? readFileSync(join(OUT, '_redirects'), 'utf8').split('\n').map(l => l.split(/\s+/)[0]).filter(Boolean) : []);
 const exists = u => {
   if (redirects.has(u)) return true;
@@ -24,6 +25,7 @@ const broken = new Map(); let links = 0;
 const missing = { title: [], description: [], h1: [] };
 for (const f of pages) {
   const h = readFileSync(f, 'utf8'), page = '/' + f.slice(OUT.length + 1).replace(/index\.html$/, '');
+  for (const m of h.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="application\/(?:ld\+)?json")[^>]*>([\s\S]*?)<\/script>/g)) { const code = m[1]; if (!code.trim() || scriptSeen.has(code)) continue; scriptSeen.add(code); try { new Function(code); } catch (e) { badScripts.push(`${page}: ${e.message}`); } }
   if (/^\/(wp-kit|embed)\//.test(page)) continue;
   for (const m of h.matchAll(/(?:href|src)="(\/[^"#?]*)/g)) {
     const u = decodeURI(m[1]); if (u.startsWith('//') || imgSkipped(u)) continue; links++;
@@ -42,6 +44,7 @@ const stale = cat.filter(c => c.last && !c.ended && !c.sourceLag && !c.id.starts
 
 const health = { checked: new Date().toISOString(), pages: pages.length, links, broken: [...broken].map(([url, from]) => ({ url, from })), stale, missing };
 writeFileSync(join(OUT, 'api/health.json'), JSON.stringify(health, null, 1));
+if (badScripts.length) { console.error('Inline scripts that do not parse:\n  ' + badScripts.slice(0, 10).join('\n  ')); process.exitCode = 1; }
 console.log(`Checks: ${pages.length} pages, ${links} internal links, ${broken.size} broken, ${stale.length} stale series, ${missing.title.length + missing.description.length + missing.h1.length} pages missing basics`);
 for (const [u, from] of [...broken].slice(0, 25)) console.log(`  broken ${u}  ← ${from.join(', ')}`);
 for (const s of stale.slice(0, 15)) console.log(`  stale  ${s.id} (${s.freq}) last ${s.last}, ${s.days} days`);

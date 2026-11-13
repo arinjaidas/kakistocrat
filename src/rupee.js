@@ -30,7 +30,7 @@
       main.setOption({ ...base(), grid: { left: 56, right: withD ? 56 : 24, top: 28, bottom: 40 }, tooltip: tip({ valueFormatter: v => nf(v) }), legend: withD ? { top: 0, right: 0, textStyle: { color: MUTE } } : { show: false },
         xAxis: axis({ type: 'category', data: ds, boundaryGap: false }),
         yAxis: [axis({ type: 'value', scale: true, name: '₹ per $', nameTextStyle: { color: MUTE } }), axis({ type: 'value', scale: true, show: !!withD, splitLine: { show: false } })],
-        series: [{ name: 'Rupees per dollar', type: 'line', data: inr, showSymbol: false, lineStyle: { color: BLUE, width: 2 }, itemStyle: { color: BLUE }, areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(29,78,216,.18)' }, { offset: 1, color: 'rgba(29,78,216,0)' }] } },
+        series: [{ name: 'Rupees per dollar', type: 'line', data: inr, showSymbol: false, lineStyle: { color: BLUE, width: 2 }, itemStyle: { color: BLUE }, areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(28,124,153,.18)' }, { offset: 1, color: 'rgba(28,124,153,0)' }] } },
           markPoint: { symbolSize: 48, label: { fontFamily: MONO, fontSize: 10, formatter: p => nf(p.value, 1) }, data: [{ type: 'max', name: 'Weakest', itemStyle: { color: DN } }, { type: 'min', name: 'Strongest', itemStyle: { color: UP } }] } },
           ...(withD ? [{ name: 'Broad dollar index', type: 'line', yAxisIndex: 1, data: dv, showSymbol: false, lineStyle: { color: INK, width: 1.4, type: 'dashed' }, itemStyle: { color: INK } }] : [])] }, true);
     };
@@ -92,7 +92,7 @@
         xAxis: axis({ type: 'category', data: yrs, boundaryGap: e.unit.includes('billion') }), yAxis: axis({ type: 'value', scale: !e.unit.includes('billion') }),
         series: e.unit.includes('billion')
           ? [{ name: 'India', type: 'bar', data: act, itemStyle: { color: SAFF, borderRadius: [2, 2, 0, 0] } }]
-          : [{ name: 'India', type: 'line', data: act, showSymbol: false, lineStyle: { color: SAFF, width: 2.6 }, itemStyle: { color: SAFF }, areaStyle: id === 'BCA_NGDPD' ? { color: 'rgba(232,115,12,.12)' } : undefined,
+          : [{ name: 'India', type: 'line', data: act, showSymbol: false, lineStyle: { color: SAFF, width: 2.6 }, itemStyle: { color: SAFF }, areaStyle: id === 'BCA_NGDPD' ? { color: 'rgba(184,119,8,.12)' } : undefined,
               markLine: id === 'BCA_NGDPD' ? { silent: true, symbol: 'none', data: [{ yAxis: 0 }], lineStyle: { color: MUTE }, label: { show: false } } : id === 'FI.RES.TOTL.MO' ? { silent: true, symbol: 'none', data: [{ yAxis: 3 }], lineStyle: { color: DN, type: 'dotted' }, label: { formatter: '3-month floor', color: DN, fontSize: 10 } } : undefined },
              ...(proj < 9999 ? [{ name: 'IMF projection', type: 'line', data: pr, showSymbol: false, lineStyle: { color: SAFF, width: 2, type: 'dashed' }, itemStyle: { color: SAFF } }] : [])] }, true);
       // peers: latest actual year with India data

@@ -19,14 +19,14 @@
       const draw = m => ch.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 56, right: 20, top: 30, bottom: 56 }, legend: { top: 0, textStyle: { color: MUTE } },
         tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontSize: 12 } }, dataZoom: [{ type: 'slider', height: 18, bottom: 8 }],
         xAxis: axis({ type: 'category', data: C.d, boundaryGap: false }), yAxis: axis({ type: 'value', scale: true, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11, formatter: m === 'price' ? '₹{value}' : '{value}' } }),
-        series: m === 'price' ? [{ name: C.n, type: 'line', showSymbol: false, connectNulls: true, data: C.c, lineStyle: { color: INK, width: 2 }, itemStyle: { color: INK }, areaStyle: { color: 'rgba(21,23,26,.05)' } }]
+        series: m === 'price' ? [{ name: C.n, type: 'line', showSymbol: false, connectNulls: true, data: C.c, lineStyle: { color: INK, width: 2 }, itemStyle: { color: INK }, areaStyle: { color: 'rgba(23,32,44,.05)' } }]
           : [{ name: C.n, data: rebase(C.c), c: INK, w: 2.4 }, { name: 'Nifty 50', data: C.nifty && rebase(C.nifty), c: '#1C7C99', w: 1.6 }, ...(C.ind ? [{ name: C.ind.n, data: rebase(C.ind.v), c: '#B87708', w: 1.6 }] : [])].filter(s => s.data)
             .map(s => ({ name: s.name, type: 'line', showSymbol: false, connectNulls: true, data: s.data, lineStyle: { color: s.c, width: s.w }, itemStyle: { color: s.c } })) }, true);
       draw('price');
       document.getElementById('co-mode')?.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; [...b.parentNode.children].forEach(x => x.classList.toggle('on', x === b)); draw(b.dataset.m); }); }
     const M = window.__CM;
     if (M) { const el = document.getElementById('cm-tree'), ch = echarts.init(el); addEventListener('resize', () => ch.resize());
-      const col = v => v == null ? '#D9D6CF' : v >= 0 ? `rgba(15,107,58,${Math.min(1, 0.25 + Math.abs(v) / (W === 'd1' ? 4 : W === 'm1' ? 12 : 40))})` : `rgba(180,35,24,${Math.min(1, 0.25 + Math.abs(v) / (W === 'd1' ? 4 : W === 'm1' ? 12 : 40))})`;
+      const col = v => v == null ? '#D9DED3' : v >= 0 ? `rgba(95,127,20,${Math.min(1, 0.25 + Math.abs(v) / (W === 'd1' ? 4 : W === 'm1' ? 12 : 40))})` : `rgba(181,54,122,${Math.min(1, 0.25 + Math.abs(v) / (W === 'd1' ? 4 : W === 'm1' ? 12 : 40))})`;
       let W = 'd1';
       const draw = () => ch.setOption({ tooltip: { formatter: p => p.data.r ? `<b>${p.name}</b><br>₹${(p.value / 1e5).toFixed(2)} lakh cr<br>${p.data.r[W] == null ? '—' : (p.data.r[W] > 0 ? '+' : '') + p.data.r[W].toFixed(1) + '%'}` : p.name },
         series: [{ type: 'treemap', roam: false, nodeClick: false, breadcrumb: { show: false }, top: 0, left: 0, right: 0, bottom: 0, leafDepth: 2,

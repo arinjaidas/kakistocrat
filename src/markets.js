@@ -40,9 +40,9 @@
       const pick = n => I.series[n].slice(s0);
       const rb = arr => { const f = arr.find(v => v != null); return arr.map(v => v == null ? null : +(v / f * 100).toFixed(2)); };
       const ser = [a, b].filter(Boolean).map((n, k) => ({ name: n, type: 'line', showSymbol: false, smooth: false, data: b ? rb(pick(n)) : pick(n), lineStyle: { width: k ? 1.8 : 2.2, color: PAL[k ? 1 : 0] }, itemStyle: { color: PAL[k ? 1 : 0] },
-        areaStyle: !b && !log ? { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(21,23,26,.18)' }, { offset: 1, color: 'rgba(21,23,26,0)' }]) } : undefined }));
+        areaStyle: !b && !log ? { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(23,32,44,.18)' }, { offset: 1, color: 'rgba(23,32,44,0)' }]) } : undefined }));
       ch.setOption({ ...base(), legend: b ? { top: 0, textStyle: { fontFamily: FONT } } : { show: false }, xAxis: { type: 'category', data: d, boundaryGap: false, ...axis() }, yAxis: { type: log ? 'log' : 'value', scale: true, ...axis() },
-        dataZoom: [{ type: 'inside' }, { type: 'slider', height: 22, bottom: 8, borderColor: RULE, fillerColor: 'rgba(180,35,24,.08)', handleStyle: { color: DN }, textStyle: { fontFamily: MONO, fontSize: 10 } }], series: ser }, true);
+        dataZoom: [{ type: 'inside' }, { type: 'slider', height: 22, bottom: 8, borderColor: RULE, fillerColor: 'rgba(181,54,122,.08)', handleStyle: { color: DN }, textStyle: { fontFamily: MONO, fontSize: 10 } }], series: ser }, true);
       const v = I.series[a], L = v.length - 1, chg = (v[L] / v[s0] - 1) * 100;
       $('#mk-chart-note').textContent = `${a}: ${nf(v[L])} on ${I.dates[L]}, ${chg >= 0 ? 'up' : 'down'} ${Math.abs(chg).toFixed(1)}% over the range.${b ? ' Both series rebased to 100 at the start of the range.' : ''} Drag the slider or scroll to zoom.`;
     };
@@ -54,7 +54,7 @@
     // heatmap
     const groups = {}; S.nifty50.forEach(s => (groups[s.ind] ||= []).push(s));
     const mix = (a, b, t) => '#' + [0, 2, 4].map(i => Math.round(parseInt(a.substr(i, 2), 16) * (1 - t) + parseInt(b.substr(i, 2), 16) * t).toString(16).padStart(2, '0')).join('');
-    const col = c => { const t = Math.min(Math.abs(c) / 3, 1) ** 0.8; return c >= 0 ? mix('E6EFE9', '0B5A30', t) : mix('F5E3E1', '9E1D14', t); };
+    const col = c => { const t = Math.min(Math.abs(c) / 3, 1) ** 0.8; return c >= 0 ? mix('EEF2E4', '4E6B12', t) : mix('F7EBF1', '8A2457', t); };
     const txt = c => Math.abs(c) >= 0.9 ? '#fff' : INK;
     mk($('#mk-heat')).setOption({ tooltip: { formatter: p => p.data.s ? `<b>${p.data.name}</b><br>${p.data.ind}<br>₹${nf(p.data.c)} (${p.data.chg >= 0 ? '+' : ''}${p.data.chg}%)<br>Market cap ₹${nf(p.data.value / 1e5, 2)} lakh cr` : `<b>${p.name}</b>` },
       series: [{ type: 'treemap', roam: false, nodeClick: false, breadcrumb: { show: false }, width: '100%', height: '100%', top: 0, left: 0,
@@ -88,7 +88,7 @@
 
     // BTC
     mk($('#mk-btc')).setOption({ ...base(), grid: { left: 64, right: 16, top: 16, bottom: 28 }, xAxis: { type: 'category', data: C.bitcoin.map(p => p[0]), boundaryGap: false, ...axis() }, yAxis: { type: 'value', scale: true, ...axis() },
-      series: [{ type: 'line', name: 'Bitcoin $', data: C.bitcoin.map(p => p[1]), showSymbol: false, lineStyle: { color: '#B87708', width: 1.8 }, itemStyle: { color: '#B87708' }, areaStyle: { color: 'rgba(180,83,9,.08)' } }] });
+      series: [{ type: 'line', name: 'Bitcoin $', data: C.bitcoin.map(p => p[1]), showSymbol: false, lineStyle: { color: '#B87708', width: 1.8 }, itemStyle: { color: '#B87708' }, areaStyle: { color: 'rgba(184,119,8,.08)' } }] });
   });
 
   /* ---------- COMMODITIES ---------- */
@@ -115,7 +115,7 @@
     ids.forEach((id, yi) => cols.forEach((m, xi) => { const i = M - 12 + xi, v = W.series[id].v[i], p = W.series[id].v[i - 12]; data.push([xi, yi, v != null && p ? +((v / p - 1) * 100).toFixed(1) : '-']); }));
     mk($('#cm-heat')).setOption({ tooltip: { formatter: p => `${W.series[ids[p.value[1]]].name}, ${cols[p.value[0]]}: ${p.value[2]}% y/y` }, grid: { left: 150, right: 20, top: 10, bottom: 60 },
       xAxis: { type: 'category', data: cols, axisLabel: { fontFamily: MONO, fontSize: 10, color: MUTE }, splitArea: { show: false } }, yAxis: { type: 'category', data: ids.map(id => W.series[id].name), axisLabel: { fontFamily: FONT, fontSize: 11, color: INK }, inverse: true },
-      visualMap: { min: -40, max: 40, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 220, text: ['+40%', '−40%'], textStyle: { fontFamily: MONO, fontSize: 10 }, inRange: { color: ['#5F7F14', '#7FB894', '#F2F4EF', '#E8968E', '#B5367A'] } },
+      visualMap: { min: -40, max: 40, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 220, text: ['+40%', '−40%'], textStyle: { fontFamily: MONO, fontSize: 10 }, inRange: { color: ['#5F7F14', '#A5B97A', '#F2F4EF', '#DB9CBD', '#B5367A'] } },
       series: [{ type: 'heatmap', data, label: { show: true, fontSize: 9, fontFamily: MONO, formatter: p => p.value[2] === '-' ? '' : Math.round(p.value[2]) }, itemStyle: { borderColor: '#fff', borderWidth: 1 } }] });
   });
 })();

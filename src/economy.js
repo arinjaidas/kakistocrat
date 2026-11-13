@@ -12,7 +12,7 @@
       h.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 210, right: 16, top: 8, bottom: 60 }, tooltip: { formatter: p => `${E.heat[p.value[1]].n}, ${E.months[p.value[0]]}: ${p.value[2] === '-' ? 'n/a' : (p.value[2] > 0 ? '+' : '') + p.value[2] + '%'}` },
         xAxis: axis({ type: 'category', data: E.months, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10, rotate: 45 }, splitArea: { show: false } }),
         yAxis: axis({ type: 'category', data: E.heat.map(r => r.n), inverse: true, axisLabel: { color: INK, fontSize: 12 } }),
-        visualMap: { show: false, min: -10, max: 10, inRange: { color: ['#9F1D14', '#E8A39B', '#F6F3EE', '#9CCBAE', '#0B5A2F'] } },
+        visualMap: { show: false, min: -10, max: 10, inRange: { color: ['#8A2457', '#DB9CBD', '#F2F4EF', '#A5B97A', '#4E6B12'] } },
         series: [{ type: 'heatmap', data, label: { show: innerWidth > 700, fontFamily: MONO, fontSize: 9.5, color: INK, formatter: p => p.value[2] === '-' ? '' : Math.round(p.value[2]) }, itemStyle: { borderColor: '#fff', borderWidth: 1.5 } }] });
       h.on('click', p => { const r = E.heat[p.value[1]]; if (r) location.href = `/s/${r.id}/`; }); }
     const lines = (id, sers, from) => { const c = mk(id); if (!c) return; const ds = [...new Set(sers.flatMap(s => s.d))].sort().filter(d => !from || d >= from);

@@ -36,7 +36,7 @@
       race.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 130, right: 90, top: 20, bottom: 30 }, xAxis: { max: 'dataMax', axisLabel: { fontFamily: MONO, color: MUTE, formatter: v => v >= 1000 ? `$${(v / 1000).toFixed(0)}tn` : `$${v}bn` }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
         yAxis: { type: 'category', inverse: true, data: rows.map(r => r.n), animationDuration: 300, animationDurationUpdate: 300, axisLabel: { fontFamily: FONT, fontSize: 13, color: INK, fontWeight: 600 } },
         series: [{ type: 'bar', realtimeSort: true, data: rows.map(r => ({ value: +r.v.toFixed(0), itemStyle: { color: FLAG[r.k] || INK } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 12, formatter: p => p.value >= 1000 ? `$${(p.value / 1000).toFixed(2)}tn` : `$${p.value}bn` }, barCategoryGap: '22%' }],
-        graphic: [{ type: 'text', right: 30, bottom: 50, style: { text: String(y) + (y >= Y ? ' (IMF projection)' : ''), font: `600 ${y >= Y ? 34 : 54}px ${MONO}`, fill: 'rgba(21,23,26,.18)' } }],
+        graphic: [{ type: 'text', right: 30, bottom: 50, style: { text: String(y) + (y >= Y ? ' (IMF projection)' : ''), font: `600 ${y >= Y ? 34 : 54}px ${MONO}`, fill: 'rgba(23,32,44,.18)' } }],
         animationDuration: 0, animationDurationUpdate: 700, animationEasing: 'linear', animationEasingUpdate: 'linear' });
       $('#ig-yl').textContent = y; $('#ig-year').value = y; };
     drawYear(Y); let timer = null;
