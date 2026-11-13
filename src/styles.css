@@ -899,3 +899,34 @@ body.sec-markets .subnav a[aria-current]{border-bottom-color:#A8B68C}
 .sub-hint{font-family:var(--sans)!important;letter-spacing:0!important;text-transform:none!important}
 .hp-head .meta{text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:12.5px}
 .ip-top .kicker{font-size:13.5px}
+
+/* ---- the engraved layer everywhere ---- */
+.mk-top:not(.ip-top),.page-head{position:relative;background:var(--sec-wash);border-top:4px solid var(--sec)}
+.mk-top:not(.ip-top){overflow:hidden}
+.page-head{border-bottom:0;box-shadow:0 0 0 100vmax var(--sec-wash);clip-path:inset(0 -100vmax);margin-bottom:22px}
+.page-head::before{content:"";position:absolute;left:-100vmax;right:-100vmax;top:-4px;height:4px;background:var(--sec)}
+.mk-top:not(.ip-top)::after,.page-head::after{content:"";position:absolute;right:-24px;top:16px;width:min(520px,55%);height:110px;background:var(--sec);opacity:.42;pointer-events:none;-webkit-mask:url(/ribbon.svg) center/100% 100% no-repeat;mask:url(/ribbon.svg) center/100% 100% no-repeat}
+.page-head>*,.mk-top>.wrap{position:relative;z-index:1}
+.mk-card{box-shadow:inset 0 3px 0 var(--sec)}
+.page-head .kicker,.mk-top .kicker{color:var(--sec)}
+/* articles: the topic's colour, an engraved rule under the headline, and a drop cap in the same ink */
+.art-head{position:relative;padding-top:18px;border-top:4px solid var(--sec)}
+.art-head::after{content:"";display:block;height:34px;margin-top:16px;background:var(--sec);opacity:.5;-webkit-mask:url(/ribbon.svg) center/100% 100% no-repeat;mask:url(/ribbon.svg) center/100% 100% no-repeat}
+.prose .has-drop-cap:first-letter{color:var(--sec)}
+.prose blockquote{border-left-color:var(--sec)}
+.prose a{text-decoration-color:var(--sec)}
+/* tables and section heads */
+.xr-table thead th,.tbl thead th,.en-tbl thead th{text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:11.5px}
+.sec-head h2{text-transform:none;letter-spacing:0;font-family:var(--sans)}
+.sub-h{text-transform:none;letter-spacing:0;font-family:var(--sans)}
+/* footer: printed on ink, with the rosette as a watermark */
+.foot{position:relative;overflow:hidden;background:var(--ink);color:#C3CAD4;border-top:0;margin-top:56px}
+.foot::after{content:"";position:absolute;right:-180px;bottom:-260px;width:620px;height:620px;background:#fff;opacity:.07;pointer-events:none;-webkit-mask:url(/rosette.svg) center/contain no-repeat;mask:url(/rosette.svg) center/contain no-repeat}
+.foot .wrap{position:relative;z-index:1}
+.foot a{color:#E6EAF0}.foot a:hover{color:#fff;text-decoration:underline}
+.foot h4{color:#8E9AAA;text-transform:none;letter-spacing:0;font:600 13px var(--sans)}
+.foot .brandline,.foot .meta,.foot p{color:#AEB8C5}
+.foot .brandline b,.foot strong{color:#fff}
+.tools-band{position:relative;overflow:hidden}
+@media (max-width:600px){.mk-top:not(.ip-top)::after,.page-head::after{width:75%;opacity:.28}}
+html,body{overflow-x:clip}
