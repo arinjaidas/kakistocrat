@@ -428,6 +428,32 @@ def fpi():
             out[cur] = {'net_cr': nm(cells[i + 3]), 'net_usd_mn': nm(cells[i + 4])}
     if out: have['days'][day] = out
     have['days'] = dict(sorted(have['days'].items())); have['source'] = 'NSDL FPI Monitor, daily trends (provisional, stock-exchange data)'
+    # monthly net investment by calendar year (ASP.NET page: one form post per year); backfill once, then the current and previous year
+    u = 'https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6'
+    MI = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
+    have.setdefault('months', {})
+    yrs = list(range(2002, dt.date.today().year + 1)); yrs = yrs[-2:] if len(have['months']) > 100 else yrs
+    first = get(u, timeout=60).decode('utf8', 'replace')
+    hidden = dict(re.findall(r'<input[^>]*type="hidden"[^>]*name="([^"]+)"[^>]*value="([^"]*)"', first))
+    for y in yrs:
+        try:
+            body = urllib.parse.urlencode({**hidden, '__EVENTTARGET': 'ddl', '__EVENTARGUMENT': '', 'ddl': str(y), 'hdnCurr': 'INR'}).encode()
+            req = urllib.request.Request(u, data=body, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36', 'Content-Type': 'application/x-www-form-urlencoded'})
+            h = urllib.request.urlopen(req, timeout=60).read().decode('utf8', 'replace')
+        except Exception as e: print('  FPI', y, e); continue
+        cells = [re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', c)).strip() for c in re.findall(r'<td[^>]*>([\s\S]*?)</td>', h)]
+        for i, c in enumerate(cells):
+            if c not in MI: continue
+            row = []
+            for x in cells[i + 1:]:
+                if x in MI or not re.fullmatch(r'[-()\d.,]+', x or '-'): break
+                row.append(nm(x))
+            if len(row) < 2 or row[0] is None or row[-1] is None: continue
+            rec = {'equity': row[0], 'total': row[-1], 'cols': len(row)}
+            if len(row) == 12: rec.update({'debt': sum(x or 0 for x in row[1:4]), 'hybrid': row[4], 'mf': sum(x or 0 for x in row[5:10]), 'aif': row[10]})
+            have['months'][f'{y}-{MI[c]:02d}'] = rec
+        time.sleep(0.4)
+    have['months'] = dict(sorted(have['months'].items()))
     json.dump(have, open(path, 'w'), separators=(',', ':'))
     print('FPI:', day, {k: v['net_cr'] for k, v in out.items()})
 

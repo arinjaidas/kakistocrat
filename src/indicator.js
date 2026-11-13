@@ -15,6 +15,9 @@
         const P = s.projectionFrom, act = [], proj = [];
         const sc = (cfg.scales || {})[s.id] || 1; s.d.forEach((d, i) => { if (s.v[i] == null) return; const p = [ts(d), s.v[i] / sc]; tMax = Math.max(tMax, p[0]); tMin = Math.min(tMin, p[0]); if (P && d.slice(0, 4) >= P) proj.push(p); else act.push(p); });
         if (proj.length && act.length) proj.unshift(act.at(-1));
+        // break the line across gaps in the data (more than four times the usual spacing)
+        if (act.length > 10) { const gaps = act.slice(1).map((p, i) => p[0] - act[i][0]).sort((a, b) => a - b), med = gaps[Math.floor(gaps.length / 2)];
+          for (let i = act.length - 1; i > 0; i--) if (act[i][0] - act[i - 1][0] > 4 * med) act.splice(i, 0, [(act[i][0] + act[i - 1][0]) / 2, null]); }
         const name = (cfg.names[s.id] || s.name) + (cfg.units && /US\$ bn/.test(cfg.units[s.id] || '') ? ' (US$ bn)' : ''), color = C[k % C.length];
         const base = { name, type: cfg.bar && k === 0 ? 'bar' : 'line', showSymbol: false, symbolSize: 4, connectNulls: false, color, lineStyle: { width: k ? 1.6 : 2.2 }, emphasis: { focus: 'series' } };
         const s1 = { ...base, data: act, ...(base.type === 'bar' ? { barGap: '-100%' } : {}) };

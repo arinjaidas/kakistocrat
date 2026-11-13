@@ -1,0 +1,19 @@
+{
+  "note": "Fixed dates are official schedules; rule-based dates are each release's usual day, which can move for holidays. Times IST.",
+  "fixed": [
+    {"date": "2026-12-04", "time": "10:00", "name": "RBI monetary policy decision", "body": "RBI", "detail": "MPC meeting 2 to 4 December 2026; decision announced on the last day", "url": "/economy/rates/", "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62422", "kind": "official"},
+    {"date": "2027-02-05", "time": "10:00", "name": "RBI monetary policy decision", "body": "RBI", "detail": "MPC meeting 3 to 5 February 2027", "url": "/economy/rates/", "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62422", "kind": "official"}
+  ],
+  "rules": [
+    {"rule": "monthday", "day": 12, "time": "16:00", "name": "CPI inflation", "body": "MoSPI", "lag": 1, "url": "/economy/prices/"},
+    {"rule": "monthday", "day": 14, "time": "12:00", "name": "WPI inflation", "body": "Office of the Economic Adviser", "lag": 1, "url": "/economy/prices/#wpi"},
+    {"rule": "monthday", "day": 15, "time": "16:00", "name": "Merchandise trade", "body": "Ministry of Commerce", "lag": 1, "url": "/external/balance-of-payments/#trade"},
+    {"rule": "monthday", "day": 20, "time": "17:00", "name": "Eight core industries", "body": "Office of the Economic Adviser", "lag": 1, "url": "/economy/industry/"},
+    {"rule": "monthday", "day": 28, "time": "16:00", "name": "Industrial production (IIP)", "body": "MoSPI", "lag": 1, "url": "/economy/industry/"},
+    {"rule": "monthday", "day": 1, "time": "", "name": "GST collections", "body": "Ministry of Finance", "lag": 1, "url": "/economy/budget/"},
+    {"rule": "monthday", "day": 1, "time": "", "name": "UPI volumes", "body": "NPCI", "lag": 1, "url": "/economy/activity/#upi"},
+    {"rule": "lastworkday", "time": "16:00", "name": "Union government accounts", "body": "CGA", "lag": 1, "url": "/economy/budget/"},
+    {"rule": "lastworkday", "months": [2, 5, 8, 11], "time": "16:00", "name": "Quarterly GDP", "body": "MoSPI", "lag": 2, "quarterly": true, "url": "/economy/growth/"},
+    {"rule": "weekday", "dow": 5, "time": "17:00", "name": "Foreign exchange reserves and the Weekly Statistical Supplement", "body": "RBI", "url": "/external/#xt-res"}
+  ]
+}

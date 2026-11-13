@@ -24,9 +24,14 @@ jobs:
         with: { node-version: 22 }
       - name: Save today's Daily Desk
         run: SKIP_IMG=1 node build.mjs >/dev/null || echo "build failed; desk not saved"
+      - name: Post new releases to Telegram (only if the owner has added the secrets)
+        run: python3 scripts/notify.py || true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       - name: Commit if data changed
         run: |
-          git add data/markets data/desk data/ogd data/repo_history.json
+          git add data/markets data/desk data/ogd data/repo_history.json data/notified.json 2>/dev/null; git add data/markets data/desk data/ogd data/repo_history.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git config user.name "kakistocrat-data"
           git config user.email "actions@users.noreply.github.com"
