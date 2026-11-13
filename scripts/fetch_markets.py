@@ -387,26 +387,73 @@ def iip():
 
 # data.gov.in (needs DATA_GOV_IN_KEY, a GitHub secret the site owner creates; skipped without it).
 # Daily mandi prices: all-India average modal price, ₹ per quintal, for the vegetables that drive food inflation.
-MANDI_RES = '9ef84268-d588-465a-a308-a864a43d0070'   # "Current daily price of various commodities from various markets (Mandi)"
-def mandi():
-    key = os.environ.get('DATA_GOV_IN_KEY')
-    if not key: print('Mandi prices: no DATA_GOV_IN_KEY, skipped'); return
-    path = os.path.join(OUT, 'mandi.json'); cache = json.load(open(path)) if os.path.exists(path) else {'source': 'Agmarknet via data.gov.in; all-India mean of market modal prices, ₹/quintal', 'days': {}}
-    for com in ['Onion', 'Tomato', 'Potato']:
-        rows = []
-        for off in range(0, 5000, 1000):
-            j = json.loads(get('https://api.data.gov.in/resource/' + MANDI_RES + '?' + urllib.parse.urlencode({'api-key': key, 'format': 'json', 'limit': 1000, 'offset': off, 'filters[commodity]': com}), timeout=90))
-            rows += j.get('records') or []
-            if len(j.get('records') or []) < 1000: break
-        by = {}
-        for r in rows:
-            try: d = dt.datetime.strptime(r['arrival_date'], '%d/%m/%Y').date().isoformat(); by.setdefault(d, []).append(float(r['modal_price']))
-            except (KeyError, ValueError): pass
-        for d, v in by.items(): cache['days'].setdefault(d, {})[com.lower()] = {'price': round(sum(v) / len(v)), 'markets': len(v)}
-        time.sleep(0.5)
-    cache['days'] = dict(sorted(cache['days'].items()))
-    json.dump(cache, open(path, 'w'), separators=(',', ':'))
-    print('Mandi prices:', list(cache['days'].items())[-1:] )
+# data.gov.in only answers Indian IPs, so GitHub can't call it. A Cloudflare function (functions/api/ogd)
+# refreshes each dataset whenever a page view is served from an Indian data centre and keeps it in KV;
+# here we read that store and save compact files.
+OGD = 'https://kakistocrat.pages.dev/api/ogd/'
+def _ogd_rows(name):
+    meta = json.loads(get(OGD + name, timeout=60))
+    if not meta.get('fetched'): return meta, None
+    rows = []
+    for i in range(meta.get('pages') or 0):
+        rows += json.loads(get(f'{OGD}{name}?page={i}', timeout=90)).get('records') or []
+    return meta, rows
+def _f(x):
+    try: return float(str(x).replace(',', ''))
+    except (TypeError, ValueError): return None
+def _k(r, *names):
+    low = {k.lower().strip('_ '): v for k, v in r.items()}
+    for n in names:
+        if n.lower() in low: return low[n.lower()]
+def ogd():
+    os.makedirs('data/ogd', exist_ok=True)
+    got = {}
+    for name in ['mandi', 'aqi', 'wpi', 'core8', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'steel', 'msme', 'mgnrega', 'fci']:
+        try: meta, rows = _ogd_rows(name)
+        except Exception as e: print('  ogd', name, 'error', e); continue
+        if rows is None: print('  ogd', name, 'not fetched yet'); continue
+        src = {'source': f"data.gov.in resource {meta['rid']} ({meta.get('note','')})", 'fetched': meta['fetched']}
+        if name == 'mandi':   # all-India mean of modal prices per commodity per day; per-state for the CPI-sensitive ones
+            path = os.path.join(OUT, 'mandi.json')
+            cache = json.load(open(path)) if os.path.exists(path) else {'days': {}}
+            cache['source'] = 'Agmarknet via data.gov.in; all-India mean of market modal prices, ₹/quintal'
+            by, st = {}, {}
+            for r in rows:
+                try: d = dt.datetime.strptime(r['arrival_date'], '%d/%m/%Y').date().isoformat(); p = float(r['modal_price'])
+                except (KeyError, ValueError): continue
+                c = r.get('commodity', '').strip().lower()
+                by.setdefault((d, c), []).append(p)
+                if c in ('onion', 'tomato', 'potato'): st.setdefault((d, c, r.get('state', '')), []).append(p)
+            for (d, c), v in by.items():
+                if len(v) >= 5: cache['days'].setdefault(d, {})[c] = {'price': round(sum(v) / len(v)), 'markets': len(v)}
+            cache['days'] = dict(sorted(cache['days'].items())[-400:])
+            cache['states'] = {}
+            for (d, c, s_), v in st.items(): cache['states'].setdefault(c, {}).setdefault(d, {})[s_] = round(sum(v) / len(v))
+            for c in cache['states']: cache['states'][c] = dict(sorted(cache['states'][c].items())[-1:])
+            json.dump(cache, open(path, 'w'), separators=(',', ':'), sort_keys=True); got[name] = len(rows); continue
+        if name == 'aqi':     # one row per city: mean PM2.5 and PM10 across stations
+            cities = {}
+            for r in rows:
+                pol = r.get('pollutant_id'); v = _f(r.get('avg_value'))
+                if pol not in ('PM2.5', 'PM10') or v is None: continue
+                c = cities.setdefault((r.get('state'), r.get('city')), {'state': r.get('state'), 'city': r.get('city'), 'lat': _f(r.get('latitude')), 'lon': _f(r.get('longitude')), 'PM2.5': [], 'PM10': [], 'at': r.get('last_update')})
+                c[pol].append(v)
+            out = [{**{k: v for k, v in c.items() if k not in ('PM2.5', 'PM10')}, 'pm25': round(sum(c['PM2.5']) / len(c['PM2.5'])) if c['PM2.5'] else None, 'pm10': round(sum(c['PM10']) / len(c['PM10'])) if c['PM10'] else None, 'stations': max(len(c['PM2.5']), len(c['PM10']))} for c in cities.values()]
+            json.dump({**src, 'cities': sorted(out, key=lambda x: -(x['pm25'] or 0))}, open('data/ogd/aqi.json', 'w'), separators=(',', ':')); got[name] = len(out); continue
+        if name == 'mgnrega':
+            keep = ['fin_year', 'month', 'state_name', 'district_name', 'Total_Households_Worked', 'Total_Individuals_Worked', 'Persondays_of_Central_Liability_so_far', 'Women_Persondays', 'Average_Wage_rate_per_day_per_person', 'Average_days_of_employment_provided_per_Household', 'Total_Exp', 'Total_No_of_Active_Workers', 'percentage_payments_gererated_within_15_days']
+            rows = [{k: r.get(k) for k in keep} for r in rows]
+        if name == 'fci':     # latest date: stock by commodity, tonnes
+            last = max((r.get('Date') or '') for r in rows)
+            agg = {}
+            for r in rows:
+                if r.get('Date') == last: agg[r.get('Commodity_name')] = agg.get(r.get('Commodity_name'), 0) + (_f(r.get('Stock')) or 0)
+            path = 'data/ogd/fci.json'; cache = json.load(open(path)) if os.path.exists(path) else {'days': {}}
+            cache.update(src); cache['days'][last] = {k: round(v) for k, v in agg.items()}
+            json.dump(cache, open(path, 'w'), separators=(',', ':'), sort_keys=True); got[name] = len(agg); continue
+        json.dump({**src, 'fields': list(rows[0].keys()) if rows else [], 'rows': rows}, open(f'data/ogd/{name}.json', 'w'), separators=(',', ':'))
+        got[name] = len(rows)
+    print('data.gov.in via Cloudflare relay:', got)
 
 # India monthly activity from FRED (OECD Main Economic Indicators, seasonally adjusted, US$)
 FRED_LONG = {'DEXINUS': 'inr_long'}  # long daily history for episode comparisons
@@ -545,7 +592,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('mandi', mandi), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:
