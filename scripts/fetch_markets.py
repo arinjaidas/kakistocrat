@@ -313,7 +313,7 @@ def _first_num(t, label):
         if re.fullmatch(r'-?\d+(\.\d+)?', c): return float(c)
     return None
 def _wss_page(i, key):
-    h = get(RBI + f'WSSView.aspx?Id={i}', timeout=60).decode('utf-8', 'replace')
+    h = get(RBI + f'WSSView.aspx?Id={i}', timeout=60).decode('utf-8', 'replace').replace('\r', ' ').replace('\n', ' ')
     k = h.find(key); t = re.sub(r'<(td|th)[^>]*>', '|', h[k:k + 30000]); t = re.sub(r'</tr>', '\n', t); t = re.sub(r'<[^>]+>', ' ', t).replace('&nbsp;', ' ').replace('&lsquo;', "'").replace('&rsquo;', "'")
     return re.sub(r'[ \t]+', ' ', t)
 def _fortnight(t):
@@ -326,28 +326,56 @@ def _fortnight(t):
     if len(ds) < 2: return None
     mon, day = MONTHS[ds[1][0].lower()], int(ds[1][1]); iy, im = int(iss.group(3)), MONTHS[iss.group(1).lower()]
     return f'{iy - (1 if mon > im else 0):04d}-{mon:02d}-{day:02d}'
-def rbi_money(limit=150):
+def _wss_row(t, label):
+    """Cells of the first table row whose label cell starts with `label`, as numbers (None for blank or bracketed ex-merger cells).
+    Older issues write minus signs as en dashes and use thousands separators."""
+    for line in t.split('\n'):
+        cells = line.split('|')
+        if len(cells) < 3 or not cells[1].strip().startswith(label): continue
+        out = []
+        for c in cells[1:]:
+            c = c.strip().replace('&ndash;', '-').replace('&minus;', '-').replace('\u2013', '-').replace('\u2212', '-').replace(',', '').replace(' ', '')
+            out.append(float(c) if re.fullmatch(r'-?\d+(\.\d+)?', c) else None)
+        return out
+    return None
+def _wss_parse(t, sec):
+    """Values from one issue. Table 3: label | outstanding | fortnight | FY so far (prev, curr) | year on year (prev, curr).
+    Table 7: label | 31 Mar | outstanding | then amount and % for fortnight, FY so far (prev, curr), year on year (prev, curr).
+    A row is used only when it has exactly that many cells; levels are stored in ₹ crore."""
+    mult = 100 if re.search(r'Billion', t[:1500]) else 1
+    def cell(label, n, want, level=False):
+        r = _wss_row(t, label)
+        if not r or len(r) < want or (len(r) > want and any(x is not None for x in r[want:])): return None
+        v = r[n]; return None if v is None else (round(v * mult, 1) if level else v)
+    if sec == 3:
+        return {'deposits': cell('2.1 Aggregate Deposits', 1, 7, True), 'deposits_yoy': cell('2.1a Growth', 6, 7), 'credit': cell('7 Bank Credit', 1, 7, True),
+                'credit_yoy': cell('7.1a Growth', 6, 7), 'nonfood': cell('7a.2 Non-food credit', 1, 7, True)}
+    return {'m3': cell('M3', 2, 13, True), 'm3_yoy': cell('M3', 12, 13), 'cic': cell('1.1 Currency with the Public', 2, 13, True), 'cic_yoy': cell('1.1 Currency with the Public', 12, 13),
+            'bccs': cell('2.2 Bank Credit to Commercial Sector', 2, 13, True), 'bccs_yoy': cell('2.2 Bank Credit to Commercial Sector', 12, 13)}
+def rbi_money(limit=150, since='2012-12-01', workers=1):
     path = os.path.join(OUT, 'rbi_money.json')
-    cache = json.load(open(path)) if os.path.exists(path) else {'source': 'RBI Weekly Statistical Supplement, Table 3 (Scheduled Commercial Banks, business in India) and Table 7 (Money Stock), fortnightly; ₹ crore and per cent', 'fortnights': {}, 'seen': []}
+    cache = json.load(open(path)) if os.path.exists(path) else {'fortnights': {}, 'seen': []}
+    if cache.get('parser') != 2: cache = {'fortnights': {}, 'seen': []}  # values from the old parser are not trusted
+    cache['source'] = 'RBI Weekly Statistical Supplement, Table 3 (Scheduled Commercial Banks, business in India) and Table 7 (Money Stock), fortnightly; levels in ₹ crore, growth in per cent year on year'
+    cache['parser'] = 2
     seen = set(cache.get('seen', []))
     for sec, key in [(3, 'Scheduled Commercial Banks - Business in India'), (7, 'Money Stock')]:
         idx = get(RBI + f'WSSViewDetail.aspx?TYPE=Section&PARAM1={sec}', timeout=90).decode('utf-8', 'replace')
         ids = [i for i in re.findall(r'WSSView.aspx\?Id=(\d+)>', idx) if f'{sec}:{i}' not in seen][: limit or None]
-        for n, i in enumerate(ids):
+        def one(i):
             try: t = _wss_page(i, key)
-            except Exception as e: print('  skip', i, e); continue
-            d = _fortnight(t)
-            if d:
-                row = cache['fortnights'].setdefault(d, {})
-                ok = lambda v: v if v is not None and -60 < v < 80 and v != 0 else None  # growth columns only: older layouts end rows with a ₹ crore change
-                if sec == 3:
-                    row.update({k: v for k, v in {'deposits': _first_num(t, r'2\.1 Aggregate Deposits'), 'deposits_yoy': ok(_last_num(t, r'2\.1a Growth \(Per cent\)')), 'credit': _first_num(t, r'\|\s*7 Bank Credit'),
-                                'credit_yoy': ok(_last_num(t, r'7\.1a Growth \(Per cent\)')), 'nonfood': _first_num(t, r'7a\.2 Non-food credit'), 'gsec': _first_num(t, r'6\.1 Government Securities')}.items() if v is not None})
-                else:
-                    row.update({k: v for k, v in {'m3': _nth_num(t, r'\|\s*M3\s', 1), 'm3_yoy': ok(_last_num(t, r'\|\s*M3\s')), 'cic_yoy': ok(_last_num(t, r'1\.1 Currency with the Public')), 'bccs_yoy': ok(_last_num(t, r'2\.2 Bank Credit to Commercial Sector'))}.items() if v is not None})
-            seen.add(f'{sec}:{i}')
-            if n % 50 == 49: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_money s{sec} {n + 1}/{len(ids)}')
-            time.sleep(0.25)
+            except Exception as e: return i, None, str(e)
+            return i, _fortnight(t), _wss_parse(t, sec)
+        done = 0
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max(1, workers)) as ex:
+            for i, d, vals in ex.map(one, ids):
+                if isinstance(vals, str): print('  skip', i, vals); continue
+                seen.add(f'{sec}:{i}'); done += 1
+                if d and d >= since:
+                    row = cache['fortnights'].setdefault(d, {}); row.update({k: v for k, v in vals.items() if v is not None})
+                if d and d < since: break
+                if done % 50 == 0: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_money s{sec} {done}/{len(ids)} {d}')
     cache['seen'] = sorted(seen); cache['fortnights'] = dict(sorted((k, v) for k, v in cache['fortnights'].items() if v))
     json.dump(cache, open(path, 'w'), separators=(',', ':'))
     f = cache['fortnights']; print('RBI money and credit:', len(f), 'fortnights', (min(f), max(f)) if f else '')

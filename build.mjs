@@ -527,11 +527,6 @@ async function main() {
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
   // ---- series catalogue for the chart workbench
   const catalog = [], SD = {};
-  // Growth rates parsed from the RBI supplement: older table layouts end some rows with a ₹ crore change, and a few parse as 0.
-  // Drop (never fill) points outside a plausible range or far from their neighbours.
-  const screenYoy = vs => { const a = vs.map(v => v == null || v === 0 || v <= -60 || v >= 120 ? null : v);
-    return a.map((v, i) => { if (v == null) return null; const nb = [...a.slice(Math.max(0, i - 3), i), ...a.slice(i + 1, i + 4)].filter(x => x != null).sort((x, y) => x - y);
-      if (nb.length < 2) return v; const md = nb.length % 2 ? nb[nb.length >> 1] : (nb[nb.length / 2 - 1] + nb[nb.length / 2]) / 2; return Math.abs(v - md) > 6 ? null : v; }); };
   const addSeries = async (id, name, group, unit, freq, source, dates, values, extra = {}) => {
     const pts = dates.map((d, i) => [d, values[i]]).filter(p => p[1] != null && Number.isFinite(p[1]));
     if (pts.length < 3) return;
@@ -559,19 +554,14 @@ async function main() {
       await addSeries(iipId(n), `IIP: ${n.replace('Infrastructure/construction Goods', 'Infrastructure & construction goods')}, growth`, 'India: industry (IIP, monthly)', '% y/y', 'monthly', 'MoSPI', P8.map(x => x[0]), P8.map(x => x[1].growth)); }
     if (MK.rbiMoney?.fortnights) { const F8 = Object.entries(MK.rbiMoney.fortnights), d = F8.map(x => x[0]);
       // Validate parsed RBI tables. Levels: drop a point more than 8% from the median of its neighbours.
-      // Growth rates: keep a published y/y only where it matches the change in the published levels over a year (±1 pt);
-      // currency and commercial-sector credit sit in the same table as M3, so they are kept only where that table's M3 check passes.
-      const T = s => Date.parse(s) / 864e5, lv = {};
-      for (const k of ['credit', 'deposits', 'm3']) { const a = F8.map(x => x[1][k] == null ? null : x[1][k] < 1e6 ? x[1][k] * 100 : x[1][k]); lv[k] = a.map((v, i) => { if (v == null) return null; const nb = [...a.slice(Math.max(0, i - 3), i), ...a.slice(i + 1, i + 4)].filter(x => x != null).sort((x, y) => x - y); if (nb.length < 2) return v; const md = nb[nb.length >> 1]; return Math.abs(v / md - 1) > 0.08 ? null : v; }); }
+      // Growth rates: keep a published y/y only where it matches the change in that item's own published level over a year (±1.5 pts).
+      const T = s => Date.parse(s) / 864e5, lv = {}, LV = ['credit', 'deposits', 'm3', 'cic', 'bccs'];
+      for (const k of LV) { const a = F8.map(x => x[1][k] ?? null); lv[k] = a.map((v, i) => { if (v == null) return null; const nb = [...a.slice(Math.max(0, i - 3), i), ...a.slice(i + 1, i + 4)].filter(x => x != null).sort((x, y) => x - y); if (nb.length < 2) return v; const md = nb[nb.length >> 1]; return Math.abs(v / md - 1) > 0.08 ? null : v; }); }
       const yAgo = i => { const t = T(d[i]) - 364; let b = -1; for (let j = i - 1; j >= 0 && T(d[j]) > t - 9; j--) if (Math.abs(T(d[j]) - t) <= 8) b = j; return b; };
-      const pass = (k, i) => { const v = F8[i][1][k + '_yoy'], j = yAgo(i); if (v == null || j < 0 || lv[k][i] == null || lv[k][j] == null) return false; return Math.abs((lv[k][i] / lv[k][j] - 1) * 100 - v) <= 1; };
-      const okRow = { credit: d.map((_, i) => pass('credit', i)), deposits: d.map((_, i) => pass('deposits', i)), m3: d.map((_, i) => pass('m3', i)) };
-      const cr = d.map((_, i) => okRow.credit[i] ? F8[i][1].credit_yoy : null), near = i => { for (let o = 0; o <= 2; o++) for (const j of [i - o, i + o]) if (cr[j] != null) return cr[j]; return null; };
-      const checked = k => F8.map((x, i) => { const v = x[1][k] ?? null; if (v == null) return null;
-        if (k === 'bccs_yoy') { const c = near(i); return okRow.m3[i] && c != null && Math.abs(v - c) <= 4 ? v : null; }
-        return okRow[k.replace('_yoy', '')][i] ? v : null; });
-      for (const [k, n, u] of [['credit_yoy', 'Bank credit, year on year', '% y/y'], ['deposits_yoy', 'Bank deposits, year on year', '% y/y'], ['m3_yoy', 'Money supply (M3), year on year', '% y/y'], ['bccs_yoy', 'Bank credit to the commercial sector, year on year', '% y/y']])
-        await addSeries(`rbi-${k.replace('_yoy', '')}-yoy`, n, 'India: money and credit (RBI, fortnightly)', u, 'fortnightly', 'RBI Weekly Statistical Supplement', d, screenYoy(checked(k)));
+      const pass = (k, i) => { const v = F8[i][1][k + '_yoy'], j = yAgo(i); if (v == null || j < 0 || lv[k][i] == null || lv[k][j] == null) return false; return Math.abs((lv[k][i] / lv[k][j] - 1) * 100 - v) <= 1.5; };
+      const checked = k => F8.map((x, i) => pass(k.replace('_yoy', ''), i) ? x[1][k] : null);
+      for (const [k, n, u] of [['credit_yoy', 'Bank credit, year on year', '% y/y'], ['deposits_yoy', 'Bank deposits, year on year', '% y/y'], ['m3_yoy', 'Money supply (M3), year on year', '% y/y'], ['cic_yoy', 'Currency with the public, year on year', '% y/y'], ['bccs_yoy', 'Bank credit to the commercial sector, year on year', '% y/y']])
+        await addSeries(`rbi-${k.replace('_yoy', '')}-yoy`, n, 'India: money and credit (RBI, fortnightly)', u, 'fortnightly', 'RBI Weekly Statistical Supplement', d, checked(k));
       for (const [k, n] of [['credit', 'Bank credit outstanding'], ['deposits', 'Bank deposits outstanding']]) await addSeries(`rbi-${k}`, n, 'India: money and credit (RBI, fortnightly)', '₹ lakh crore', 'fortnightly', 'RBI Weekly Statistical Supplement', d, lv[k].map(v => v == null ? null : +(v / 1e5).toFixed(2))); }
     for (const [k, id] of [['XTEXVA01INM667S', 'in-exports'], ['XTIMVA01INM667S', 'in-imports']]) { const sr = MK.inMonthly?.[k]; if (sr) await addSeries(id, sr.label, 'India: trade (monthly)', 'US$ bn', 'monthly', 'OECD MEI via FRED', sr.pts.map(p => p[0]), sr.pts.map(p => +(p[1] / 1e9).toFixed(2))); }
     for (const [n, c] of Object.entries(MK.portwatch?.chokepoints || {})) { const sl = n.toLowerCase().replace(/[^a-z]+/g, '-').replace(/-$/, '');
@@ -882,11 +872,11 @@ async function main() {
       key: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-m3-yoy', 'rbi-cd-ratio'],
       panels: [
         { anchor: 'growth', title: 'Credit and deposit growth', ids: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-bccs-yoy'], range: '10Y' },
-        { anchor: 'money', title: 'Money supply (M3)', ids: ['rbi-m3-yoy'], range: '10Y', note: 'Currency with the public is not shown: the supplement’s older tables cannot be checked against a published level, and some readings were plainly wrong.' },
+        { anchor: 'money', title: 'Money supply and currency', ids: ['rbi-m3-yoy', 'rbi-cic-yoy'], range: '10Y', note: 'The swing around 2017 is the November 2016 demonetisation: currency fell sharply that winter, so growth a year later was measured against the depleted base.' },
         { anchor: 'cd-ratio', title: 'Credit-deposit ratio', ids: ['rbi-cd-ratio'], range: 'All', note: 'Bank credit as a share of deposits. A rising ratio means lending is outrunning deposit growth, which pushes banks towards certificates of deposit and higher deposit rates.' },
         { anchor: 'levels', title: 'Outstanding credit and deposits', ids: ['rbi-credit', 'rbi-deposits'], range: 'All' },
       ],
-      method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li><li>Growth rates are read from the RBI supplement’s tables. Where an older table layout gave a ₹ crore change instead of a growth rate, that fortnight is left blank rather than estimated. Each growth rate shown has been checked against the change in the RBI’s own outstanding amounts over the year.</li></ul>',
+      method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li><li>Growth rates are read from the RBI supplement’s tables. Each growth rate shown is the RBI’s published figure, kept only where it is within 1.5 points of the change in the RBI’s own outstanding amount over the year (in some periods, such as 2022, the two differ by about a point); a fortnight that fails the check is left blank rather than estimated.</li></ul>',
       related: [['/economy/rates/', 'Interest rates and yields'], ['/economy/prices/', 'Inflation'], ['/markets/', 'Bank shares']] },
     { path: '/external/', defer: true, title: 'Rupee and reserves', kicker: 'External · Rupee and reserves', desc: 'The rupee against the dollar since 2005, India’s foreign exchange reserves every week since 1998, the cost of hedging dollars, reserve cover, and the 2013 and 2026 FCNR(B) episodes side by side.',
       dek: 'The exchange rate, the reserves the RBI holds to defend it, and the forward premium that prices the cost of hedging. The episode comparison sets the 2026 defence against the 2013 one.',
