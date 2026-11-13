@@ -845,3 +845,57 @@ a.mk-card{color:inherit;text-decoration:none}a.mk-card:hover{border-color:#15171
 .live small{font:500 11px var(--sans);color:var(--slate)}
 .embed-body{margin:0;padding:10px;font-family:var(--sans)}
 .meta code{word-break:break-all;white-space:normal}
+
+/* ================= Rupee-note design layer =================
+   Intaglio ink and security paper; each section takes the colour of a banknote; guilloché engraving as ornament. */
+:root{--ink:#17202C;--ink-2:#273142;--stone:#F2F4EF;--stone-2:#E6EAE2;--rule:#DFE3DA;--rule-2:#C9CFC3;--sec:#17202C;--sec-wash:#EEF1EA}
+body.sec-desk{--sec:#B5367A;--sec-wash:#F8EDF3}
+body.sec-markets{--sec:#5E6B4E;--sec-wash:#EFF1EA}
+body.sec-economy{--sec:#B87708;--sec-wash:#FBF3E3}
+body.sec-external{--sec:#1C7C99;--sec-wash:#E8F3F6}
+body.sec-places{--sec:#7B4B2A;--sec-wash:#F5EDE6}
+body.sec-whatif{--sec:#6D5BA8;--sec-wash:#F0EDF8}
+body.sec-charts{--sec:#5F7F14;--sec-wash:#F0F5E4}
+body.sec-explore{--sec:#4B5563;--sec-wash:#EEF0F2}
+.topbar,.subnav,.tools-band{background:var(--ink)}
+/* sentence-case labels in the sans; mono only for numbers */
+.kicker,.mk-card .lbl,.hn-l,.col-title,.hp-h,.ip-t thead th,.tape-label,.hr-hd,.hr-hd .hr-n,.tl-out .lbl,.brand small,.ip-t tr.ip-g th{text-transform:none;letter-spacing:0;font-family:var(--sans)}
+.kicker{font-weight:600;font-size:13px;color:var(--sec)}
+.mk-card .lbl,.hn-l{font-size:12.5px;font-weight:600;color:var(--slate)}
+.col-title,.hp-h{font-size:15px;font-weight:700}
+.ip-t thead th{font-size:11.5px;font-weight:600}
+.tape-label{font-weight:700;font-size:12px}
+.brand small{font-size:10.5px;font-weight:500;color:#A9B1BC}
+.subnav a[aria-current="page"],.subnav a.on{box-shadow:inset 0 -3px 0 var(--sec)}
+/* concept headers: security paper with an engraved band in the section colour */
+.ip-top{position:relative;overflow:hidden;background:var(--sec-wash);border-top:4px solid var(--sec)}
+.ip-rib{position:absolute;right:-20px;top:14px;width:min(560px,60%);height:120px;color:var(--sec);opacity:.55;pointer-events:none}
+.ip-top .wrap{position:relative}
+.ip-top .mk-card{border-color:var(--rule-2);box-shadow:inset 0 3px 0 var(--sec)}
+.ip-panel .col-title{border-bottom-color:var(--sec)}
+/* front page: the note */
+.hp-top{position:relative;overflow:hidden;background:var(--ink);color:#fff;border-bottom:0;padding:34px 0 26px}
+.hp-ros{position:absolute;right:-140px;top:50%;width:760px;height:760px;transform:translateY(-50%);pointer-events:none}
+.hp-ros path{stroke-dasharray:1;stroke-dashoffset:1;animation:gl-draw 2.6s cubic-bezier(.4,0,.2,1) forwards;animation-delay:calc(var(--k) * .22s)}
+@keyframes gl-draw{to{stroke-dashoffset:0}}
+.hp-top .wrap{position:relative}
+.hp-head h1{color:#fff;font-weight:500;letter-spacing:-.015em}
+.hp-head p{color:#C9D0D9}.hp-head .meta{color:#93A0B0}
+.hn{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);color:#fff;backdrop-filter:blur(2px)}
+.hn:hover{border-color:rgba(255,255,255,.6);color:#fff}
+.hn::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--c,#fff)}
+.hn-l{color:#AEB8C5}.hn-c{color:#AEB8C5}.hn-c em{color:#8794A4}
+.hn-c.up{color:#7ED3A2}.hn-c.dn{color:#F29B95}
+.hn-sp path{stroke:#fff;stroke-opacity:.75}
+.hp-top .hp-more a{color:#F0C36A}
+.hp-top .live{color:#C9D0D9}.hp-top .live small{color:#8794A4}.hp-top .live i.up{color:#7ED3A2}.hp-top .live i.dn{color:#F29B95}
+@media (prefers-reduced-motion:reduce){.hp-ros path{animation:none;stroke-dashoffset:0}}
+@media (max-width:600px){.hp-ros{width:520px;height:520px;right:-220px;top:120px;transform:none}.ip-rib{width:80%;opacity:.35}}
+.subnav{background:var(--ink);border-top:1px solid #2B3647}
+.subnav a{font:600 13px/1 var(--sans);letter-spacing:0;text-transform:none;color:#C3CAD4}
+.subnav a[aria-current]{color:#fff;border-bottom-color:var(--sec)}
+body.sec-markets .subnav a[aria-current]{border-bottom-color:#A8B68C}
+.subnav .sub-sec{font:700 13px var(--sans);letter-spacing:0;text-transform:none;color:#fff;box-shadow:inset 3px 0 0 var(--sec);padding-left:12px}
+.sub-hint{font-family:var(--sans)!important;letter-spacing:0!important;text-transform:none!important}
+.hp-head .meta{text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:12.5px}
+.ip-top .kicker{font-size:13.5px}

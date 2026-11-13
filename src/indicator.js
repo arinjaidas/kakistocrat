@@ -1,7 +1,8 @@
 // Indicator page charts: every panel loads its series from /api/series/, draws actuals solid and IMF projections dashed,
 // shades target bands, marks series breaks, and offers range buttons and a CSV of exactly what is drawn.
 (function () {
-  const C = ['#b3261e', '#1f4e79', '#c98a1b', '#2e7d5b', '#6b4c9a', '#4a4a4a', '#0e7c86', '#a0522d'];
+  const SEC = getComputedStyle(document.body).getPropertyValue('--sec').trim() || '#17202C';
+  const C = [SEC, '#17202C', '#B5367A', '#1C7C99', '#B87708', '#6D5BA8', '#5E6B4E', '#7B4B2A'].filter((c, i, a) => a.indexOf(c) === i);
   const ts = d => Date.parse((d.length === 4 ? d + '-12-31' : d.length === 7 ? d + '-15' : d) + 'T00:00:00Z');
   const cache = {};
   const load = id => cache[id] || (cache[id] = fetch('/api/series/' + id + '.json').then(r => r.json()));
@@ -20,7 +21,7 @@
           for (let i = act.length - 1; i > 0; i--) if (act[i][0] - act[i - 1][0] > 4 * med) act.splice(i, 0, [(act[i][0] + act[i - 1][0]) / 2, null]); }
         const name = (cfg.names[s.id] || s.name) + (cfg.units && /US\$ bn/.test(cfg.units[s.id] || '') ? ' (US$ bn)' : ''), color = C[k % C.length];
         const base = { name, type: cfg.bar && k === 0 ? 'bar' : 'line', showSymbol: false, symbolSize: 4, connectNulls: false, color, lineStyle: { width: k ? 1.6 : 2.2 }, emphasis: { focus: 'series' } };
-        const s1 = { ...base, data: act, ...(base.type === 'bar' ? { barGap: '-100%' } : {}) };
+        const s1 = { ...base, data: act, ...(base.type === 'bar' ? { barGap: '-100%' } : {}), ...(k === 0 && S.length === 1 && base.type === 'line' ? { areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: color + '33' }, { offset: 1, color: color + '00' }] } } } : {}) };
         if (k === 0) {
           const ml = [];
           if (cfg.line != null) ml.push({ yAxis: cfg.line, lineStyle: { color: '#333', type: 'dashed', width: 1 }, label: { show: !!cfg.lineLabel, formatter: cfg.lineLabel || '', position: 'insideEndTop', color: '#333', fontSize: 11 } });
@@ -33,7 +34,7 @@
       });
       chart.setOption({
         animation: false, grid: { left: 52, right: 18, top: 36, bottom: 64 }, legend: { top: 0, type: 'scroll', textStyle: { fontSize: 12 } },
-        tooltip: { trigger: 'axis', valueFormatter: fmt },
+        tooltip: { trigger: 'axis', valueFormatter: fmt, backgroundColor: '#17202C', borderWidth: 0, textStyle: { color: '#fff', fontFamily: 'IBM Plex Sans', fontSize: 12 }, axisPointer: { lineStyle: { color: '#17202C', type: 'dashed' } } },
         xAxis: { type: 'time', min: 'dataMin', max: 'dataMax' }, yAxis: { type: 'value', scale: true, splitLine: { lineStyle: { color: '#eee' } } },
         dataZoom: [{ type: 'inside' }, { type: 'slider', height: 18, bottom: 8 }], series,
       });
