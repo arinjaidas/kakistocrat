@@ -36,6 +36,7 @@ import { appendixFiles, appendixPage } from './lib/appendix.mjs';
 import { rosette, ribbon } from './lib/guilloche.mjs';
 import { myInflationPage, rupeeValuePage, policyRulePage, debtPathPage, calendarEvents, calendarPage } from './lib/tools.mjs';
 import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
+import { seriesUpdate, writeYearReview } from './lib/year-review.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
 let MK = null;
@@ -82,12 +83,12 @@ const TOOLS = [
 ];
 // The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
 const SECTIONS = [
-  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
+  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review']], match: ['/desk/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
-  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt']], match: ['/economy/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs']], match: ['/economy/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix']], match: ['/external/', '/trade/', '/hormuz/'] },
-  { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
-  { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/my-inflation/', 'Your inflation'], ['/what-if/rupee-value/', 'Rupee value'], ['/what-if/policy-rule/', 'Policy rule'], ['/what-if/debt-path/', 'Debt path'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
+  { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/states/fiscal-room/', 'State budgets'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
+  { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/my-inflation/', 'Your inflation'], ['/what-if/rupee-value/', 'Rupee value'], ['/what-if/policy-rule/', 'Policy rule'], ['/what-if/debt-path/', 'Debt path'], ['/what-if/pump-price/', 'Pump price'], ['/what-if/landed-cost/', 'Landed cost']], match: ['/what-if/'] },
   { name: 'Charts', url: '/charts/', blurb: 'Plot any series against any other', tabs: [], match: ['/charts/', '/s/'] },
   { name: 'Explore', url: '/explore/', blurb: 'Search everything, browse the directory, download the data', tabs: [['/explore/', 'Directory'], ['/api/', 'Data API']], match: ['/explore/', '/api/'] },
 ];
@@ -250,7 +251,7 @@ ${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; co
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
 <div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
@@ -303,6 +304,7 @@ function home(m, tape, ledger, X = {}) {
  <aside class="hp-col hp-rail">
   <section><h2 class="hp-h">Coming up <a href="/desk/calendar/">Calendar →</a></h2>${(() => { const nx = (globalThis.__EVENTS || []).find(e => e.kind === 'official' || /CPI|GDP|IIP|WPI/.test(e.name)); return nx ? `<p class="hp-cd" data-at="${nx.date}T${nx.time || '16:00'}:00+05:30">${esc(nx.name)}${nx.ref ? ' for ' + esc(nx.ref) : ''} in <b>…</b></p><script>(function(){var el=document.querySelector('.hp-cd');if(!el)return;var t=Date.parse(el.dataset.at),b=el.querySelector('b');function f(){var d=t-Date.now();if(d<=0){b.textContent='now';return}var D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5),M=Math.floor(d%36e5/6e4);b.textContent=(D?D+'d ':'')+H+'h '+M+'m';}f();setInterval(f,30000)})();</script>` : ''; })()}<div class="hr-t">${(globalThis.__EVENTS || []).filter(e => e.rule !== 'weekday' && !/Weekly Statistical/.test(e.name)).slice(0, 6).map(e => `<a class="hr hc" href="${e.url}"><span class="hr-n">${esc(e.name)}${e.ref ? ` <em>${esc(e.ref)}</em>` : ''}</span><span class="hr-p">${esc(new Date(e.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }))}</span><span class="hr-v">${esc(e.time || '')}</span></a>`).join('')}</div></section>
   <section><h2 class="hp-h">Latest data</h2><div class="hr-t"><div class="hr hr-hd"><span class="hr-n">Indicator</span><span class="hr-p">Period</span><span class="hr-v">Latest</span><span class="hr-o">Prior</span></div>${rel}</div></section>
+  <a class="hp-desk" href="/desk/india-year-in-review/"><span class="kicker" style="color:#E3A9C6">India’s year in review</span><b>What shaped India’s economy</b><span>Eight timelines, from tariffs and oil to jobs and household bills →</span></a>
   <a class="hp-desk" href="/desk/"><span class="kicker" style="color:#E3A9C6">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><b>What moved today, and why</b><span>Markets, rates and the releases of the day, written up every evening →</span></a>
   ${MK?.unusual?.length ? `<div class="module"><span class="kicker">Unusual moves</span><h3>What just moved more than usual</h3><ul class="mini-moves">${MK.unusual.slice(0, 6).map(u => `<li><a href="/s/${u.id}/">${esc(u.name)}</a><span class="${u.ch > 0 ? 'up' : 'dn'}">${u.ch > 0 ? '+' : '−'}${Math.abs(u.ch).toFixed(u.rate ? 2 : 1)}${u.rate ? ' pts' : '%'}</span></li>`).join('')}</ul><a class="more" href="/explore/">Explore everything →</a></div>` : ''}
  </aside>
@@ -357,10 +359,10 @@ function topicPage(slug, m) {
 
 function seriesIndex(m) {
   return pageHead('Series', 'Series', 'Some questions need more than one article. Each series follows a single question across several pieces, in the order they were published.') +
-  `<div class="wrap"><div class="series-strip" style="margin-top:24px">${m.series.map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · ${esc(shortDate(s.items[0].date))} – ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div></div>`;
+  `<div class="wrap"><p class="yr-links"><a href="/desk/india-year-in-review/">Explore India’s year in review and its reading paths →</a></p><div class="series-strip" style="margin-top:24px">${m.series.map(s => `<a class="series-card" href="/series/${s.slug}/"><span class="n">${s.items.length} parts · ${esc(shortDate(s.items[0].date))} – ${esc(shortDate(s.items.at(-1).date))}</span><h3>${esc(s.name)}</h3><p>${esc(s.description)}</p></a>`).join('')}</div></div>`;
 }
-function seriesPage(s) {
-  return pageHead('Series', s.name, esc(s.description)) + `<div class="wrap" style="max-width:900px;margin-top:20px">${s.items.map((a, i) => `<a class="row-story story" href="${a.url}"><div class="when">Part ${i + 1}<br>${esc(shortDate(a.date))}</div><div>${kicker(a)}${fmtBadge(a)}<h3 class="h-3">${esc(a.title)}</h3><p class="dek sm">${esc(a.excerpt)}</p></div></a>`).join('')}</div>`;
+function seriesPage(s, review) {
+  return pageHead('Series', s.name, esc(s.description)) + seriesUpdate(s.slug, review) + `<div class="wrap" style="max-width:900px;margin-top:20px">${s.items.map((a, i) => `<a class="row-story story" href="${a.url}"><div class="when">Part ${i + 1}<br>${esc(shortDate(a.date))}</div><div>${kicker(a)}${fmtBadge(a)}<h3 class="h-3">${esc(a.title)}</h3><p class="dek sm">${esc(a.excerpt)}</p></div></a>`).join('')}</div>`;
 }
 
 function archivePage(m) {
@@ -404,13 +406,13 @@ let __tapeRef = null; function window_tape_others(i) { return __tapeRef.indicato
 
 function ledgerPage(ledger, m) {
   const arts = Object.fromEntries(m.articles.map(a => [a.slug, a]));
-  return pageHead('Policy Ledger', 'The Policy Ledger', 'Every policy we write about, tracked from <b>announced → notified → funded → implemented → measured</b>. Each card shows the promise, the document that established it, the outcome we are tracking and the date we will check again.') +
+  return pageHead('Policy Ledger', 'The Policy Ledger', 'Selected policies tracked from <b>announced → notified → funded → implemented → measured</b>. Each card shows the promise, the document that established it, the outcome we are tracking and the date we will check again.') +
   `<div class="wrap"><div class="ledger-grid">${ledger.items.map(i => { const a = arts[i.article]; return `<article class="lcard" id="${i.id}"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><span class="kicker desk" style="--desk:${TOPICS[i.topic].color}">${esc(TOPICS[i.topic].short)}</span><span class="status ${esc(i.status)}">${esc(i.status)}</span></div>
   <h3>${esc(i.title)}</h3><p class="promise">${esc(i.promise)}</p>
   <div class="stages">${ledger.stages.map(s => `<div class="stage ${i.stage[s] ? 'done' : ''}" title="${esc(i.stageNotes?.[s] || '')}">${s}<span class="dt">${i.stage[s] ? esc(isoOrMonth(i.stage[s])) : 'Not yet'}</span></div>`).join('')}</div>
   <dl>${Object.entries(i.stageNotes || {}).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}
   <dt>Tracking</dt><dd>${esc(i.tracking)}</dd>
-  <dt>Next check</dt><dd>${esc(isoOrMonth(i.nextCheck))}: ${esc(i.nextCheckWhat)}</dd>
+  <dt>Next check</dt><dd>${i.nextCheck ? esc(isoOrMonth(i.nextCheck)) + " · " : ""}${esc(i.nextCheckWhat)}</dd>
   <dt>Documents</dt><dd>${i.documents.map(d => `<a href="${esc(d.url)}">${esc(d.name)}</a>`).join('<br>')}</dd>
   ${a ? `<dt>Our analysis</dt><dd><a href="${a.url}">${esc(a.title)}</a></dd>` : ''}</dl></article>`; }).join('')}</div>
   <p class="meta" style="margin-top:18px">A stage is marked only when a document shows it happened. “Measured” requires published outcome data, not an announcement.</p></div>`;
@@ -486,10 +488,16 @@ async function main() {
   const [wp, tape, ledger, fc, budget, states, twocharts, exposure] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states', 'twocharts', 'exposure'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
   __tapeRef = tape; HAS_CALLS = (fc.calls || []).length > 0;
   const m = model(wp);
+  const [review, fiscal, repoCsv, repoScript] = await Promise.all([
+    ...['year-review', 'fiscal-room'].map(name => readFile(`data/${name}.json`, 'utf8').then(JSON.parse)),
+    readFile('data/repo-transmission.csv', 'utf8'),
+    readFile('scripts/repo_transmission.py', 'utf8'),
+  ]);
   if (existsSync(OUT)) await rm(OUT, { recursive: true });
   await mkdir(OUT, { recursive: true });
   await cp('src/styles.css', join(OUT, 'styles.css'));
   await cp('src/app.js', join(OUT, 'app.js'));
+  await cp('src/landed-cost.js', join(OUT, 'landed-cost.js'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
   await cp('src/workbench.js', join(OUT, 'workbench.js'));
   await cp('src/chartle.js', join(OUT, 'chartle.js'));
@@ -517,7 +525,7 @@ async function main() {
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
   // ---- public data API (static JSON, CORS open)
-  const api = {};
+  const api = { 'india-year-in-review': 'Dated India policy milestones, primary documents and related coverage' };
   if (MK) {
     const I = { dates: MK.dates, series: MK.series, pe: MK.pe, pb: MK.pb, dy: MK.dy };
     await write('api/markets/indices.json', JSON.stringify(I));
@@ -723,7 +731,7 @@ async function main() {
     const snaps = [...await Promise.all(saved.map(async d => JSON.parse(await readFile(`data/desk/${d}.json`, 'utf8')))), snap].sort((a, b) => b.date.localeCompare(a.date));
     const days = snaps.map(x => x.date);
     for (const x of snaps) await write(`desk/${x.date}/index.html`, P({ title: `The Daily Desk, ${x.date}`, path: `/desk/${x.date}/`, ogImage: `/img/desk/${x.date}.png`, description: `What moved in India’s markets and economy on ${x.date}: the Nifty, the rupee, oil, yields, reserves and the day’s data releases.`, body: deskPage(x, { pageHead, archive: days, movesHTML }) }));
-    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', ogImage: `/img/desk/${snap.date}.png`, description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML, extra: (() => { const T = todayPage({ pageHead, tape, budget, MK, BUILT, embed: true }); return T.tiles + T.heat; })() }) }));
+    await write('desk/index.html', P({ title: 'The Daily Desk', path: '/desk/', ogImage: `/img/desk/${snap.date}.png`, description: 'What moved in India’s markets and economy today, written from the numbers: the Nifty, the rupee, oil, yields, reserves and the day’s releases.', body: deskPage(snap, { pageHead, archive: days, movesHTML, extra: (() => { const T = todayPage({ pageHead, tape, budget, MK, BUILT, embed: true }); return '<div class="yr-desk-link"><a href="/desk/india-year-in-review/">What shaped India’s economy →</a><p>Eight timelines connect today’s releases to the decisions that preceded them.</p></div>' + T.tiles + T.heat; })() }) }));
     await write('desk/archive/index.html', P({ title: 'The Daily Desk: every day', path: '/desk/archive/', description: 'Every Daily Desk page, by month.', body: deskArchive(snaps, { pageHead }) }));
     await write('api/desk.json', JSON.stringify(snap)); api['desk'] = 'Today’s Daily Desk as data: closing levels and changes for the main Indian and world markets, releases, events and what is coming up';
   }
@@ -1019,6 +1027,11 @@ async function main() {
   await write('api/index.json', JSON.stringify({ site: BASE_URL, updated: BUILT.toISOString(), endpoints: Object.fromEntries(Object.entries(api).map(([k, v]) => [`${BASE_URL}/api/${k}.json`, v])) }, null, 1));
 
 
+  const reviewPaths = await writeYearReview({
+    review, wp: m.articles, fiscal, repoCsv, repoScript,
+    repoResults: execSync('python3 scripts/repo_transmission.py data/repo-transmission.csv', { encoding: 'utf8' }),
+    pageHead, publish: P, write,
+  });
   await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
   const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
   const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
@@ -1028,7 +1041,7 @@ async function main() {
   for (const a of m.articles) await write(`a/${a.slug}/index.html`, P({ title: a.title, description: a.excerpt, path: a.url, canonical: a.wpLink, active: a.topic, type: 'article', body: articlePage(a, m) }));
   for (const t of TOPIC_ORDER) await write(`topic/${t}/index.html`, P({ title: TOPICS[t].name, description: TOPICS[t].blurb, path: `/topic/${t}/`, active: t, body: topicPage(t, m) }));
   await write('series/index.html', P({ title: 'Series', path: '/series/', description: 'Questions followed across several articles.', body: seriesIndex(m) }));
-  for (const s of m.series) await write(`series/${s.slug}/index.html`, P({ title: s.name, path: `/series/${s.slug}/`, description: s.description, body: seriesPage(s) }));
+  for (const s of m.series) await write(`series/${s.slug}/index.html`, P({ title: s.name, path: `/series/${s.slug}/`, description: s.description, body: seriesPage(s, review) }));
   await write('archive/index.html', P({ title: 'Archive and search', path: '/archive/', description: 'Search every article.', body: archivePage(m) }));
   if (false) await write('data/index.html', P({ title: 'India macro data', path: '/data/', description: 'CPI, repo rate, rupee, bond yields, Brent and the Nifty with sources.', body: dataHub(tape, m) }));
   if (false) for (const i of tape.indicators) await write(`data/${i.id}/index.html`, P({ title: i.label, path: `/data/${i.id}/`, description: i.definition, body: indicatorPage(i, m) }));
@@ -1098,7 +1111,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/archive/', '/explore/', '/ledger/', ...(HAS_CALLS ? ['/forecasts/'] : []), '/desk/', '/desk/calendar/', '/desk/archive/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/activity/', '/markets/flows/', '/economy/growth/', '/economy/industry/', '/economy/money/', '/economy/prices/', '/economy/rates/', '/economy/budget/', '/external/balance-of-payments/', '/external/', '/external/data/', '/trade/', '/hormuz/', '/states/', '/districts/', '/world/', '/what-if/', '/what-if/my-inflation/', '/what-if/rupee-value/', '/what-if/policy-rule/', '/what-if/debt-path/', '/what-if/pump-price/', '/charts/', '/stories/hormuz/', '/api/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
+  const urls = ['/', ...reviewPaths, '/series/', '/archive/', '/explore/', '/ledger/', ...(HAS_CALLS ? ['/forecasts/'] : []), '/desk/', '/desk/calendar/', '/desk/archive/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/activity/', '/markets/flows/', '/economy/growth/', '/economy/industry/', '/economy/money/', '/economy/prices/', '/economy/rates/', '/economy/budget/', '/external/balance-of-payments/', '/external/', '/external/data/', '/trade/', '/hormuz/', '/states/', '/districts/', '/world/', '/what-if/', '/what-if/my-inflation/', '/what-if/rupee-value/', '/what-if/policy-rule/', '/what-if/debt-path/', '/what-if/pump-price/', '/charts/', '/stories/hormuz/', '/api/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nDisallow: /wp-kit/\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   const MOVED = [['/today/', '/desk/'], ['/rupee/', '/external/'], ['/maps/', '/states/'], ['/maps/districts/', '/districts/'], ['/infographics/', '/states/'], ['/tools/', '/explore/'], ['/tools/shock-lab/', '/what-if/'], ['/tools/pump-price/', '/what-if/pump-price/'], ['/tools/emi/', '/what-if/'], ['/tools/budget-x-ray/', '/economy/budget/'], ['/tools/india-by-state/', '/states/'], ['/tools/two-chart-test/', '/charts/'], ['/tools/exposure/', '/what-if/'], ['/chartle/', '/charts/'], ['/explainers/', '/archive/'], ['/data/', '/desk/'], ...(HAS_CALLS ? [] : [['/forecasts/', '/ledger/']]), ...HIDDEN.map(c => { const iso = c.id.split('-').pop().toUpperCase(), n = W?.countries?.[iso]; return n ? [`/s/${c.id}/`, `/country/${slugify(cleanCountry(n))}/`] : null; }).filter(Boolean), ...Object.entries(TAPE_S).map(([k, v]) => [`/data/${k}/`, `/s/${v}/`])];

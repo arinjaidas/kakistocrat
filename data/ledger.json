@@ -80,6 +80,153 @@
       "nextCheckWhat": "A CBIC instruction or ruling on heading 2208.30 versus 2106",
       "status": "Disputed",
       "article": "trade-deal-tariff-cuts-classification-origin-valuation-explained"
+    },
+    {
+      "id": "rural-work-guarantee",
+      "title": "The 125-day rural employment guarantee",
+      "topic": "rural-economy-welfare",
+      "promise": "Provide a statutory guarantee of 125 days of wage employment per rural household under VB–G RAM G.",
+      "documents": [
+        {
+          "name": "Commencement notification",
+          "url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/may/doc2026511867901.pdf"
+        },
+        {
+          "name": "21 July parliamentary reply and state funding annex",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2287304&lang=1&reg=48"
+        }
+      ],
+      "stage": {
+        "Announced": "2025-12",
+        "Notified": "2026-05",
+        "Funded": "2026-07-21",
+        "Implemented": "2026-07-01",
+        "Measured": null
+      },
+      "stageNotes": {
+        "Funded": "The 21 July reply reports allocations and releases. Wage payments depend on muster rolls and fund transfer orders."
+      },
+      "tracking": "Households seeking work, work provided, person-days and delayed wage payments.",
+      "nextCheck": null,
+      "nextCheckWhat": "Next comparable administrative release across states",
+      "status": "Watching",
+      "article": "india-rural-employment-guarantee-work-applications-july-2026"
+    },
+    {
+      "id": "semicon-two",
+      "title": "Semicon 2.0",
+      "topic": "growth-jobs-industry",
+      "promise": "Support semiconductor design and manufacturing with an approved outlay of ₹1,27,500 crore.",
+      "documents": [
+        {
+          "name": "Cabinet approval, 15 July 2026",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2284784&lang=1&reg=48"
+        }
+      ],
+      "stage": {
+        "Announced": "2026-07-15",
+        "Notified": null,
+        "Funded": null,
+        "Implemented": null,
+        "Measured": null
+      },
+      "stageNotes": {
+        "Announced": "The approved scheme outlay is a commitment. Track releases and project awards separately."
+      },
+      "tracking": "Awarded projects, disbursed amounts, commissioned lines and customer qualification.",
+      "nextCheck": null,
+      "nextCheckWhat": "Next award list or implementing agency release",
+      "status": "Watching",
+      "article": "india-semicon-2-qualified-suppliers-industrial-policy"
+    },
+    {
+      "id": "grid-storage-vgf",
+      "title": "Grid storage viability-gap funding",
+      "topic": "energy-climate",
+      "promise": "Support 92 GWh of grid-scale energy storage under the approved programme.",
+      "documents": [
+        {
+          "name": "Cabinet approval",
+          "url": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2332486&lang=2&reg=48"
+        }
+      ],
+      "stage": {
+        "Announced": "2026-11-04",
+        "Notified": null,
+        "Funded": null,
+        "Implemented": null,
+        "Measured": null
+      },
+      "stageNotes": {
+        "Announced": "The Cabinet approved ₹14,500 crore of viability-gap funding. Project awards and disbursements are separate milestones."
+      },
+      "tracking": "Awarded and commissioned storage by technology, verified discharge during peak hours and cost per available unit.",
+      "nextCheck": null,
+      "nextCheckWhat": "First tender awards and delivery obligations",
+      "status": "Watching",
+      "article": "india-92-gwh-storage-vgf-procurement-reliability"
+    },
+    {
+      "id": "labour-codes",
+      "title": "Four labour codes",
+      "topic": "growth-jobs-industry",
+      "promise": "Bring the codes on wages, industrial relations, social security and occupational safety into effect.",
+      "documents": [
+        {
+          "name": "Commencement announcement, 21 November 2025",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2192463&lang=2&reg=3"
+        },
+        {
+          "name": "Draft central industrial relations rules, December 2025",
+          "url": "https://www.labour.gov.in/static/uploads/2026/01/0ea4e7d1b8f264a8cd27bb4560e9202c.pdf"
+        }
+      ],
+      "stage": {
+        "Announced": "2025-11-21",
+        "Notified": null,
+        "Funded": null,
+        "Implemented": "2025-11-21",
+        "Measured": null
+      },
+      "stageNotes": {
+        "Implemented": "The government announced commencement from 21 November. Applicable duties should be checked against the relevant provisions and central or state rules."
+      },
+      "tracking": "Rules issued, establishments covered and implementation evidence by worker group.",
+      "nextCheck": null,
+      "nextCheckWhat": "Next verified rules, enforcement figures or social security coverage release",
+      "status": "Watching",
+      "article": "india-labour-codes-formal-employment-worker-protection"
+    },
+    {
+      "id": "epfo-ceiling",
+      "title": "EPFO wage ceiling",
+      "topic": "money-finance",
+      "promise": "Increase the monthly wage ceiling for mandatory coverage from ₹15,000 to ₹25,000.",
+      "documents": [
+        {
+          "name": "Cabinet decision and effective date",
+          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2310973&lang=2&reg=48"
+        },
+        {
+          "name": "Gazette notification reference",
+          "url": "https://gazettetracker.com/g/CG-DL-E-17092026-276299"
+        }
+      ],
+      "stage": {
+        "Announced": "2026-09-16",
+        "Notified": "2026-09-17",
+        "Funded": null,
+        "Implemented": "2026-09-17",
+        "Measured": null
+      },
+      "stageNotes": {
+        "Implemented": "Coverage changes and take-home pay depend on the worker’s enrolment and pay structure."
+      },
+      "tracking": "First-time membership around the old and new thresholds, compliance and contribution changes.",
+      "nextCheck": null,
+      "nextCheckWhat": "Next comparable EPFO enrolment release",
+      "status": "Watching",
+      "article": "india-epfo-wage-ceiling-25000-payroll-savings-incidence"
     }
   ]
 }

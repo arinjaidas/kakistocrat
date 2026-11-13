@@ -1,0 +1,780 @@
+{
+  "asOf": "2026-11-13",
+  "windowStart": "2025-11-14",
+  "series": [
+    {
+      "id": "tariffs",
+      "title": "America’s Tariff Reset",
+      "question": "Who paid the duties, and which orders moved?",
+      "slug": "americas-tariff-reset",
+      "events": [
+        "S01",
+        "S02",
+        "S03",
+        "S05",
+        "S16",
+        "S19",
+        "S22",
+        "S31",
+        "S53"
+      ],
+      "next": "Check US customs implementation notices, exemptions and Indian export volumes at the product level.",
+      "tool": "/what-if/landed-cost/"
+    },
+    {
+      "id": "oil",
+      "title": "The 2026 Oil Shock",
+      "question": "How did the supply shock reach bills, margins and dollar demand?",
+      "slug": "the-2026-oil-shock",
+      "events": [
+        "S21",
+        "S23",
+        "S24",
+        "S25",
+        "S29",
+        "S40",
+        "S45",
+        "S48",
+        "S50"
+      ],
+      "next": "Track landed energy costs, commercial LPG deliveries and oil-related import payments.",
+      "tool": "/stories/five-bills/"
+    },
+    {
+      "id": "public-money",
+      "title": "The Politics of Public Money",
+      "question": "Where did changes in tax, transfers and spending land?",
+      "slug": "the-politics-of-public-money",
+      "events": [
+        "S04",
+        "S08",
+        "S14",
+        "S15",
+        "S43"
+      ],
+      "next": "Compare state and Union actuals against the same elapsed period and their original budgets.",
+      "tool": "/states/fiscal-room/"
+    },
+    {
+      "id": "rates",
+      "title": "From the Repo Rate to the EMI",
+      "question": "How quickly did policy reach borrowers and savers?",
+      "slug": "credit-through-the-cycle",
+      "events": [
+        "S09",
+        "S17",
+        "S32",
+        "S38",
+        "S42",
+        "S44"
+      ],
+      "next": "Check the next lending and deposit release for both new and outstanding loans.",
+      "tool": "/research/repo-transmission/"
+    },
+    {
+      "id": "work",
+      "title": "Work, Wages and the Safety Net",
+      "question": "Did access to work and income protection improve?",
+      "slug": "reading-indias-jobs-data",
+      "events": [
+        "S07",
+        "S10",
+        "S12",
+        "S35",
+        "S41",
+        "S47"
+      ],
+      "next": "Check rural work requests, payment delays, participation and hours alongside unemployment.",
+      "tool": "/ledger/#rural-work-guarantee"
+    },
+    {
+      "id": "measurement",
+      "title": "Measuring the Indian Economy",
+      "question": "How much of the change is real, and how much reflects measurement?",
+      "slug": "",
+      "events": [
+        "S06",
+        "S18",
+        "S20",
+        "S33",
+        "S39",
+        "S47",
+        "S49"
+      ],
+      "next": "Compare the next GDP release on the same base and keep the advance estimate and subsequent vintages distinct.",
+      "tool": "/economy/divergence/"
+    },
+    {
+      "id": "trade-deals",
+      "title": "India’s Trade Deals After the Headlines",
+      "question": "Which preferences can firms claim, and do they use them?",
+      "slug": "indias-trade-deals",
+      "events": [
+        "S11",
+        "S13",
+        "S27",
+        "S36"
+      ],
+      "next": "Check customs rules, certificates and product-level preference utilisation.",
+      "tool": "/what-if/landed-cost/"
+    },
+    {
+      "id": "industry",
+      "title": "What India Buys With Industrial Subsidies",
+      "question": "When does funding lead to capacity firms can actually use?",
+      "slug": "testing-indias-subsidies",
+      "events": [
+        "S25",
+        "S30",
+        "S37",
+        "S46",
+        "S48"
+      ],
+      "next": "Check awards, disbursements, commissioning and qualified output against each scheme’s target.",
+      "tool": "/ledger/"
+    }
+  ],
+  "events": [
+    {
+      "id": "S01",
+      "date": "2025-04-02",
+      "when": "2025-04-02 US / 04-03 IST",
+      "detail": "US reciprocal tariff announcement. Compare Indian exporters with competing suppliers and check exclusions and original Annex I.",
+      "priority": 1,
+      "source": "https://www.whitehouse.gov/presidential-actions/2025/04/regulating-imports-with-a-reciprocal-tariff-to-rectify-trade-practices-that-contribute-to-large-and-persistent-annual-united-states-goods-trade-deficits/",
+      "articles": []
+    },
+    {
+      "id": "S02",
+      "date": "2025-07-31",
+      "when": "2025-07-31 US",
+      "detail": "Revised country rates changed relative exposure of Asian suppliers before the oil surcharge.",
+      "priority": 2,
+      "source": "https://www.whitehouse.gov/presidential-actions/2025/07/further-modifying-the-reciprocal-tariff-rates/",
+      "articles": [
+        {
+          "id": 1790,
+          "url": "https://thekakisto.wordpress.com/2025/08/27/india-august-2025-russian-oil-export-tariff/"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "date": "2025-08-06",
+      "when": "2025-08-06 US / effective 08-27",
+      "detail": "Russian-oil surcharge fell on covered Indian exports. Exporters could absorb the duty through margins or lose orders.",
+      "priority": 1,
+      "source": "https://www.whitehouse.gov/presidential-actions/2025/08/addressing-threats-to-the-united-states-by-the-government-of-the-russian-federation/",
+      "articles": [
+        {
+          "id": 1790,
+          "url": "https://thekakisto.wordpress.com/2025/08/27/india-august-2025-russian-oil-export-tariff/"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "date": "2025-09-03",
+      "when": "2025-09-03 / generally effective 09-22",
+      "detail": "GST Council rate changes. Household prices and domestic tax receipts become separate empirical questions.",
+      "priority": 1,
+      "source": "https://www.gstcouncil.gov.in/sites/default/files/2025-09/press_release_press_information_bureau_0.pdf",
+      "articles": []
+    },
+    {
+      "id": "S05",
+      "date": "2025-11-12",
+      "when": "2025-11-12",
+      "detail": "India’s export credit guarantee shifted some lending risk to the public balance sheet.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2189389&lang=1&reg=3",
+      "articles": [
+        {
+          "id": 1069,
+          "url": "https://thekakisto.wordpress.com/2025/11/21/india-export-credit-guarantees-us-tariffs-october-2025/"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "date": "2025-11-12",
+      "when": "2025-11-12",
+      "detail": "October 2025 inflation fell sharply. The composition of that decline mattered for the case for easing.",
+      "priority": 1,
+      "source": "https://mospi.gov.in/sites/default/files/press_release/CPI_PR_12nov25.pdf",
+      "articles": [
+        {
+          "id": 1068,
+          "url": "https://thekakisto.wordpress.com/2025/11/14/india-october-2025-inflation-rbi-base-effects/"
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "date": "2025-11-21",
+      "when": "2025-11-21",
+      "detail": "Four labour codes commenced. Coverage and enforcement vary by worker and establishment.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2192463&lang=2&reg=3",
+      "articles": [
+        {
+          "id": 1071,
+          "url": "https://thekakisto.wordpress.com/2025/11/28/india-labour-codes-formal-employment-worker-protection/"
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "date": "2025-12-01",
+      "when": "2025-12-01",
+      "detail": "November GST release. Imports cushioned weaker domestic gross receipts.",
+      "priority": 1,
+      "source": "https://studycafe.in/wp-content/uploads/2025/12/GST-Revenue-Collections-for-Month-of-Nov-2025.pdf",
+      "articles": []
+    },
+    {
+      "id": "S09",
+      "date": "2025-12-05",
+      "when": "2025-12-05",
+      "detail": "RBI reduced the repo rate to 5.25%. Borrower gains depend on benchmark, reset and spreads.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=61749",
+      "articles": [
+        {
+          "id": 1070,
+          "url": "https://thekakisto.wordpress.com/2025/12/05/rbi-december-2025-rate-cut-credit-transmission/"
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "date": null,
+      "when": "2025-12 parliamentary passage",
+      "detail": "Rural jobs legislation changes the guarantee and financing framework. State capacity matters for realised access.",
+      "priority": 1,
+      "source": "https://sansad.in/getFile/BillsTexts/LSBillTexts/Asintroduced/As%20intro1216202512439PM.pdf?source=legislation",
+      "articles": [
+        {
+          "id": 1074,
+          "url": "https://thekakisto.wordpress.com/2025/12/19/india-rural-jobs-guarantee-state-funding-vb-g-ram-g/"
+        }
+      ]
+    },
+    {
+      "id": "S11",
+      "date": "2025-12-22",
+      "when": "2025-12-22",
+      "detail": "India–NZ negotiations concluded. Agriculture quota design matters for farm prices.",
+      "priority": 2,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2207299&lang=1&reg=1",
+      "articles": [
+        {
+          "id": 1073,
+          "url": "https://thekakisto.wordpress.com/2025/12/26/india-new-zealand-fta-apple-quota-farm-prices/"
+        }
+      ]
+    },
+    {
+      "id": "S12",
+      "date": "2025-12-30",
+      "when": "2025-12-30",
+      "detail": "Draft central industrial relations rules. Verify final instruments and state coverage before claims about employer obligations.",
+      "priority": 2,
+      "source": "https://www.labour.gov.in/static/uploads/2026/01/0ea4e7d1b8f264a8cd27bb4560e9202c.pdf",
+      "articles": []
+    },
+    {
+      "id": "S13",
+      "date": "2026-01-27",
+      "when": "2026-01-27",
+      "detail": "India–EU negotiations concluded. Tariff preferences depend on legal entry, origin, standards and compliance.",
+      "priority": 1,
+      "source": "https://www.commerce.gov.in/files/2026-02/India%E2%80%93EU%20Free%20Trade%20Agreement%20Concluded%20dated%2027.01.2026.pdf",
+      "articles": [
+        {
+          "id": 1080,
+          "url": "https://thekakisto.wordpress.com/2026/01/30/india-eu-trade-deal-export-capability/"
+        }
+      ]
+    },
+    {
+      "id": "S14",
+      "date": "2026-01-29",
+      "when": "2026-01-29",
+      "detail": "Economic Survey sets out evidence on investment and infrastructure. Use its tables as a baseline for actual spending and private capex.",
+      "priority": 2,
+      "source": "https://www.indiabudget.gov.in/economicsurvey/",
+      "articles": []
+    },
+    {
+      "id": "S15",
+      "date": "2026-02-01",
+      "when": "2026-02-01",
+      "detail": "Union Budget and 16th Finance Commission. Spending, fiscal space and devolution have different baselines.",
+      "priority": 1,
+      "source": "https://indiabudget.gov.in/doc/bh1.pdf",
+      "articles": [
+        {
+          "id": 1079,
+          "url": "https://thekakisto.wordpress.com/2026/02/06/union-budget-2026-capex-debt-execution/"
+        },
+        {
+          "id": 1490,
+          "url": "https://thekakisto.wordpress.com/2026/02/05/sixteenth-finance-commission-horizontal-devolution-gdp-weight-states/"
+        }
+      ]
+    },
+    {
+      "id": "S16",
+      "date": "2026-02-06",
+      "when": "2026-02-06 US / 02-07 IST",
+      "detail": "US–India interim framework. Separate tariff intentions from legal actions and reciprocal concessions.",
+      "priority": 1,
+      "source": "https://www.whitehouse.gov/briefings-statements/2026/02/united-states-india-joint-statement/",
+      "articles": [
+        {
+          "id": 1083,
+          "url": "https://thekakisto.wordpress.com/2026/02/27/india-us-tariffs-section-122-exporter-bargaining/"
+        }
+      ]
+    },
+    {
+      "id": "S17",
+      "date": "2026-02-06",
+      "when": "2026-02-06",
+      "detail": "RBI kept repo at 5.25%. A checkpoint in measuring lending rate pass-through.",
+      "priority": 2,
+      "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62169",
+      "articles": []
+    },
+    {
+      "id": "S18",
+      "date": "2026-02-12",
+      "when": "2026-02-12",
+      "detail": "New CPI series. A changed household basket alters how inflation is measured.",
+      "priority": 1,
+      "source": "https://www.mospi.gov.in/uploads/latestreleasesfiles/1770893247472-Press%20Relase%20of%20CPI%20for%20Jan26.pdf",
+      "articles": [
+        {
+          "id": 1081,
+          "url": "https://thekakisto.wordpress.com/2026/02/13/india-new-cpi-2024-base-food-weights-inflation/"
+        }
+      ]
+    },
+    {
+      "id": "S19",
+      "date": "2026-02-20",
+      "when": "2026-02-20 US",
+      "detail": "Supreme Court ruled on IEEPA tariff authority. Contract and refund consequences depend on the importer and legal regime.",
+      "priority": 1,
+      "source": "https://www.supremecourt.gov/opinions/25pdf/24-1287_4gcj.pdf",
+      "articles": [
+        {
+          "id": 1612,
+          "url": "https://thekakisto.wordpress.com/2026/02/21/us-ieepa-tariff-ruling-importer-contract-incidence/"
+        },
+        {
+          "id": 1614,
+          "url": "https://thekakisto.wordpress.com/2026/02/25/us-section-122-temporary-tariff-inventory-investment/"
+        },
+        {
+          "id": 1083,
+          "url": "https://thekakisto.wordpress.com/2026/02/27/india-us-tariffs-section-122-exporter-bargaining/"
+        }
+      ]
+    },
+    {
+      "id": "S20",
+      "date": "2026-02-27",
+      "when": "2026-02-27",
+      "detail": "New GDP series. Compare statistical revisions to economic changes on matched periods.",
+      "priority": 1,
+      "source": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/feb/doc2026227806401.pdf",
+      "articles": [
+        {
+          "id": 1082,
+          "url": "https://thekakisto.wordpress.com/2026/03/06/india-gdp-2022-23-base-double-deflation-informal-economy/"
+        }
+      ]
+    },
+    {
+      "id": "S21",
+      "date": "2026-03-11",
+      "when": "2026-03-11",
+      "detail": "The IEA announced an emergency stock release as supply through West Asia faced disruption.",
+      "priority": 1,
+      "source": "https://www.iea.org/news/iea-member-countries-to-carry-out-largest-ever-oil-stock-release-amid-market-disruptions-from-middle-east-conflict",
+      "articles": [
+        {
+          "id": 1085,
+          "url": "https://thekakisto.wordpress.com/2026/03/13/hormuz-oil-stock-release-india-lpg-supply/"
+        }
+      ]
+    },
+    {
+      "id": "S22",
+      "date": "2026-03-11",
+      "when": "2026-03-11",
+      "detail": "USTR initiated a Section 301 excess-capacity investigation. The initiation opened a process to gather evidence.",
+      "priority": 1,
+      "source": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/march/ustr-initiates-section-301-investigations-relating-structural-excess-capacity-and-production",
+      "articles": [
+        {
+          "id": 1613,
+          "url": "https://thekakisto.wordpress.com/2026/03/18/us-section-301-excess-capacity-investigation-economic-test/"
+        }
+      ]
+    },
+    {
+      "id": "S23",
+      "date": "2026-03-27",
+      "when": "2026-03-27",
+      "detail": "Petrol and diesel excise relief shifted part of the shock onto the public balance sheet.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleaseIframePage.aspx?PRID=2245970&lang=2&reg=48",
+      "articles": [
+        {
+          "id": 1087,
+          "url": "https://thekakisto.wordpress.com/2026/04/03/india-petrol-diesel-excise-cut-oil-shock-fiscal-incidence/"
+        }
+      ]
+    },
+    {
+      "id": "S24",
+      "date": "2026-03-28",
+      "when": "2026-03-28",
+      "detail": "Government reported commercial LPG allocation at 70% of pre-crisis levels. Supply restrictions could reach restaurants and commercial users through quantities.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2246464&lang=1&reg=3",
+      "articles": []
+    },
+    {
+      "id": "S25",
+      "date": "2026-04-08",
+      "when": "2026-04-08 / Kharif period from 04-01",
+      "detail": "P&K fertiliser subsidy rates. Map import costs and administered prices into planting incentives.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2250032&lang=1&reg=35",
+      "articles": [
+        {
+          "id": 1095,
+          "url": "https://thekakisto.wordpress.com/2026/05/22/india-kharif-msp-2026-procurement-paddy-diversification/"
+        },
+        {
+          "id": 1406,
+          "url": "https://thekakisto.wordpress.com/2026/11/11/india-rabi-2026-fertiliser-subsidy-nbs-dap-price-cap/"
+        }
+      ]
+    },
+    {
+      "id": "S27",
+      "date": "2026-04-27",
+      "when": "2026-04-27",
+      "detail": "India–NZ FTA signed. Publication of preferences supports comparison of agricultural protections.",
+      "priority": 2,
+      "source": "https://www.commerce.gov.in/files/2026-04/final_1.pdf",
+      "articles": [
+        {
+          "id": 1073,
+          "url": "https://thekakisto.wordpress.com/2025/12/26/india-new-zealand-fta-apple-quota-farm-prices/"
+        }
+      ]
+    },
+    {
+      "id": "S29",
+      "date": "2026-05-13",
+      "when": "2026-05-13 effective",
+      "detail": "Gold import duty changes affect the import bill and domestic buyers.",
+      "priority": 2,
+      "source": "https://taxinformation.cbic.gov.in/view-pdf/1010634/ENG/Notifications",
+      "articles": [
+        {
+          "id": 1094,
+          "url": "https://thekakisto.wordpress.com/2026/05/15/india-gold-import-duty-15-percent-external-account/"
+        }
+      ]
+    },
+    {
+      "id": "S30",
+      "date": null,
+      "when": "2026-05 Kharif MSP decision",
+      "detail": "MSP changes shape crop incentives through realised procurement.",
+      "priority": 2,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2260617&lang=2&reg=3",
+      "articles": [
+        {
+          "id": 1095,
+          "url": "https://thekakisto.wordpress.com/2026/05/22/india-kharif-msp-2026-procurement-paddy-diversification/"
+        }
+      ]
+    },
+    {
+      "id": "S31",
+      "date": "2026-06-02",
+      "when": "2026-06-02 US",
+      "detail": "USTR forced-labour proposal creates potential compliance costs and differential textile exposure. Later actions require separate legal checks.",
+      "priority": 1,
+      "source": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/june/ustr-makes-findings-and-proposes-action-60-section-301-investigations-relating-failures-take-action",
+      "articles": []
+    },
+    {
+      "id": "S32",
+      "date": "2026-06-05",
+      "when": "2026-06-05",
+      "detail": "The RBI’s June resolution gave policymakers more time to assess the effect of the oil shock on inflation.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/scripts/BS_ViewBulletin.aspx?Id=24239",
+      "articles": [
+        {
+          "id": 1096,
+          "url": "https://thekakisto.wordpress.com/2026/06/05/rbi-june-2026-repo-pause-oil-inflation-pass-through/"
+        }
+      ]
+    },
+    {
+      "id": "S33",
+      "date": "2026-06-05",
+      "when": "2026-06-05",
+      "detail": "MoSPI published provisional full-year GDP estimates on the revised base.",
+      "priority": 1,
+      "source": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1780655857536_5ac01869-ca4a-422d-b7a7-57b81da60932_Press_Note_on_GDP_Estimates_for_Q4_2025-26_and_PE_FY_2025-26_F.pdf",
+      "articles": []
+    },
+    {
+      "id": "S35",
+      "date": "2026-07-01",
+      "when": "2026-07-01 effective",
+      "detail": "Rural jobs law takes effect. Track requests, person-days, payment delays and funding across states.",
+      "priority": 1,
+      "source": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/may/doc2026511867901.pdf",
+      "articles": [
+        {
+          "id": 1100,
+          "url": "https://thekakisto.wordpress.com/2026/07/03/india-rural-employment-guarantee-work-applications-july-2026/"
+        }
+      ]
+    },
+    {
+      "id": "S36",
+      "date": "2026-07-15",
+      "when": "2026-07-15",
+      "detail": "The India–UK agreement entered into force. The commercial test is how much eligible trade claims the preferences.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2285085&lang=1&reg=48",
+      "articles": [
+        {
+          "id": 1104,
+          "url": "https://thekakisto.wordpress.com/2026/07/17/uk-india-ceta-tariffs-market-access/"
+        }
+      ]
+    },
+    {
+      "id": "S37",
+      "date": "2026-07-15",
+      "when": "2026-07-15",
+      "detail": "Cabinet approved Semicon 2.0. Awards, installed capacity and qualified output are later tests.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2284784&lang=1&reg=48",
+      "articles": [
+        {
+          "id": 1103,
+          "url": "https://thekakisto.wordpress.com/2026/07/24/india-semicon-2-qualified-suppliers-industrial-policy/"
+        }
+      ]
+    },
+    {
+      "id": "S53",
+      "date": "2026-07-23",
+      "when": "2026-07-23 US / effective 07-24",
+      "detail": "USTR final action puts India in the 10% group for covered goods. Compare applicable product exemptions and the announced textile quota treatment for competing suppliers.",
+      "priority": 1,
+      "source": "https://www.ustr.gov/about/policy-offices/press-office/press-releases/2026/july/ustr-takes-action-forced-labor-section-301-investigations",
+      "articles": []
+    },
+    {
+      "id": "S38",
+      "date": "2026-08-05",
+      "when": "2026-08-05",
+      "detail": "RBI policy resolution gives a pre-October checkpoint for inflation and the rate path.",
+      "priority": 2,
+      "source": "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63287",
+      "articles": [
+        {
+          "id": 1114,
+          "url": "https://thekakisto.wordpress.com/2026/10/09/rbi-october-2026-rate-hike-calibrated-tightening-inflation-breadth/"
+        }
+      ]
+    },
+    {
+      "id": "S39",
+      "date": "2026-08-31",
+      "when": "2026-08-31",
+      "detail": "April–June GDP release reported 7.8% real growth. Composition and employment matter for interpreting the headline.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2304949&lang=2&reg=48",
+      "articles": []
+    },
+    {
+      "id": "S40",
+      "date": "2026-09-01",
+      "when": "2026-09-01",
+      "detail": "RBI first-quarter BoP release. Separate goods, services, income and flows financing the deficit.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/scripts/FS_PressRelease.aspx?prid=63493",
+      "articles": [
+        {
+          "id": 1109,
+          "url": "https://thekakisto.wordpress.com/2026/09/04/india-current-account-deficit-q1-2026-services-remittances-capital-flows/"
+        }
+      ]
+    },
+    {
+      "id": "S41",
+      "date": "2026-09-16",
+      "when": "2026-09-16 / effective 09-17",
+      "detail": "EPFO threshold increase affects payroll deductions, coverage and employer costs.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2310973&lang=2&reg=48",
+      "articles": [
+        {
+          "id": 1116,
+          "url": "https://thekakisto.wordpress.com/2026/09/18/india-epfo-wage-ceiling-25000-payroll-savings-incidence/"
+        }
+      ]
+    },
+    {
+      "id": "S42",
+      "date": "2026-09-30",
+      "when": "2026-09-30",
+      "detail": "RBI lending and deposit rate release supplies observed evidence before the October hike.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63702",
+      "articles": [
+        {
+          "id": 1791,
+          "url": "https://thekakisto.wordpress.com/2026/09/30/rbi-easing-fresh-outstanding-loan-rates-september-2026/"
+        }
+      ]
+    },
+    {
+      "id": "S43",
+      "date": null,
+      "when": "2026-09 · August accounts",
+      "detail": "CGA outturn versus Budget Estimates and prior-year share, with seasonality and transfers.",
+      "priority": 1,
+      "source": "https://cga.nic.in/writereaddata/MonthAccount/82026/DATA2627.htm",
+      "articles": [
+        {
+          "id": 1113,
+          "url": "https://thekakisto.wordpress.com/2026/10/02/india-august-2026-fiscal-deficit-tax-capex-budget-risks/"
+        }
+      ]
+    },
+    {
+      "id": "S44",
+      "date": "2026-10-07",
+      "when": "2026-10-07",
+      "detail": "RBI raised the policy rate. Track how breadth and persistence of inflation inform the decision.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63742",
+      "articles": [
+        {
+          "id": 1114,
+          "url": "https://thekakisto.wordpress.com/2026/10/09/rbi-october-2026-rate-hike-calibrated-tightening-inflation-breadth/"
+        }
+      ]
+    },
+    {
+      "id": "S45",
+      "date": "2026-10-12",
+      "when": "2026-10-12 effective",
+      "detail": "RBI opened a dollar window for three public oil marketers. Market liquidity and import costs require different measures.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=63784",
+      "articles": [
+        {
+          "id": 1115,
+          "url": "https://thekakisto.wordpress.com/2026/10/16/rbi-oil-dollar-window-rupee-market-liquidity/"
+        }
+      ]
+    },
+    {
+      "id": "S46",
+      "date": "2026-11-04",
+      "when": "2026-11-04",
+      "detail": "Cabinet approved critical-mineral processing support and grid storage funding. Track commissioning and performance alongside awards.",
+      "priority": 2,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2332476&lang=2&reg=3",
+      "articles": [
+        {
+          "id": 1119,
+          "url": "https://thekakisto.wordpress.com/2026/11/06/india-critical-minerals-lithium-nickel-processing-capex-supply-risk/"
+        },
+        {
+          "id": 1578,
+          "url": "https://thekakisto.wordpress.com/2026/11/10/india-92-gwh-storage-vgf-procurement-reliability/"
+        }
+      ]
+    },
+    {
+      "id": "S47",
+      "date": "2026-11-10",
+      "when": "2026-11-10",
+      "detail": "July–September PLFS. Participation, work status and hours give different answers about job quality.",
+      "priority": 1,
+      "source": "https://www.mospi.gov.in/uploads/publications_reports/publications_reports1794297172776_05eae330-7f2d-45ec-84c5-07031201ecf1_PLFS_QB_July-Sept_2026_m.pdf",
+      "articles": [
+        {
+          "id": 1122,
+          "url": "https://thekakisto.wordpress.com/2026/11/11/india-plfs-july-september-2026-jobs-quality/"
+        }
+      ]
+    },
+    {
+      "id": "S48",
+      "date": "2026-11-11",
+      "when": "2026-11-11 / subsidy period from 10-01",
+      "detail": "Rabi P&K subsidy approval. Distinguish approval date from the season the rates cover.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2334972&lang=2&reg=48",
+      "articles": [
+        {
+          "id": 1406,
+          "url": "https://thekakisto.wordpress.com/2026/11/11/india-rabi-2026-fertiliser-subsidy-nbs-dap-price-cap/"
+        },
+        {
+          "id": 1120,
+          "url": "https://thekakisto.wordpress.com/2026/11/11/india-rabi-fertiliser-subsidy-2026-policy-test/"
+        }
+      ]
+    },
+    {
+      "id": "S49",
+      "date": "2026-11-12",
+      "when": "2026-11-12",
+      "detail": "October CPI release. Compare annual inflation, monthly momentum and household exposure.",
+      "priority": 1,
+      "source": "https://mospi.gov.in/uploads/latestreleasesfiles/1794480048335-Press%20Release%20of%20CPI%20for%20October%202026%20.pdf",
+      "articles": [
+        {
+          "id": 1786,
+          "url": "https://thekakisto.wordpress.com/2026/11/12/india-october-2026-cpi-food-price-momentum/"
+        }
+      ]
+    },
+    {
+      "id": "S50",
+      "date": "2026-11-13",
+      "when": "2026-11-13",
+      "detail": "The October merchandise deficit widened from September and narrowed from October 2025. The monthly goods balance does not include services, income or remittances.",
+      "priority": 2,
+      "source": "https://www.reuters.com/world/india/indias-october-merchandise-trade-deficit-rose-one-year-high-3988-billion-2026-11-13/",
+      "articles": [
+        {
+          "id": 1789,
+          "url": "https://thekakisto.wordpress.com/2026/11/13/india-october-2026-trade-deficit-imports-services/"
+        }
+      ]
+    }
+  ]
+}

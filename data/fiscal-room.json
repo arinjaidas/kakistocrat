@@ -1,0 +1,5 @@
+[
+  {"name":"Maharashtra","actualCommitted":52,"budgetCommitted":55,"priorBudgetCapex":85292,"actualCapex":82773,"newBudgetCapex":97498,"source":"https://prsindia.org/budgets/states/maharashtra-budget-analysis-2026-27"},
+  {"name":"Karnataka","actualCommitted":51,"budgetCommitted":59,"priorBudgetCapex":52903,"actualCapex":57906,"newBudgetCapex":71924,"source":"https://prsindia.org/budgets/states/karnataka-budget-analysis-2026-27"},
+  {"name":"Uttar Pradesh","actualCommitted":50,"budgetCommitted":49,"priorBudgetCapex":154747,"actualCapex":114001,"newBudgetCapex":177744,"source":"https://prsindia.org/budgets/states/uttar-pradesh-budget-analysis-2026-27"}
+]
