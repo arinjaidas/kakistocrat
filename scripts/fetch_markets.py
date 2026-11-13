@@ -367,6 +367,29 @@ def mospi_pages(path, params):
         out += j.get('data') or []
         if page >= (j.get('meta_data') or {}).get('totalPages', 1): return out
         page += 1; time.sleep(0.3)
+def wpi_mospi():
+    """WPI (2011-12=100) from MoSPI's API: the headline, major groups and groups (no items), monthly. Fetches missing years and the current year."""
+    path = os.path.join(OUT, 'wpi_hist.json')
+    have = json.load(open(path)) if os.path.exists(path) else {'series': {}}
+    years = {k[:4] for v in have['series'].values() for k, _ in v}
+    now = dt.date.today().year
+    mi = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
+    for yr in range(2013, now + 1):
+        if str(yr) in years and yr < now - 0: continue
+        try: rows = mospi_pages('wpi/getWpiRecords', {'year': yr, 'Format': 'JSON'})
+        except Exception as e: print('  WPI', yr, e); continue
+        for r in rows:
+            if r.get('subgroup') or r.get('month') not in mi: continue
+            k = (r.get('majorgroup') or '') + '|' + (r.get('group') or '')
+            v = num(str(r.get('index_value')))
+            if v is None: continue
+            d = f"{yr}-{mi[r['month']]:02d}"
+            ser = dict(have['series'].get(k, [])); ser[d] = v; have['series'][k] = sorted(ser.items())
+        print('  WPI', yr, len(rows), 'rows')
+    have['source'] = 'MoSPI WPI (base 2011-12=100) via api.mospi.gov.in'
+    json.dump(have, open(path, 'w'), separators=(',', ':'))
+    print('WPI history:', len(have['series']), 'series')
+
 def cpi_mospi():
     """All-India CPI (2012=100) from MoSPI's API: every sector (rural/urban/combined), group and subgroup, Jan 2011 to Dec 2025.
     The 2024-base series that started in 2026 is not in the API yet; its releases are in data/tape.json."""
@@ -436,7 +459,7 @@ def ogd():
             if not r.get('due'): break
         except Exception as e: print('  ogd refresh error', e); break
     got = {}
-    for name in ['mandi', 'aqi', 'wpi', 'core8', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'steel', 'msme', 'mgnrega', 'fci']:
+    for name in ['mandi', 'aqi', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'steel', 'msme', 'fci']:
         try: meta, rows = _ogd_rows(name)
         except Exception as e: print('  ogd', name, 'error', e); continue
         if rows is None: print('  ogd', name, 'not fetched yet'); continue
@@ -471,6 +494,14 @@ def ogd():
         if name == 'mgnrega':
             keep = ['fin_year', 'month', 'state_name', 'district_name', 'Total_Households_Worked', 'Total_Individuals_Worked', 'Persondays_of_Central_Liability_so_far', 'Women_Persondays', 'Average_Wage_rate_per_day_per_person', 'Average_days_of_employment_provided_per_Household', 'Total_Exp', 'Total_No_of_Active_Workers', 'percentage_payments_gererated_within_15_days']
             rows = [{k: r.get(k) for k in keep} for r in rows]
+            MI = {m: i for i, m in enumerate(['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'March'])}
+            latest = max(rows, key=lambda r: MI.get(r['month'], -1))['month'] if rows else None
+            st = {}
+            for r in rows:
+                k = (r['state_name'], r['month']); a = st.setdefault(k, {'state': r['state_name'], 'month': r['month'], 'hh': 0, 'pd': 0, 'exp': 0})
+                a['hh'] += _f(r.get('Total_Households_Worked')) or 0; a['pd'] += _f(r.get('Persondays_of_Central_Liability_so_far')) or 0; a['exp'] += _f(r.get('Total_Exp')) or 0
+            json.dump({**src, 'fin_year': rows[0]['fin_year'] if rows else None, 'latest_month': latest, 'districts': [r for r in rows if r['month'] == latest], 'states': list(st.values())}, open('data/ogd/mgnrega.json', 'w'), separators=(',', ':'))
+            got[name] = len(rows); continue
         if name == 'fci':     # latest date: stock by commodity, tonnes
             last = max((r.get('Date') or '') for r in rows)
             agg = {}
@@ -620,7 +651,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:

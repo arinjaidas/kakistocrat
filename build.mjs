@@ -578,6 +578,35 @@ async function main() {
       const cm = new Map(core), yoy = core.map(([d, v]) => { const pd = `${+d.slice(0, 4) - 1}${d.slice(4)}`; return cm.has(pd) ? [d, (v / cm.get(pd) - 1) * 100] : null; }).filter(Boolean).filter(x => x[0] >= '2012-01');
       if (yoy.length) await addSeries('cpi-core', 'Core CPI inflation, excluding food and fuel (derived, 2012 base)', 'India: prices', '% y/y', 'monthly', 'Derived from MoSPI 2012-base CPI indices using combined weights', yoy.map(x => x[0]), yoy.map(x => +x[1].toFixed(2)), { short: 'Core (ex food and fuel)', ended: '2025-12' }); }
   }
+  // energy from PPAC via data.gov.in (monthly): crude imports and the oil bill, fuel demand, refinery output
+  { const ogd = async n => existsSync(`data/ogd/${n}.json`) ? JSON.parse(await readFile(`data/ogd/${n}.json`, 'utf8')) : null;
+    const MI = Object.fromEntries(MONTHS.map((m, i) => [m, String(i + 1).padStart(2, '0')]));
+    const num = x => { const v = parseFloat(String(x ?? '').replace(/,/g, '')); return Number.isFinite(v) ? v : null; };
+    const T = await ogd('pettrade');
+    if (T) { const by = {};
+      for (const r of T.rows) { const m = MI[r.Month], k = r.PRODUCTS && r.PRODUCTS.trim(); if (!m || !k) continue; const d = `${r.Year}-${m}`, o = (by[k] ||= {})[d] ||= {};
+        const q = num(r['Quantity (000 Metric Tonnes)']), u = num(r['Value in Dollars (Million US dollar)']); if (q != null && o.q == null) o.q = q; if (u != null && o.u == null) o.u = u; }
+      const ser = async (k, f, id, name, unit, short) => { const o = by[k]; if (!o) return; const ds = Object.keys(o).sort().filter(d => o[d][f] != null); await addSeries(id, name, 'India: energy', unit, 'monthly', 'PPAC, Ministry of Petroleum and Natural Gas, via data.gov.in', ds, ds.map(d => o[d][f]), { short }); };
+      await ser('CRUDE OIL', 'q', 'oil-crude-imports', 'Crude oil imports, volume', '000 tonnes', 'Crude imports, volume');
+      await ser('CRUDE OIL', 'u', 'oil-crude-bill', 'Crude oil import bill', 'US$ mn', 'Crude import bill');
+      await ser('NET IMPORT', 'u', 'oil-net-imports-usd', 'Net imports of crude and petroleum products', 'US$ mn', 'Net oil imports'); }
+    const C = await ogd('petcons');
+    if (C) { const tot = {}; for (const r of C.rows) { const m = MI[r._month_], v = num(r.quantity_000_metric_tonnes_); if (m && v != null) tot[`${r.year}-${m}`] = (tot[`${r.year}-${m}`] || 0) + v; }
+      const ds = Object.keys(tot).sort(); await addSeries('oil-consumption', 'Consumption of petroleum products, total', 'India: energy', '000 tonnes', 'monthly', 'PPAC via data.gov.in', ds, ds.map(d => +tot[d].toFixed(1)), { short: 'Fuel consumption' });
+      const yoy = ds.map(d => { const p = `${+d.slice(0, 4) - 1}${d.slice(4)}`; return tot[p] ? [d, +((tot[d] / tot[p] - 1) * 100).toFixed(2)] : null; }).filter(Boolean);
+      await addSeries('oil-consumption-yoy', 'Consumption of petroleum products, year on year', 'India: energy', '% y/y', 'monthly', 'Derived from PPAC data via data.gov.in', yoy.map(x => x[0]), yoy.map(x => x[1]), { short: 'Fuel demand growth' }); }
+  }
+  // WPI from MoSPI (2011-12=100): year-on-year inflation for the headline and major groups
+  if (existsSync('data/markets/wpi_hist.json')) { const W = JSON.parse(await readFile('data/markets/wpi_hist.json', 'utf8')).series;
+    const pick = re => Object.keys(W).find(k => re.test(k));
+    const yoy = async (k, id, name, short) => { if (!k) return; const m = new Map(W[k]); const pts = W[k].map(([d, v]) => { const p = `${+d.slice(0, 4) - 1}${d.slice(4)}`; return m.has(p) ? [d, +((v / m.get(p) - 1) * 100).toFixed(2)] : null; }).filter(Boolean);
+      await addSeries(id, name, 'India: prices', '% y/y', 'monthly', 'MoSPI/Office of the Economic Adviser, WPI base 2011-12=100', pts.map(p => p[0]), pts.map(p => p[1]), { short }); };
+    await yoy(pick(/^Wholesale price index\|$/i) || pick(/^all commodities\|$/i), 'wpi', 'WPI inflation, all commodities', 'WPI, all commodities');
+    await yoy(pick(/^Primary articles\|$/i), 'wpi-primary', 'WPI inflation: primary articles', 'Primary articles');
+    await yoy(pick(/^Fuel (&|and) power\|$/i), 'wpi-fuel', 'WPI inflation: fuel and power', 'Fuel and power');
+    await yoy(pick(/^Manufactured products\|$/i), 'wpi-manufactured', 'WPI inflation: manufactured products', 'Manufactured products');
+    await yoy(pick(/food index/i), 'wpi-food', 'WPI food index inflation', 'WPI food index');
+  }
   // derived rate spreads, in percentage points
   { const spread = async (id, name, short, a, b) => { if (!SD[a] || !SD[b]) return; const B = new Map(SD[b].d.map((d, k) => [d, SD[b].v[k]])); const pts = SD[a].d.map((d, k) => B.has(d) && SD[a].v[k] != null && B.get(d) != null ? [d, +(SD[a].v[k] - B.get(d)).toFixed(3)] : null).filter(Boolean); if (pts.length > 20) await addSeries(id, name, 'India: rates', 'pts', catalog.find(c => c.id === a)?.freq || 'daily', 'Derived from the two series named', pts.map(p => p[0]), pts.map(p => p[1]), { short }); };
     await spread('spread-in-us-10y', 'India 10-year G-Sec yield minus US 10-year Treasury yield (weekly)', 'India minus US 10-year', 'rbi-gsec10', 'fred-dgs10');
@@ -687,9 +716,10 @@ async function main() {
   const CONCEPTS = [
     { path: '/economy/prices/', title: 'Inflation', kicker: 'Economy · Prices', desc: 'India’s consumer price inflation since 2012: headline, food, core, rural and urban, every CPI group, the basket and its movers, and the IMF’s annual view and projections.',
       dek: `Headline CPI was ${tape.indicators.find(i => i.id === 'cpi')?.latest.value}% in ${tape.indicators.find(i => i.id === 'cpi')?.latest.period}, against the RBI’s 4% target and its 2–6% band. The history runs on the 2012-base index to December 2025 and the 2024-base index from January 2026.`,
-      key: ['india-cpi', 'cpi-core', 'cpi-food', 'imf-pcpipch-ind'],
+      key: ['india-cpi', 'cpi-core', 'cpi-food', 'wpi', 'imf-pcpipch-ind'],
       panels: [
         { anchor: 'headline', title: 'Headline, food and core inflation', ids: ['india-cpi', 'cpi-food', 'cpi-core'], band: [2, 6], line: 4, breaks: [{ at: '2026-01', label: 'Base 2024' }], range: 'All', note: 'Year-on-year change. Shaded: the RBI’s 2–6% tolerance band around the 4% target (a statutory target since 2016). Food (CFPI) and core are on the 2012 base and end in December 2025; MoSPI does not yet publish either on the 2024 base.' },
+        { anchor: 'wpi', title: 'Wholesale prices', ids: ['wpi', 'wpi-primary', 'wpi-fuel', 'wpi-manufactured', 'wpi-food'], range: '10Y', line: 0, note: 'Year-on-year change in the Wholesale Price Index (2011-12=100), computed from the index. WPI leads CPI goods inflation by a few months and has no services.' },
         { anchor: 'groups', title: 'Inflation by CPI group', ids: ['cpi-g-food', 'cpi-g-fuel', 'cpi-g-housing', 'cpi-g-clothing', 'cpi-g-misc', 'cpi-g-pan'], range: '5Y', note: 'Combined (rural plus urban) CPI, 2012 base. Click a group in the legend to hide or show it.' },
         { anchor: 'rural-urban', title: 'Rural and urban', ids: ['cpi-rural', 'cpi-urban'], band: [2, 6], line: 4, range: '10Y' },
         { anchor: 'annual', title: 'Annual average, with IMF projections', ids: ['imf-pcpipch-ind'], line: 4, note: 'IMF World Economic Outlook, fiscal-year basis. Dashed: projections, which are excluded from every statistic on this page.' },
@@ -707,6 +737,7 @@ async function main() {
         { anchor: 'size', title: 'Size of the economy', ids: ['imf-ngdpd-ind', 'imf-pppgdp-ind'], note: 'Current US$ billions at market exchange rates, and international dollars at purchasing power parity.' },
         { anchor: 'per-person', title: 'GDP per person', ids: ['imf-ngdpdpc-ind'] },
         { anchor: 'investment', title: 'Investment', ids: ['wdi-ne-gdi-totl-zs-ind'], note: 'Gross capital formation, per cent of GDP (World Bank).' },
+        { anchor: 'fuel', title: 'Monthly activity: fuel demand', ids: ['oil-consumption-yoy'], line: 0, range: 'All', note: 'Year-on-year growth in total consumption of petroleum products (PPAC). Diesel and petrol demand is among the earliest monthly signals of activity.' },
         { anchor: 'iip', title: 'Monthly activity: industrial production', ids: ['iip-general', 'iip-manufacturing'], range: '10Y', note: 'Year-on-year growth of the Index of Industrial Production. Sector and use-based detail is on <a href="/economy/industry/">Industrial production</a>.' },
       ],
       method: '<ul><li>IMF figures are on India’s fiscal year (April to March) and come from the latest World Economic Outlook database; each vintage revises history.</li><li>The IIP has a 2011-12 base; growth before 2012 is spliced by MoSPI from the 2004-05 base.</li></ul>',
@@ -749,6 +780,8 @@ async function main() {
       panels: [
         { anchor: 'current-account', title: 'Current account balance, per cent of GDP', ids: ['imf-bca-ngdpd-ind', 'wdi-bn-cab-xoka-gd-zs-ind'], line: 0, note: 'Two estimates of the same thing: the IMF’s (fiscal year, with projections dashed) and the World Bank’s (calendar year). Differences come from the year basis and GDP denominators.' },
         { anchor: 'trade', title: 'Monthly merchandise trade', ids: ['in-exports', 'in-imports'], range: '10Y', note: 'US$, seasonally adjusted (OECD via FRED). Partner and product detail is on <a href="/trade/">Trade</a>.' },
+        { anchor: 'oil', title: 'The oil bill', ids: ['oil-crude-bill', 'oil-net-imports-usd'], range: 'All', note: 'US$ million a month (PPAC). Crude is roughly a quarter of India’s merchandise imports; the net figure subtracts petroleum product exports. PPAC prorates the latest months until DGCI&S data arrive.' },
+        { anchor: 'oil-volume', title: 'Crude oil imports, volume', ids: ['oil-crude-imports'], range: 'All' },
         { anchor: 'openness', title: 'Trade in goods and services, per cent of GDP', ids: ['wdi-ne-exp-gnfs-zs-ind', 'wdi-ne-imp-gnfs-zs-ind'] },
         { anchor: 'invisibles', title: 'Services and remittances', ids: ['wdi-bx-gsr-nfsv-cd-ind', 'wdi-bx-trf-pwkr-cd-dt-ind'], note: 'US$, annual (World Bank).' },
         { anchor: 'capital', title: 'Capital flows', ids: ['wdi-bx-klt-dinv-cd-wd-ind', 'wdi-bx-pef-totl-cd-wd-ind'], line: 0, note: 'Net inflows, US$ (World Bank).' },
@@ -768,7 +801,17 @@ async function main() {
   const conceptUrl = id => CONCEPT_OF[id] || `/s/${id}/`;
   globalThis.__CONCEPT_OF = CONCEPT_OF;
   for (const C of CONCEPTS) {
-    const extra = C.path === '/economy/prices/' ? infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), basket: JSON.parse(await readFile('data/cpi_basket.json', 'utf8')), only: ['cpi'], head: false }) : '';
+    const mandiHTML = await (async () => { if (C.path !== '/economy/prices/' || !existsSync('data/markets/mandi.json')) return '';
+      const M = JSON.parse(await readFile('data/markets/mandi.json', 'utf8')), days = Object.keys(M.days).sort(), d = days.at(-1), p = days.at(-2); if (!d) return '';
+      const nice = c => c.replace(/\(.*?\)/g, m => ' ' + m).replace(/\s+/g, ' ').replace(/^./, x => x.toUpperCase());
+      const rows = Object.entries(M.days[d]).filter(([, x]) => x.markets >= 40).sort((a, b) => b[1].markets - a[1].markets).slice(0, 36);
+      const st = ['onion', 'tomato', 'potato'].map(c => [c, Object.values(M.states?.[c] || {})[0] || {}]);
+      const states = [...new Set(st.flatMap(([, o]) => Object.keys(o)))].sort();
+      return `<section class="xr-sec" id="mandi"><h2 class="col-title">Mandi prices today</h2><p class="meta">Wholesale modal prices reported to Agmarknet on ${esc(new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }))}, averaged across the markets that reported. ₹ per quintal (100 kg), so ₹2,500 a quintal is ₹25 a kg wholesale. Commodities reported by at least 40 markets.${p ? '' : ' Day-on-day changes appear from the next trading day, and a price history builds from here.'}</p>
+        <div class="ip-tw"><table class="ip-t"><thead><tr><th>Commodity</th><th>₹/quintal</th><th>₹/kg</th><th>Markets</th>${p ? '<th>Previous day</th>' : ''}</tr></thead><tbody>${rows.map(([c, x]) => { const q = p && M.days[p][c]; return `<tr><th>${esc(nice(c))}</th><td><b>${x.price.toLocaleString('en-IN')}</b></td><td>${(x.price / 100).toFixed(1)}</td><td>${x.markets}</td>${p ? `<td>${q ? `${q.price.toLocaleString('en-IN')}<span>${x.price >= q.price ? '+' : '−'}${Math.abs((x.price / q.price - 1) * 100).toFixed(1)}%</span>` : '—'}</td>` : ''}</tr>`; }).join('')}</tbody></table></div>
+        ${states.length ? `<h3 class="sub-h" style="margin-top:18px">Onion, tomato and potato by state, ₹/quintal</h3><div class="ip-tw"><table class="ip-t"><thead><tr><th>State</th>${st.map(([c]) => `<th>${nice(c)}</th>`).join('')}</tr></thead><tbody>${states.map(sn => `<tr><th>${esc(sn)}</th>${st.map(([, o]) => `<td>${o[sn] != null ? o[sn].toLocaleString('en-IN') : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : ''}
+        <p class="meta">Source: Agmarknet, Department of Agriculture and Farmers Welfare, via data.gov.in. Modal price: the price at which most of the day’s trade in that market happened. Unweighted by arrivals.</p></section>`; })();
+    const extra = mandiHTML + (C.path === '/economy/prices/' ? infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), basket: JSON.parse(await readFile('data/cpi_basket.json', 'utf8')), only: ['cpi'], head: false }) : '');
     await write(C.path.slice(1) + 'index.html', P({ title: C.title, path: C.path, description: C.desc, body: conceptPage({ ...C, extraBottom: extra }, { SD, byId }) }));
   }
   for (const c of catalog) if (!CONCEPT_OF[c.id]) await write(`s/${c.id}/index.html`, P({ jsonld: { '@context': 'https://schema.org', '@type': 'Dataset', name: c.name, description: `${c.name}${c.unit ? ', ' + c.unit : ''}, ${c.freq}. Source: ${c.source}. Updated automatically.`, url: `${BASE_URL}/s/${c.id}/`, creator: { '@type': 'Person', name: 'Arinjai Das' }, isAccessibleForFree: true, temporalCoverage: c.first && c.last ? `${c.first}/${c.last}` : undefined, distribution: [{ '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${BASE_URL}/api/series/${c.id}.json` }] }, title: c.name, path: `/s/${c.id}/`, ogImage: TAPE_INV[c.id] ? `/img/release/${TAPE_INV[c.id]}.png` : undefined, description: `${c.name}: ${c.unit}, ${c.freq}, ${c.first} to ${c.last}. Chart, history, what moves with it, and the articles that mention it.`, body: entitySeriesPage(c, SD[c.id], { catalog, corr, ment, byId, crumbsFor, tapeBy }) }));
@@ -843,10 +886,10 @@ async function main() {
     await write('api/companies.json', JSON.stringify({ date: CO.date, companies: Object.values(CO.C).map(({ c, t, dp, ...x }) => x) })); api['companies'] = 'Nifty 500 companies: name, industry, ISIN, market value (₹ crore), last close, returns over a day, week, month, quarter, six months, a year and the year to date, 52-week range, turnover and delivery share (NSE)';
   }
   { const L = id => (globalThis.__CONCEPT_OF || {})[id] || `/s/${id}/`;
-    const G = [['Activity', [['imf-ngdp-rpch-ind'], ['iip-general'], ['iip-manufacturing'], ['iip-capital']]], ['Prices', [['india-cpi'], ['cpi-core'], ['cpi-food'], ['imf-pcpipch-ind']]],
+    const G = [['Activity', [['imf-ngdp-rpch-ind'], ['iip-general'], ['iip-manufacturing'], ['iip-capital'], ['oil-consumption-yoy']]], ['Prices', [['india-cpi'], ['cpi-core'], ['cpi-food'], ['wpi'], ['imf-pcpipch-ind']]],
       ['Money, credit and rates', [['india-repo'], ['rbi-call'], ['rbi-gsec10'], ['spread-in-us-10y'], ['rbi-credit-yoy'], ['rbi-deposits-yoy'], ['rbi-m3-yoy'], ['rbi-cd-ratio']]],
       ['Public finance', [['imf-ggxcnl-ngdp-ind'], ['imf-ggxwdg-ngdp-ind']]],
-      ['External', [['imf-bca-ngdpd-ind'], ['in-exports'], ['in-imports'], ['rbi-fx-total', null, 'Foreign exchange reserves'], ['fx-usdinr', null, 'Rupee per US dollar'], ['wdi-dt-dod-dect-gn-zs-ind']]],
+      ['External', [['imf-bca-ngdpd-ind'], ['in-exports'], ['in-imports'], ['oil-crude-bill'], ['rbi-fx-total', null, 'Foreign exchange reserves'], ['fx-usdinr', null, 'Rupee per US dollar'], ['wdi-dt-dod-dect-gn-zs-ind']]],
       ['Markets', [['nse-nifty-50', null, 'Nifty 50'], ['nifty50-pe', null, 'Nifty 50 P/E'], ['nse-india-vix', null, 'India VIX'], ['fred-dcoilbrenteu', null, 'Brent crude']]]].map(([g, xs]) => [g, xs.map(([id, u, l]) => [id, u || L(id), l])]);
     await write('economy/index.html', P({ title: 'India macro dashboard', path: '/economy/', description: 'Every headline Indian macro indicator in one table: growth, industry, inflation, rates, credit, the budget, the external accounts and markets, each against its history and linked to its full page.',
       body: `<div class="mk-top"><div class="wrap"><div class="mk-head"><div><span class="kicker">Economy</span><h1>India macro dashboard</h1><p class="dek sm">Every headline indicator in one table, each against its own history: the previous reading, a year earlier, the five-year average and where it sits in the last ten years. Click an indicator for its full page. Statistics use published figures only; IMF projections are listed separately.</p></div></div></div></div>
