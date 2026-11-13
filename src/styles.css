@@ -754,3 +754,6 @@ a.mk-card{color:inherit;text-decoration:none}a.mk-card:hover{border-color:#15171
 .ip-t td.src{text-align:left;white-space:normal;min-width:220px;font-size:12px}
 .ip-t tbody tr:target{background:#fff7e6}
 .ip-method p,.ip-method li{max-width:880px}
+.ip-t tr.ip-g th{background:#1b1b1b;color:#fff;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:7px 10px}
+.ip-heat td{text-align:center;font-size:12px;min-width:52px}
+.ip-heat thead th{text-align:center}

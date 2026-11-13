@@ -30,7 +30,7 @@ import { economyPage, IIP_ORDER, iipId } from './lib/economy.mjs';
 import { loadCompanies, companyPage, companiesHub } from './lib/companies.mjs';
 import { districtsPage } from './lib/districts.mjs';
 import { hormuzStory } from './lib/story.mjs';
-import { indicatorPage as conceptPage } from './lib/indicators.mjs';
+import { indicatorPage as conceptPage, heatTable, dashboardPage } from './lib/indicators.mjs';
 import { appendixFiles, appendixPage } from './lib/appendix.mjs';
 import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
@@ -62,7 +62,7 @@ const TOOLS = [
   { url: '/companies/', kicker: 'Companies', title: 'The Nifty 500, company by company', blurb: 'A market map of India’s 500 largest listed companies and a page for each.' },
   { url: '/commodities/', kicker: 'Commodities', title: 'Energy, metals, fertilisers and food', blurb: '35 world prices with five-year ranges and comparisons.' },
   { url: '/terminal/', kicker: 'Terminal', title: 'Everything on one screen', blurb: 'Every market and macro number on one dense screen, with a command bar that charts any series.' },
-  { url: '/economy/', kicker: 'Economy', title: 'Factories, banks and money', blurb: 'Industrial production by sector, bank credit, deposits, money supply and monthly trade.' },
+  { url: '/economy/', kicker: 'Economy', title: 'India macro dashboard', blurb: 'Every headline indicator in one table: growth, industry, inflation, rates, credit, the budget and the external accounts.' },
   { url: '/economy/prices/', kicker: 'Prices', title: 'What’s in the inflation basket', blurb: 'The CPI basket by group, what is driving inflation, and the month’s biggest movers.' },
   { url: '/economy/budget/', kicker: 'Budget', title: 'The Union Budget, line by line', blurb: 'Receipts, spending and the deficit against the full-year plan, and where the Budget rupee comes from and goes.' },
   { url: '/external/', kicker: 'External', title: 'The rupee, the reserves and the price of dollars', blurb: 'The rupee against 14 currencies, weekly reserves, money-market rates, the rate gap, and the 2013 and 2026 FCNR(B) episodes.' },
@@ -81,7 +81,7 @@ const TOOLS = [
 const SECTIONS = [
   { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/archive/', 'Every day']], match: ['/desk/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
-  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Industry & credit'], ['/economy/growth/', 'Growth'], ['/economy/prices/', 'Inflation'], ['/economy/rates/', 'Rates'], ['/economy/budget/', 'Budget & debt']], match: ['/economy/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/budget/', 'Budget & debt']], match: ['/economy/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix']], match: ['/external/', '/trade/', '/hormuz/'] },
   { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
   { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/pump-price/', 'Pump price']], match: ['/what-if/'] },
@@ -581,6 +581,7 @@ async function main() {
   // derived rate spreads, in percentage points
   { const spread = async (id, name, short, a, b) => { if (!SD[a] || !SD[b]) return; const B = new Map(SD[b].d.map((d, k) => [d, SD[b].v[k]])); const pts = SD[a].d.map((d, k) => B.has(d) && SD[a].v[k] != null && B.get(d) != null ? [d, +(SD[a].v[k] - B.get(d)).toFixed(3)] : null).filter(Boolean); if (pts.length > 20) await addSeries(id, name, 'India: rates', 'pts', catalog.find(c => c.id === a)?.freq || 'daily', 'Derived from the two series named', pts.map(p => p[0]), pts.map(p => p[1]), { short }); };
     await spread('spread-in-us-10y', 'India 10-year G-Sec yield minus US 10-year Treasury yield (weekly)', 'India minus US 10-year', 'rbi-gsec10', 'fred-dgs10');
+    if (SD['rbi-credit'] && SD['rbi-deposits']) { const D = new Map(SD['rbi-deposits'].d.map((d, k) => [d, SD['rbi-deposits'].v[k]])); const pts = SD['rbi-credit'].d.map((d, k) => D.get(d) ? [d, +(SD['rbi-credit'].v[k] / D.get(d) * 100).toFixed(2)] : null).filter(Boolean); await addSeries('rbi-cd-ratio', 'Credit-deposit ratio, scheduled commercial banks', 'India: money and credit (RBI, fortnightly)', '%', 'fortnightly', 'Derived from RBI bank credit and deposits outstanding', pts.map(p => p[0]), pts.map(p => p[1]), { short: 'Credit-deposit ratio' }); }
     await spread('spread-10y-tb91', 'Term spread: 10-year G-Sec minus 91-day T-bill (RBI, weekly)', '10-year minus 91-day', 'rbi-gsec10', 'rbi-tb91'); }
   // ---- the connected layer
   // World annual series for other countries live on the country pages and in the API, not as pages of their own
@@ -648,8 +649,8 @@ async function main() {
     'energy-climate': ['fred-dcoilbrenteu', 'fred-dhhngsp', 'wb-coal', 'pw-strait-of-hormuz', 'wb-ngeu', 'nse-nifty-energy'],
     'world-geopolitics': ['pw-strait-of-hormuz', 'fred-dtwexbgs', 'fx-usdcny', 'wb-gold', 'fred-dgs10', 'pw-bab-el-mandeb-strait'],
   };
-  const TOPIC_TOOLS = { 'money-finance': [['/external/', 'Rupee & reserves'], ['/economy/', 'Credit & money'], ['/what-if/', 'What if?']], 'trade-external-sector': [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], 'public-finance': [['/economy/budget/', 'Budget'], ['/states/', 'State finances']],
-    'growth-jobs-industry': [['/economy/', 'Industry'], ['/world/', 'World rankings'], ['/companies/', 'Companies']], 'rural-economy-welfare': [['/economy/prices/', 'Prices'], ['/commodities/', 'Fertiliser & food'], ['/districts/', 'Districts']], 'energy-climate': [['/what-if/pump-price/', 'Pump price'], ['/what-if/', 'What if?'], ['/hormuz/', 'Shipping & oil']], 'world-geopolitics': [['/world/', 'World rankings'], ['/hormuz/', 'Shipping & oil'], ['/trade/', 'Trade']] };
+  const TOPIC_TOOLS = { 'money-finance': [['/external/', 'Rupee & reserves'], ['/economy/money/', 'Credit & money'], ['/what-if/', 'What if?']], 'trade-external-sector': [['/external/', 'Rupee & reserves'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil']], 'public-finance': [['/economy/budget/', 'Budget'], ['/states/', 'State finances']],
+    'growth-jobs-industry': [['/economy/industry/', 'Industry'], ['/world/', 'World rankings'], ['/companies/', 'Companies']], 'rural-economy-welfare': [['/economy/prices/', 'Prices'], ['/commodities/', 'Fertiliser & food'], ['/districts/', 'Districts']], 'energy-climate': [['/what-if/pump-price/', 'Pump price'], ['/what-if/', 'What if?'], ['/hormuz/', 'Shipping & oil']], 'world-geopolitics': [['/world/', 'World rankings'], ['/hormuz/', 'Shipping & oil'], ['/trade/', 'Trade']] };
   // every article reaches the data: articles that name no series get their topic's main series and dashboards
   for (const a of m.articles) {
     a.topicTools = TOPIC_TOOLS[a.topic] || [];
@@ -679,6 +680,8 @@ async function main() {
     'wdi-bx-trf-pwkr-cd-dt-ind': 'Remittances received', 'wdi-bx-klt-dinv-cd-wd-ind': 'FDI, net inflows', 'wdi-bx-pef-totl-cd-wd-ind': 'Portfolio equity, net inflows', 'wdi-dt-dod-dect-gn-zs-ind': 'External debt',
     'wdi-dt-dod-dstc-ir-zs-ind': 'Short-term debt', 'wdi-dt-tds-dect-ex-zs-ind': 'External debt service', 'wdi-ne-exp-gnfs-zs-ind': 'Exports of goods and services', 'wdi-ne-imp-gnfs-zs-ind': 'Imports of goods and services',
     'wdi-fi-res-totl-mo-ind': 'Reserves, months of imports', 'wdi-fi-res-totl-cd-ind': 'Total reserves (annual)' };
+  for (const c of catalog) if (/^iip-/.test(c.id) && c.id !== 'iip-general' && !SHORT[c.id]) SHORT[c.id] = c.name.replace(/^IIP: /, '').replace(/, growth$/, '').replace(/ Goods$/, ' goods').replace('Infrastructure & construction goods', 'Infrastructure and construction');
+  for (const id of ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-m3-yoy', 'rbi-cic-yoy', 'rbi-bccs-yoy']) if (byId[id]) SHORT[id] = byId[id].name.replace(/, year on year$/, '');
   for (const [id, sh] of Object.entries(SHORT)) if (byId[id]) byId[id].short = sh;
   const T = id => byId[id] ? id : null;
   const CONCEPTS = [
@@ -704,10 +707,10 @@ async function main() {
         { anchor: 'size', title: 'Size of the economy', ids: ['imf-ngdpd-ind', 'imf-pppgdp-ind'], note: 'Current US$ billions at market exchange rates, and international dollars at purchasing power parity.' },
         { anchor: 'per-person', title: 'GDP per person', ids: ['imf-ngdpdpc-ind'] },
         { anchor: 'investment', title: 'Investment', ids: ['wdi-ne-gdi-totl-zs-ind'], note: 'Gross capital formation, per cent of GDP (World Bank).' },
-        { anchor: 'iip', title: 'Monthly activity: industrial production', ids: ['iip-general', 'iip-manufacturing'], range: '10Y', note: 'Year-on-year growth of the Index of Industrial Production. Sector and use-based detail is on <a href="/economy/">Industry and credit</a>.' },
+        { anchor: 'iip', title: 'Monthly activity: industrial production', ids: ['iip-general', 'iip-manufacturing'], range: '10Y', note: 'Year-on-year growth of the Index of Industrial Production. Sector and use-based detail is on <a href="/economy/industry/">Industrial production</a>.' },
       ],
       method: '<ul><li>IMF figures are on India’s fiscal year (April to March) and come from the latest World Economic Outlook database; each vintage revises history.</li><li>The IIP has a 2011-12 base; growth before 2012 is spliced by MoSPI from the 2004-05 base.</li></ul>',
-      related: [['/economy/', 'Industry and credit'], ['/world/', 'India against other economies'], ['/states/', 'Growth by state']] },
+      related: [['/economy/industry/', 'Industrial production'], ['/world/', 'India against other economies'], ['/states/', 'Growth by state']] },
     { path: '/economy/rates/', title: 'Interest rates and yields', kicker: 'Economy · Rates', desc: 'India’s repo rate, money-market rates, Treasury bill and 10-year G-Sec yields, the term spread and the gap over US Treasuries.',
       dek: 'The policy rate, where overnight and short-term money trades against it, the 10-year sovereign yield, and the two spreads that matter for the curve and for capital flows.',
       key: ['india-repo', 'rbi-call', 'rbi-gsec10', 'spread-in-us-10y'],
@@ -719,6 +722,27 @@ async function main() {
       ],
       method: '<ul><li>The repo rate is shown as a month-end step series built from each MPC decision.</li><li>Spreads are computed on dates where both series have an observation; no interpolation.</li></ul>',
       related: [['/economy/prices/', 'Inflation'], ['/external/', 'Rupee, reserves and forward premia'], ['/markets/', 'Bond and equity markets']] },
+    { path: '/economy/industry/', title: 'Industrial production', kicker: 'Economy · Industry', desc: 'India’s Index of Industrial Production by sector and by use since 1994: mining, manufacturing, electricity, capital, intermediate, infrastructure and consumer goods.',
+      dek: 'The Index of Industrial Production by sector and by end use, year on year, with the last thirteen months side by side. Released by MoSPI around the 28th of each month, about six weeks after the month ends.',
+      key: ['iip-general', 'iip-manufacturing', 'iip-capital', 'iip-consumer-durables'],
+      extraTop: `<section class="xr-sec"><h2 class="col-title">The last thirteen months</h2>${heatTable([['iip-general', 'General index'], ['iip-mining', 'Mining'], ['iip-manufacturing', 'Manufacturing'], ['iip-electricity', 'Electricity'], ['iip-primary', 'Primary goods'], ['iip-capital', 'Capital goods'], ['iip-intermediate', 'Intermediate goods'], ['iip-infrastructure-construction', 'Infrastructure and construction'], ['iip-consumer-durables', 'Consumer durables'], ['iip-consumer-non-durables', 'Consumer non-durables']].map(([id, n]) => [Object.keys(SD).find(k => k === id || k.startsWith(id)) || id, n]), SD)}<p class="meta">Green: growth; red: contraction. The latest month is a quick estimate and is revised in the next two releases.</p></section>`,
+      panels: [
+        { anchor: 'sectors', title: 'By sector', ids: ['iip-general', 'iip-mining', 'iip-manufacturing', 'iip-electricity'], range: '10Y', line: 0 },
+        { anchor: 'use', title: 'By use', ids: ['iip-primary', 'iip-capital', 'iip-intermediate', Object.keys(SD).find(k => k.startsWith('iip-infrastructure')), 'iip-consumer-durables', 'iip-consumer-non-durables'].filter(Boolean), range: '5Y', line: 0, note: 'Capital goods and consumer durables are the swing components: the first tracks investment, the second discretionary spending.' },
+      ],
+      method: '<ul><li>Base 2011-12=100. Growth rates before 2012 are MoSPI’s spliced series on the 2004-05 base; the use-based groups for primary and infrastructure goods start in 2012.</li><li>2020-21 growth rates are distorted by the lockdown base; 2021-22 by its rebound.</li></ul>',
+      related: [['/economy/growth/', 'Growth and output'], ['/economy/money/', 'Money and credit'], ['/companies/', 'Listed companies']] },
+    { path: '/economy/money/', title: 'Money and credit', kicker: 'Economy · Money and credit', desc: 'India’s bank credit, deposits, money supply (M3), currency with the public and credit to the commercial sector, fortnightly from the RBI, with the credit-deposit ratio.',
+      dek: 'How fast banks are lending and raising deposits, how much money is in the system, and how stretched balance sheets are. Fortnightly, from the RBI Weekly Statistical Supplement.',
+      key: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-m3-yoy', 'rbi-cd-ratio'],
+      panels: [
+        { anchor: 'growth', title: 'Credit and deposit growth', ids: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-bccs-yoy'], range: '10Y' },
+        { anchor: 'money', title: 'Money supply and currency', ids: ['rbi-m3-yoy', 'rbi-cic-yoy'], range: '5Y' },
+        { anchor: 'cd-ratio', title: 'Credit-deposit ratio', ids: ['rbi-cd-ratio'], range: 'All', note: 'Bank credit as a share of deposits. A rising ratio means lending is outrunning deposit growth, which pushes banks towards certificates of deposit and higher deposit rates.' },
+        { anchor: 'levels', title: 'Outstanding credit and deposits', ids: ['rbi-credit', 'rbi-deposits'], range: 'All' },
+      ],
+      method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li></ul>',
+      related: [['/economy/rates/', 'Interest rates and yields'], ['/economy/prices/', 'Inflation'], ['/markets/', 'Bank shares']] },
     { path: '/external/balance-of-payments/', title: 'Balance of payments', kicker: 'External · Balance of payments', desc: 'India’s current account from the IMF and the World Bank, monthly merchandise trade, services, remittances, FDI and portfolio flows, and external debt.',
       dek: 'How India pays its way: the current account, the trade in goods and services that drives it, the capital that finances it, and the debt it leaves behind.',
       key: ['imf-bca-ngdpd-ind', 'in-exports', 'wdi-bx-trf-pwkr-cd-dt-ind', 'wdi-dt-dod-dect-gn-zs-ind'],
@@ -738,8 +762,7 @@ async function main() {
   for (const C of CONCEPTS) for (const p of C.panels) for (const id of p.ids) if (byId[id] && !CONCEPT_OF[id]) CONCEPT_OF[id] = `${C.path}#${p.anchor}`;
   for (const id of ['imf-ggxwdg-ngdp-ind', 'imf-ggxcnl-ngdp-ind']) if (byId[id]) CONCEPT_OF[id] = '/economy/budget/#fiscal';
   for (const c of catalog) { if (CONCEPT_OF[c.id]) continue;
-    if (/^(iip-|rbi-(credit|deposits|m3|cic|bccs))/.test(c.id)) CONCEPT_OF[c.id] = '/economy/#' + c.id;
-    else if (/^(rbi-fx-|rbi-inr|rbi-fwd)/.test(c.id)) CONCEPT_OF[c.id] = '/external/';
+    if (/^(rbi-fx-|rbi-inr|rbi-fwd)/.test(c.id)) CONCEPT_OF[c.id] = '/external/';
     else if (/^wdi-fi-res/.test(c.id)) CONCEPT_OF[c.id] = '/external/balance-of-payments/#cover'; }
   const conceptUrl = id => CONCEPT_OF[id] || `/s/${id}/`;
   globalThis.__CONCEPT_OF = CONCEPT_OF;
@@ -818,7 +841,15 @@ async function main() {
     await write('companies/index.html', P({ title: 'The Nifty 500, company by company', path: '/companies/', description: 'India’s 500 largest listed companies on one map: market value, returns over a day, a month and a year, by industry, each with its own page.', body: companiesHub(CO, { pageHead }) }));
     await write('api/companies.json', JSON.stringify({ date: CO.date, companies: Object.values(CO.C).map(({ c, t, dp, ...x }) => x) })); api['companies'] = 'Nifty 500 companies: name, industry, ISIN, market value (₹ crore), last close, returns over a day, week, month, quarter, six months, a year and the year to date, 52-week range, turnover and delivery share (NSE)';
   }
-  if (MK?.iip || MK?.rbiMoney) await write('economy/index.html', P({ title: 'The real-economy tracker: industry, credit, money and trade', path: '/economy/', description: 'India’s industrial production by sector, bank credit and deposits, money supply and monthly trade, updated from MoSPI and the RBI, with every series on its own page.', body: economyPage(SD, byId, { pageHead, tape }) }));
+  { const L = id => (globalThis.__CONCEPT_OF || {})[id] || `/s/${id}/`;
+    const G = [['Activity', [['imf-ngdp-rpch-ind'], ['iip-general'], ['iip-manufacturing'], ['iip-capital']]], ['Prices', [['india-cpi'], ['cpi-core'], ['cpi-food'], ['imf-pcpipch-ind']]],
+      ['Money, credit and rates', [['india-repo'], ['rbi-call'], ['rbi-gsec10'], ['spread-in-us-10y'], ['rbi-credit-yoy'], ['rbi-deposits-yoy'], ['rbi-m3-yoy'], ['rbi-cd-ratio']]],
+      ['Public finance', [['imf-ggxcnl-ngdp-ind'], ['imf-ggxwdg-ngdp-ind']]],
+      ['External', [['imf-bca-ngdpd-ind'], ['in-exports'], ['in-imports'], ['rbi-fx-total', null, 'Foreign exchange reserves'], ['fx-usdinr', null, 'Rupee per US dollar'], ['wdi-dt-dod-dect-gn-zs-ind']]],
+      ['Markets', [['nse-nifty-50', null, 'Nifty 50'], ['nifty50-pe', null, 'Nifty 50 P/E'], ['nse-india-vix', null, 'India VIX'], ['fred-dcoilbrenteu', null, 'Brent crude']]]].map(([g, xs]) => [g, xs.map(([id, u, l]) => [id, u || L(id), l])]);
+    await write('economy/index.html', P({ title: 'India macro dashboard', path: '/economy/', description: 'Every headline Indian macro indicator in one table: growth, industry, inflation, rates, credit, the budget, the external accounts and markets, each against its history and linked to its full page.',
+      body: `<div class="mk-top"><div class="wrap"><div class="mk-head"><div><span class="kicker">Economy</span><h1>India macro dashboard</h1><p class="dek sm">Every headline indicator in one table, each against its own history: the previous reading, a year earlier, the five-year average and where it sits in the last ten years. Click an indicator for its full page. Statistics use published figures only; IMF projections are listed separately.</p></div></div></div></div>
+      <div class="wrap"><section class="xr-sec">${dashboardPage(G, { SD, byId })}</section><section class="xr-sec"><h2 class="col-title">Pages</h2><p class="chips">${[['/economy/growth/', 'Growth and output'], ['/economy/industry/', 'Industrial production'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money and credit'], ['/economy/rates/', 'Interest rates and yields'], ['/economy/budget/', 'Budget and debt'], ['/external/balance-of-payments/', 'Balance of payments'], ['/external/', 'Rupee and reserves']].map(([u, t]) => `<a class="chip" href="${u}">${t}</a>`).join('')}</p></section></div>` })); }
   if (MK?.trade) { const cs = {}, cn = {}; for (const iso of Object.keys(W.countries)) { cn[iso] = cleanCountry(W.countries[iso]); cs[iso] = slugify(cn[iso]); } await write('trade/index.html', P({ title: 'India’s trade: who buys, who sells, and what', path: '/trade/', description: 'India’s goods exports and imports by partner and product since 2015, from UN Comtrade, with surpluses, deficits and every partner linked to its country page.', body: tradePage(MK.trade, { pageHead, countrySlug: cs, countryName: cn }) })); }
   if (MK?.rbiFx) await write('external/index.html', P({ title: 'External sector lab: reserves, the rupee and the price of dollars', path: '/external/', description: 'India’s foreign exchange reserves every week since 1998, money-market rates, forward premia and external sustainability indicators, with the 2013 and 2026 FCNR(B) episodes side by side.', body: externalPage(MK, { pageHead, episodes: JSON.parse(await readFile('data/episodes.json', 'utf8')), rupee: rupeePage(MK, tape, { pageHead, embed: true }) }) }));
   if (MK?.imfWorld) await write('world/index.html', P({ title: 'India against the world', path: '/world/', description: 'Where India ranks among every economy in the IMF World Economic Outlook: GDP, income per person, growth, inflation, debt and the current account.', body: worldPage(MK.imfWorld, { pageHead, year: BUILT.getUTCFullYear() }) + infographicsPage({ pageHead, year: BUILT.getUTCFullYear(), only: ['race', 'bub', 'debt'], head: false }) }));
@@ -832,7 +863,7 @@ async function main() {
 
   const idx = m.articles.map(a => ({ title: a.title, excerpt: a.excerpt, url: a.url, date: a.date.slice(0, 10), topic: a.topic, topicName: TOPICS[a.topic].short, color: TOPICS[a.topic].color, format: a.format, series: a.series[0]?.name || '' }));
   await write('search.json', JSON.stringify(idx));
-  const urls = ['/', '/series/', '/archive/', '/explore/', '/ledger/', ...(HAS_CALLS ? ['/forecasts/'] : []), '/desk/', '/desk/archive/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/growth/', '/economy/prices/', '/economy/rates/', '/economy/budget/', '/external/balance-of-payments/', '/external/', '/external/data/', '/trade/', '/hormuz/', '/states/', '/districts/', '/world/', '/what-if/', '/what-if/pump-price/', '/charts/', '/stories/hormuz/', '/api/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
+  const urls = ['/', '/series/', '/archive/', '/explore/', '/ledger/', ...(HAS_CALLS ? ['/forecasts/'] : []), '/desk/', '/desk/archive/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/growth/', '/economy/industry/', '/economy/money/', '/economy/prices/', '/economy/rates/', '/economy/budget/', '/external/balance-of-payments/', '/external/', '/external/data/', '/trade/', '/hormuz/', '/states/', '/districts/', '/world/', '/what-if/', '/what-if/pump-price/', '/charts/', '/stories/hormuz/', '/api/', ...TOPIC_ORDER.map(t => `/topic/${t}/`), ...m.series.map(s => `/series/${s.slug}/`), ...catalog.map(c => `/s/${c.id}/`), ...(existsSync('data/markets/nse500_meta.json') ? Object.keys(JSON.parse(readFileSync('data/markets/nse500_meta.json', 'utf8')).companies).map(s => `/company/${s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-')}/`).filter(u => existsSync(join(OUT, u, 'index.html'))) : []), ...states.states.map(st => `/state/${slugify(st.name)}/`)];
   await write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${BASE_URL}${u}</loc></url>`).join('')}</urlset>`);
   await write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}/sitemap.xml\n`);
   const MOVED = [['/today/', '/desk/'], ['/rupee/', '/external/'], ['/maps/', '/states/'], ['/maps/districts/', '/districts/'], ['/infographics/', '/states/'], ['/tools/', '/explore/'], ['/tools/shock-lab/', '/what-if/'], ['/tools/pump-price/', '/what-if/pump-price/'], ['/tools/emi/', '/what-if/'], ['/tools/budget-x-ray/', '/economy/budget/'], ['/tools/india-by-state/', '/states/'], ['/tools/two-chart-test/', '/charts/'], ['/tools/exposure/', '/what-if/'], ['/chartle/', '/charts/'], ['/explainers/', '/archive/'], ['/data/', '/desk/'], ...(HAS_CALLS ? [] : [['/forecasts/', '/ledger/']]), ...HIDDEN.map(c => { const iso = c.id.split('-').pop().toUpperCase(), n = W?.countries?.[iso]; return n ? [`/s/${c.id}/`, `/country/${slugify(cleanCountry(n))}/`] : null; }).filter(Boolean), ...Object.entries(TAPE_S).map(([k, v]) => [`/data/${k}/`, `/s/${v}/`])];

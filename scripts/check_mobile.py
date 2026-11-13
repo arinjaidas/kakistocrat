@@ -2,7 +2,7 @@
 # Usage: python3 scripts/check_mobile.py http://localhost:8811
 import sys, asyncio, os
 from playwright.async_api import async_playwright
-PAGES = ['/', '/desk/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/prices/', '/economy/growth/', '/economy/rates/', '/external/balance-of-payments/', '/economy/budget/', '/external/', '/trade/', '/hormuz/',
+PAGES = ['/', '/desk/', '/markets/', '/companies/', '/commodities/', '/terminal/', '/economy/', '/economy/prices/', '/economy/growth/', '/economy/rates/', '/economy/industry/', '/economy/money/', '/external/balance-of-payments/', '/economy/budget/', '/external/', '/trade/', '/hormuz/',
          '/states/', '/districts/', '/world/', '/what-if/', '/what-if/pump-price/', '/charts/', '/explore/', '/stories/hormuz/', '/s/fx-usdinr/', '/state/kerala/', '/country/china/', '/company/hdfcbank/', '/topic/trade-external-sector/', '/research/oil-rupee/']
 
 async def check_scenario(pg, base):
