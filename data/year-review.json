@@ -230,7 +230,12 @@
       "detail": "November GST release. Imports cushioned weaker domestic gross receipts.",
       "priority": 1,
       "source": "https://studycafe.in/wp-content/uploads/2025/12/GST-Revenue-Collections-for-Month-of-Nov-2025.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1792,
+          "url": "https://thekakisto.wordpress.com/2025/12/01/gst-rate-cuts-november-2025-receipts-pass-through/"
+        }
+      ]
     },
     {
       "id": "S09",
