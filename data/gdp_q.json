@@ -1,0 +1,21 @@
+{
+  "base": "2022-23",
+  "note": "Quarterly estimates, constant 2022-23 prices, year-on-year growth. The 2022-23 base series replaced the 2011-12 base on 27 February 2026; growth rates from the two bases are not comparable.",
+  "latest": {
+    "quarter": "Q1 2026-27", "period": "April-June 2026", "released": "2026-08-31", "next": "2026-11-30",
+    "rows": [
+      ["Real GDP", 7.8, 6.9], ["Real GVA", 8.2, 7.0], ["Nominal GDP", 10.3, 8.1],
+      ["Private final consumption", 7.1, 6.8], ["Government final consumption", 4.3, 4.5], ["Gross fixed capital formation", 11.9, 5.8],
+      ["Exports of goods and services", 12.0, null], ["Imports of goods and services", -1.1, null],
+      ["Primary sector GVA", 2.9, null], ["Agriculture and allied GVA", 3.6, null], ["Tertiary sector GVA", 10.0, null]
+    ],
+    "cols": ["Q1 2026-27", "Q1 2025-26"]
+  },
+  "quarters": [["2025-06", 6.9], ["2026-03", 8.6], ["2026-06", 7.8]],
+  "sources": [
+    {"name": "PIB factsheet: India's GDP performance, 1 September 2026", "url": "https://www.pib.gov.in/FactsheetDetails.aspx?id=150991"},
+    {"name": "MoSPI quarterly estimates Q1 2026-27, as reported (Business Today, 31 August 2026)", "url": "https://www.businesstoday.in/india/story/indias-q1-gdp-surges-7-8-as-strong-services-sector-double-digit-capex-boost-economic-momentum-552302-2026-08-31"},
+    {"name": "The Policy Edge: component growth rates from the MoSPI release", "url": "https://www.policyedge.in/p/indias-gdp-growth-accelerates-to-78-in-q1-fy27-as-investment-and-services-strengthen"}
+  ],
+  "checked": "2026-11-13"
+}

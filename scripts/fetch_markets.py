@@ -457,6 +457,47 @@ def fpi():
     json.dump(have, open(path, 'w'), separators=(',', ':'))
     print('FPI:', day, {k: v['net_cr'] for k, v in out.items()})
 
+def amfi():
+    """AMFI monthly report: net inflows and assets under management by fund type, from April 2019 (one .xls a month)."""
+    try: import xlrd
+    except ImportError: print('AMFI: xlrd missing, skipped'); return
+    path = os.path.join(OUT, 'amfi.json'); have = json.load(open(path)) if os.path.exists(path) else {'months': {}}
+    mon = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+    t, end = dt.date(2019, 4, 1), dt.date.today()
+    todo = []
+    while t < end.replace(day=1):
+        k = f'{t.year}-{t.month:02d}'
+        if k not in have['months'] or k >= (end - dt.timedelta(days=70)).strftime('%Y-%m'): todo.append((k, t))
+        t = (t.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    LAB = {'debt': r'^Sub Total\s*-\s*I(\s|\(|$)', 'equity': r'^Sub Total\s*-\s*II(\s|\(|$)', 'hybrid': r'^Sub Total\s*-\s*III(\s|\(|$)', 'index_equity': r'^Equity Funds?$', 'etf_equity': r'^(Equity ETF|Other ETFs?)$', 'etf_gold': r'^Gold ETF$', 'total': r'^Grand Total$'}
+    for k, t in todo[-90:]:
+        try: b = get(f'https://portal.amfiindia.com/spages/am{mon[t.month - 1]}{t.year}repo.xls', timeout=90)
+        except Exception as e: print('  AMFI', k, e); continue
+        try:
+            if b.startswith(b'\xd0\xcf'): sh = xlrd.open_workbook(file_contents=b).sheet_by_index(0); rows = [[sh.cell_value(r, c) for c in range(sh.ncols)] for r in range(sh.nrows)]
+            elif b.startswith(b'PK'): import openpyxl; ws = openpyxl.load_workbook(io.BytesIO(b), read_only=True, data_only=True).worksheets[0]; rows = [list(r) for r in ws.iter_rows(values_only=True)]
+            else: continue
+        except Exception as e: print('  AMFI', k, e); continue
+        net = aum = None
+        for row in rows[:8]:
+            for c, h in enumerate(row):
+                h = str(h or '')
+                if 'Net Inflow' in h and net is None: net = c
+                if 'Net Assets Under' in h and aum is None: aum = c
+        if net is None: continue
+        rec = {}
+        for row in rows:
+            lab = str(row[1] if len(row) > 1 and row[1] is not None else '').strip()
+            for key, rx in LAB.items():
+                if key not in rec and re.match(rx, lab, re.I):
+                    try: rec[key] = round(float(row[net]), 2); rec[key + '_aum'] = round(float(row[aum]), 2) if aum is not None else None
+                    except (TypeError, ValueError, IndexError): pass
+        if 'total' in rec: have['months'][k] = rec
+        time.sleep(0.3)
+    have['months'] = dict(sorted(have['months'].items())); have['source'] = 'AMFI monthly report (net inflows and AUM, ₹ crore)'
+    json.dump(have, open(path, 'w'), separators=(',', ':'))
+    print('AMFI:', len(have['months']), 'months, last', list(have['months'])[-1:])
+
 def cpi_mospi():
     """All-India CPI (2012=100) from MoSPI's API: every sector (rural/urban/combined), group and subgroup, Jan 2011 to Dec 2025.
     The 2024-base series that started in 2026 is not in the API yet; its releases are in data/tape.json."""
@@ -718,7 +759,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('amfi', amfi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:

@@ -27,7 +27,7 @@
   });
 
   if (T.tool === 'rupee-value') ready(() => {
-    const M = new Map(T.cpi), G = new Map(T.gold || []), c = chart('rv-chart');
+    const M = new Map(T.cpi), G = new Map(T.gold || []), N = new Map(T.nifty || []), c = chart('rv-chart');
     const run = () => {
       const a = num($('#rv-amt')), f = $('#rv-from').value, t = $('#rv-to').value, i0 = M.get(f), i1 = M.get(t);
       if (!a || !i0 || !i1) return;
@@ -36,11 +36,13 @@
       $('#rv-sub').textContent = `Prices ${i1 >= i0 ? 'rose' : 'fell'} ${fmt(Math.abs(i1 / i0 - 1) * 100, 1)}% from ${f} to ${t}` + (yrs > 1 ? `, ${fmt((Math.pow(i1 / i0, 1 / yrs) - 1) * 100, 1)}% a year.` : '.');
       const g0 = G.get(f), g1 = G.get(t);
       $('#rv-gold').textContent = g0 && g1 ? `₹${fmt(a, 0)} in gold in ${f} would have been worth ₹${fmt(a * g1 / g0, 0)} in ${t}, ${fmt((g1 / g0) / (i1 / i0) * 100 - 100, 0)}% more in real terms.` : '';
+      const n0 = N.get(f), n1 = N.get(t);
+      $('#rv-nifty').textContent = n0 && n1 ? `In the Nifty 50 (price index) it would have been worth ₹${fmt(a * n1 / n0, 0)}, ${fmt((n1 / n0) / (i1 / i0) * 100 - 100, 0)}% in real terms.` : (N.size ? `Nifty 50 comparison available from ${[...N.keys()][0]}.` : '');
       if (c) { const ds = T.cpi.map(x => x[0]).filter(d => d >= f && d <= t);
         c.setOption({ grid: { left: 50, right: 16, top: 30, bottom: 30 }, legend: { top: 0 }, tooltip: { trigger: 'axis', valueFormatter: v => '₹' + fmt(v, 0) },
           xAxis: { type: 'category', data: ds }, yAxis: { type: 'value', scale: true },
           series: [{ name: 'Same purchasing power', type: 'line', showSymbol: false, color: C[0], data: ds.map(d => +(a * M.get(d) / i0).toFixed(0)) },
-                   ...(g0 ? [{ name: 'Held in gold', type: 'line', showSymbol: false, color: C[2], data: ds.map(d => G.get(d) ? +(a * G.get(d) / g0).toFixed(0) : null) }] : [])] }, true); }
+                   ...(g0 ? [{ name: 'Held in gold', type: 'line', showSymbol: false, color: C[2], data: ds.map(d => G.get(d) ? +(a * G.get(d) / g0).toFixed(0) : null) }] : []), ...(n0 ? [{ name: 'Held in the Nifty 50', type: 'line', showSymbol: false, color: C[1], data: ds.map(d => N.get(d) ? +(a * N.get(d) / n0).toFixed(0) : null) }] : [])] }, true); }
     };
     ['#rv-amt', '#rv-from', '#rv-to'].forEach(s => $(s).addEventListener('input', run)); run();
   });

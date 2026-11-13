@@ -930,3 +930,4 @@ body.sec-markets .subnav a[aria-current]{border-bottom-color:#A8B68C}
 .tools-band{position:relative;overflow:hidden}
 @media (max-width:600px){.mk-top:not(.ip-top)::after,.page-head::after{width:75%;opacity:.28}}
 html,body{overflow-x:clip}
+.hp-cd{margin:0 0 10px;font:500 14px var(--sans)}.hp-cd b{font:600 16px var(--mono);color:var(--accent)}
