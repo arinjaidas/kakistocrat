@@ -2,7 +2,7 @@
 // so these are refreshed only when a request reaches a Cloudflare data centre in India,
 // stored in KV (binding OGD), and read from anywhere (the GitHub build reads them here).
 export const DATASETS = {
-  mandi:     { rid: '9ef84268-d588-465a-a308-a864a43d0070', ttlH: 6,   pages: 10, note: 'Agmarknet daily mandi prices, latest day' },
+  mandi:     { rid: '9ef84268-d588-465a-a308-a864a43d0070', ttlH: 6,   pages: 15, note: 'Agmarknet daily mandi prices, latest day' },
   aqi:       { rid: '3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69', ttlH: 3,   pages: 6,  note: 'CPCB real-time air quality, hourly' },
   wpi:       { rid: '239ac3d0-f08d-40d0-b03c-9b7a426a62d5', ttlH: 24,  pages: 2,  note: 'WPI 2011-12=100, all items, monthly' },
   core8:     { rid: 'cc473f03-4db1-4c34-949e-481bdb3da490', ttlH: 24,  pages: 1,  note: 'Eight core industries index, monthly' },
