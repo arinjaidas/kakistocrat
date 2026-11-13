@@ -391,6 +391,46 @@ def wpi_mospi():
     json.dump(have, open(path, 'w'), separators=(',', ':'))
     print('WPI history:', len(have['series']), 'series')
 
+def upi():
+    """UPI monthly volume and value from NPCI's statistics API, through the site's Mumbai relay (NPCI refuses non-Indian IPs)."""
+    path = os.path.join(OUT, 'upi.json'); have = json.load(open(path)) if os.path.exists(path) else {'months': {}}
+    now = dt.date.today(); fy = now.year if now.month >= 4 else now.year - 1
+    years = [f'{y}-{str(y + 1)[2:]}' for y in range(2016, fy + 1)]
+    if have['months']: years = years[-2:]
+    MI = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
+    for y in years:
+        try: j = json.loads(get(f'https://kakistocrat.pages.dev/api/in/npci-upi-month?y={y}', timeout=90))
+        except Exception as e: print('  UPI', y, e); continue
+        for r in (j.get('data') or {}).get('results') or []:
+            mo, _, yr = (r.get('month') or '').partition('-')
+            if mo not in MI or not yr.isdigit(): continue
+            v, c = num(str(r.get('volume_in_mn', '')).replace(',', '')), num(str(r.get('value_in_cr', '')).replace(',', ''))
+            if v is None: continue
+            have['months'][f'{yr}-{MI[mo]:02d}'] = {'volume_mn': v, 'value_cr': c, 'banks': num(str(r.get('no_of_banks_live_on_upi', '')))}
+        time.sleep(0.5)
+    have['months'] = dict(sorted(have['months'].items())); have['source'] = 'NPCI UPI product statistics (monthly)'
+    json.dump(have, open(path, 'w'), separators=(',', ':'))
+    print('UPI:', len(have['months']), 'months, last', list(have['months'])[-1:] )
+
+def fpi():
+    """Daily net FPI investment from NSDL's FPI Monitor (provisional exchange data for the latest day); accumulates a daily history."""
+    path = os.path.join(OUT, 'fpi.json'); have = json.load(open(path)) if os.path.exists(path) else {'days': {}}
+    html = get('https://www.fpi.nsdl.co.in/web/Reports/Latest.aspx', timeout=60).decode('utf8', 'replace')
+    cells = [re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', c)).strip() for c in re.findall(r'<td[^>]*>([\s\S]*?)</td>', html)]
+    nm = lambda x: num(x.replace(',', '').replace('(', '-').replace(')', '')) if x else None
+    m = re.search(r'Daily Trends in FPI Investments on (\d{2}-\w{3}-\d{4})', html)
+    if not m: print('FPI: no date found'); return
+    day = dt.datetime.strptime(m.group(1), '%d-%b-%Y').date().isoformat()
+    out, cur = {}, None
+    for i, c in enumerate(cells):
+        if c in ('Equity', 'Debt-General Limit', 'Debt-VRR', 'Debt-FAR', 'Hybrid', 'Mutual Funds', 'AIFs'): cur = c
+        if c == 'Sub-total' and cur and i + 4 < len(cells):
+            out[cur] = {'net_cr': nm(cells[i + 3]), 'net_usd_mn': nm(cells[i + 4])}
+    if out: have['days'][day] = out
+    have['days'] = dict(sorted(have['days'].items())); have['source'] = 'NSDL FPI Monitor, daily trends (provisional, stock-exchange data)'
+    json.dump(have, open(path, 'w'), separators=(',', ':'))
+    print('FPI:', day, {k: v['net_cr'] for k, v in out.items()})
+
 def cpi_mospi():
     """All-India CPI (2012=100) from MoSPI's API: every sector (rural/urban/combined), group and subgroup, Jan 2011 to Dec 2025.
     The 2024-base series that started in 2026 is not in the API yet; its releases are in data/tape.json."""
@@ -652,7 +692,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('wpi_mospi', wpi_mospi), ('upi', upi), ('fpi', fpi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:

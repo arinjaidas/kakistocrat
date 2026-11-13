@@ -6,9 +6,12 @@ const SRC = {
   'grid-report': 'https://report.grid-india.in/',
   'mospi-cal': 'https://www.mospi.gov.in/advance-release-calendar',
 };
+const YR = /^20\d\d-\d\d$/;
+const DYN = { 'npci-upi-month': y => YR.test(y) && `https://www.npci.org.in/api/product-statistic/tab/detail?product_name=upi&tab_name=product-statistics-upi&year_range=${y}&excel_type=monthly&page_no=1&page_size=20&locale=en` };
 export async function onRequestGet({ params, env, request }) {
-  const u = SRC[params.name]; if (!u) return new Response(JSON.stringify({ error: 'unknown', known: Object.keys(SRC) }), { status: 404 });
-  const k = `in:${params.name}`, fresh = new URL(request.url).searchParams.has('fresh');
+  const y = new URL(request.url).searchParams.get('y') || '';
+  const u = SRC[params.name] || (DYN[params.name] && DYN[params.name](y)); if (!u) return new Response(JSON.stringify({ error: 'unknown', known: Object.keys(SRC) }), { status: 404 });
+  const k = `in:${params.name}:${y}`, fresh = new URL(request.url).searchParams.has('fresh');
   if (env.OGD && !fresh) { const c = await env.OGD.get(k); if (c) return new Response(c, { headers: { 'content-type': 'text/plain; charset=utf-8', 'x-cache': 'kv' } }); }
   let r; try { r = await fetch(u, { headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36', accept: 'text/html,application/json;q=0.9,*/*;q=0.8', 'accept-language': 'en-IN,en;q=0.9' } }); } catch (e) { return new Response('fetch failed: ' + e, { status: 502 }); }
   const t = await r.text();
