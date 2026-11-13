@@ -600,7 +600,7 @@ async function main() {
   if (existsSync('data/markets/wpi_hist.json')) { const W = JSON.parse(await readFile('data/markets/wpi_hist.json', 'utf8')).series;
     const pick = re => Object.keys(W).find(k => re.test(k));
     const yoy = async (k, id, name, short) => { if (!k) return; const m = new Map(W[k]); const pts = W[k].map(([d, v]) => { const p = `${+d.slice(0, 4) - 1}${d.slice(4)}`; return m.has(p) ? [d, +((v / m.get(p) - 1) * 100).toFixed(2)] : null; }).filter(Boolean);
-      await addSeries(id, name, 'India: prices', '% y/y', 'monthly', 'MoSPI/Office of the Economic Adviser, WPI base 2011-12=100', pts.map(p => p[0]), pts.map(p => p[1]), { short }); };
+      await addSeries(id, name, 'India: prices', '% y/y', 'monthly', 'MoSPI/Office of the Economic Adviser, WPI base 2011-12=100', pts.map(p => p[0]), pts.map(p => p[1]), { short, sourceLag: 'MoSPI’s API publishes WPI with a lag of several months' }); };
     await yoy(pick(/^Wholesale price index\|$/i) || pick(/^all commodities\|$/i), 'wpi', 'WPI inflation, all commodities', 'WPI, all commodities');
     await yoy(pick(/^Primary articles\|$/i), 'wpi-primary', 'WPI inflation: primary articles', 'Primary articles');
     await yoy(pick(/^Fuel (&|and) power\|$/i), 'wpi-fuel', 'WPI inflation: fuel and power', 'Fuel and power');
@@ -719,7 +719,7 @@ async function main() {
       key: ['india-cpi', 'cpi-core', 'cpi-food', 'wpi', 'imf-pcpipch-ind'],
       panels: [
         { anchor: 'headline', title: 'Headline, food and core inflation', ids: ['india-cpi', 'cpi-food', 'cpi-core'], band: [2, 6], line: 4, breaks: [{ at: '2026-01', label: 'Base 2024' }], range: 'All', note: 'Year-on-year change. Shaded: the RBI’s 2–6% tolerance band around the 4% target (a statutory target since 2016). Food (CFPI) and core are on the 2012 base and end in December 2025; MoSPI does not yet publish either on the 2024 base.' },
-        { anchor: 'wpi', title: 'Wholesale prices', ids: ['wpi', 'wpi-primary', 'wpi-fuel', 'wpi-manufactured', 'wpi-food'], range: '10Y', line: 0, note: 'Year-on-year change in the Wholesale Price Index (2011-12=100), computed from the index. WPI leads CPI goods inflation by a few months and has no services.' },
+        { anchor: 'wpi', title: 'Wholesale prices', ids: ['wpi', 'wpi-primary', 'wpi-fuel', 'wpi-manufactured', 'wpi-food'], range: '10Y', line: 0, note: 'Year-on-year change in the Wholesale Price Index (2011-12=100), computed from the index. WPI leads CPI goods inflation by a few months and has no services. MoSPI’s API currently runs some months behind the Office of the Economic Adviser’s monthly press release; the latest month here is the latest the API serves.' },
         { anchor: 'groups', title: 'Inflation by CPI group', ids: ['cpi-g-food', 'cpi-g-fuel', 'cpi-g-housing', 'cpi-g-clothing', 'cpi-g-misc', 'cpi-g-pan'], range: '5Y', note: 'Combined (rural plus urban) CPI, 2012 base. Click a group in the legend to hide or show it.' },
         { anchor: 'rural-urban', title: 'Rural and urban', ids: ['cpi-rural', 'cpi-urban'], band: [2, 6], line: 4, range: '10Y' },
         { anchor: 'annual', title: 'Annual average, with IMF projections', ids: ['imf-pcpipch-ind'], line: 4, note: 'IMF World Economic Outlook, fiscal-year basis. Dashed: projections, which are excluded from every statistic on this page.' },
