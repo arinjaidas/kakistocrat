@@ -1,17 +1,11 @@
-import urllib.request, json, re
-H={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36','Accept':'*/*'}
+import urllib.request, re
+H={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36'}
 def g(u):
-    try:
-        r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=45); b=r.read(); return r.status, b, len(b)
-    except Exception as e: return 'ERR', str(e)[:140].encode(), 0
-U=['https://api.mospi.gov.in/api/nas/getNASData?Format=JSON&base_year=2022-23&limit=3','https://api.mospi.gov.in/api/nas/getNASData?Format=JSON&series=Current&limit=3',
- 'https://api.mospi.gov.in/api/plfs/getPLFSData?Format=JSON&limit=3','https://api.mospi.gov.in/api/plfs/getData?Format=JSON&limit=3','https://api.mospi.gov.in/api/plfs/getPLFSMonthly?Format=JSON&limit=3',
- 'https://api.mospi.gov.in/api-docs/','https://api.mospi.gov.in/swagger.json','https://api.mospi.gov.in/api/swagger.json',
- 'https://www.npci.org.in/what-we-do/upi/product-statistics','https://www.fpi.nsdl.co.in/web/Reports/Latest.aspx','https://www.fpi.nsdl.co.in/web/Reports/Yearwise.aspx?RptType=6',
- 'https://www.amfiindia.com/research-information/amfi-monthly','https://portal.amfiindia.com/spages/NAVAll.txt',
- 'https://www.fbil.org.in/','https://www.ccilindia.com/','https://grid-india.in/en/reports/daily-psp-report','https://report.grid-india.in/',
- 'https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx','https://rbi.org.in/Scripts/AnnualPolicy.aspx','https://www.mospi.gov.in/advance-release-calendar',
- 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT','https://api.exchange.coinbase.com/products/BTC-USD/ticker','https://open.er-api.com/v6/latest/USD']
-for u in U:
-    s,b,n=g(u); t=b.decode('utf8','replace'); t=re.sub(r'<script[\s\S]*?</script>|<style[\s\S]*?</style>','',t); t=re.sub(r'<[^>]+>',' ',t); t=re.sub(r'\s+',' ',t)
-    print('###',u,'|',s,n,'|',t[:260])
+    try: r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=45); return r.read().decode('utf8','replace')
+    except Exception as e: return 'ERR '+str(e)[:120]
+d=g('https://api.mospi.gov.in/api-docs/'); print('DOCS', re.findall(r'(?:src|href)="([^"]+)"', d)[:20]); print(d[:600])
+for js in re.findall(r'src="([^"]+\.js)"', d):
+    u=js if js.startswith('http') else 'https://api.mospi.gov.in/api-docs/'+js.lstrip('./')
+    t=g(u); print('JS',u,len(t)); print(' urls:', sorted(set(re.findall(r'["\'](/api/[a-zA-Z0-9_/]+)["\']', t)))[:200]); print(' spec:', re.findall(r'url\s*:\s*["\']([^"\']+)', t)[:5])
+f=g('https://www.fpi.nsdl.co.in/web/Reports/Latest.aspx'); i=f.find('<table'); print('NSDL', re.sub(r'\s+',' ',re.sub(r'<[^>]+>','|',f[i:i+6000]))[:1800])
+a=g('https://www.amfiindia.com/research-information/amfi-monthly'); print('AMFI', re.findall(r'href="([^"]+(?:xls|xlsx)[^"]*)"', a, re.I)[:6])
