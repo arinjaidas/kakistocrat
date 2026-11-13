@@ -374,8 +374,8 @@ def wpi_mospi():
     years = {k[:4] for v in have['series'].values() for k, _ in v}
     now = dt.date.today().year
     mi = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
-    for yr in range(2013, now + 1):
-        if str(yr) in years and yr < now - 0: continue
+    todo = [yr for yr in range(now, 2012, -1) if yr == now or str(yr) not in years][:4]   # current year plus up to three missing years a run, newest first
+    for yr in todo:
         try: rows = mospi_pages('wpi/getWpiRecords', {'year': yr, 'Format': 'JSON'})
         except Exception as e: print('  WPI', yr, e); continue
         for r in rows:
@@ -386,6 +386,7 @@ def wpi_mospi():
             d = f"{yr}-{mi[r['month']]:02d}"
             ser = dict(have['series'].get(k, [])); ser[d] = v; have['series'][k] = sorted(ser.items())
         print('  WPI', yr, len(rows), 'rows')
+        have['source'] = 'MoSPI WPI (base 2011-12=100) via api.mospi.gov.in'; json.dump(have, open(path, 'w'), separators=(',', ':'))
     have['source'] = 'MoSPI WPI (base 2011-12=100) via api.mospi.gov.in'
     json.dump(have, open(path, 'w'), separators=(',', ':'))
     print('WPI history:', len(have['series']), 'series')
