@@ -367,6 +367,28 @@ def mospi_pages(path, params):
         out += j.get('data') or []
         if page >= (j.get('meta_data') or {}).get('totalPages', 1): return out
         page += 1; time.sleep(0.3)
+def cpi_mospi():
+    """All-India CPI (2012=100) from MoSPI's API: every sector (rural/urban/combined), group and subgroup, Jan 2011 to Dec 2025.
+    The 2024-base series that started in 2026 is not in the API yet; its releases are in data/tape.json."""
+    path = os.path.join(OUT, 'cpi_hist.json')
+    have = json.load(open(path)) if os.path.exists(path) else {}
+    if have.get('last', '') >= '2025-12': print('CPI history: complete to', have['last']); return
+    rows = []
+    for yr in range(2011, 2026):
+        try: rows += mospi_pages('cpi/getCPIIndex', {'base_year': 2012, 'year': yr, 'state_code': 99, 'Format': 'JSON'})
+        except Exception as e: print('  CPI', yr, e)
+    mi = {m: i + 1 for i, m in enumerate(['January','February','March','April','May','June','July','August','September','October','November','December'])}
+    ser = {}
+    for r in rows:
+        if r.get('state') != 'All India' or r.get('month') not in mi: continue
+        k = f"{r.get('sector')}|{r.get('group')}|{r.get('subgroup')}"
+        d = f"{r['year']}-{mi[r['month']]:02d}"
+        ser.setdefault(k, {})[d] = [num(str(r.get('index'))), num(str(r.get('inflation')))]
+    out = {'source': 'MoSPI CPI (base 2012=100) via api.mospi.gov.in, All India', 'series': {k: sorted([[d, *v] for d, v in s_.items()]) for k, s_ in ser.items()}}
+    out['last'] = max((v[-1][0] for v in out['series'].values()), default='')
+    json.dump(out, open(path, 'w'), separators=(',', ':'))
+    print('CPI history:', len(rows), 'rows,', len(out['series']), 'series, to', out['last'])
+
 def iip():
     MON = {m: i + 1 for i, m in enumerate(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'])}
     series = {}
@@ -598,7 +620,7 @@ def portwatch():
     print('PortWatch:', {k: (v['d'][-1], v['total'][-1]) for k, v in out.items()})
 
 if __name__ == '__main__':
-    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
+    steps = [('fred', fred), ('fx', fx), ('worldbank', worldbank), ('crypto', crypto), ('imf_wdi', imf_wdi), ('portwatch', portwatch), ('imf_world', imf_world), ('rbi_fx', rbi_fx), ('rbi_rates', rbi_rates), ('rbi_money', rbi_money), ('india_monthly', india_monthly), ('iip', iip), ('cpi_mospi', cpi_mospi), ('ogd', ogd), ('nse500', nse500), ('comtrade', comtrade)]
     if '--quick' in sys.argv:  # Cloudflare builds: just the fast daily sources; the GitHub workflow refreshes and commits everything else
         steps = [(n, f) for n, f in steps if n in ('fred', 'fx', 'crypto', 'portwatch')] + [('nse500', lambda: nse500(days=3))]
     if '--only' in sys.argv:
