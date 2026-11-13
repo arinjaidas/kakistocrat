@@ -2,14 +2,14 @@
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace';
-  const INK = '#15171A', RULE = '#E2DFD8', MUTE = '#6B7078', UP = '#0F6B3A', DN = '#B42318', BLUE = '#1D4ED8', SAFF = '#E8730C';
-  const PAL = ['#1D4ED8', '#B42318', '#0F766E', '#B45309', '#7C3AED', '#3F6212', '#0E7490', '#9D174D', '#57534E', '#A16207', '#4338CA', '#15803D', '#BE123C', '#64748B'];
+  const INK = '#17202C', RULE = '#D9DED3', MUTE = '#555A61', UP = '#5F7F14', DN = '#B5367A', BLUE = '#1C7C99', SAFF = '#E8730C';
+  const PAL = ['#1C7C99', '#B5367A', '#5F7F14', '#B87708', '#6D5BA8', '#5E6B4E', '#1C7C99', '#8A2457', '#57534E', '#B87708', '#6D5BA8', '#5F7F14', '#BE123C', '#64748B'];
   const nf = (v, d = 2) => v == null ? '—' : Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
   const NAME = { INR: 'Indian rupee', EUR: 'Euro', GBP: 'British pound', JPY: 'Japanese yen', CNY: 'Chinese yuan', KRW: 'Korean won', IDR: 'Indonesian rupiah', MYR: 'Malaysian ringgit', PHP: 'Philippine peso', THB: 'Thai baht', SGD: 'Singapore dollar', BRL: 'Brazilian real', MXN: 'Mexican peso', ZAR: 'South African rand', TRY: 'Turkish lira' };
   const charts = [];
   const mk = id => { const el = document.getElementById(id); if (!el) return null; const c = echarts.init(el, null, { renderer: 'canvas' }); charts.push(c); return c; };
   addEventListener('resize', () => charts.forEach(c => c.resize()));
-  const axis = (extra = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...extra });
+  const axis = (extra = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...extra });
   const tip = (extra = {}) => ({ trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontFamily: FONT, fontSize: 12 }, ...extra });
   const base = () => ({ textStyle: { fontFamily: FONT }, grid: { left: 56, right: 24, top: 28, bottom: 40 }, animationDuration: 500 });
   const seg = (root, cb) => root && $$('button', root).forEach(b => b.addEventListener('click', () => { $$('button', root).forEach(x => x.removeAttribute('aria-pressed')); b.setAttribute('aria-pressed', 'true'); cb(b.dataset.r || b.dataset.x); }));
@@ -73,7 +73,7 @@
             label: { show: true, position: 'top', formatter: p => `${p.name} ${nf(p.value[1])}%`, color: SAFF, fontWeight: 700, fontSize: 11 } }] });
     }
     if (us && Fr.DGS10) {
-      const ids = [['DFF', 'Fed funds', SAFF], ['DGS2', '2-year', BLUE], ['DGS10', '10-year', INK], ['T10YIE', '10-year breakeven inflation', '#0F766E']].filter(t => Fr[t[0]]);
+      const ids = [['DFF', 'Fed funds', SAFF], ['DGS2', '2-year', BLUE], ['DGS10', '10-year', INK], ['T10YIE', '10-year breakeven inflation', '#5F7F14']].filter(t => Fr[t[0]]);
       const all = [...new Set(ids.flatMap(t => Fr[t[0]].pts.map(p => p[0])))].sort();
       us.setOption({ ...base(), tooltip: tip({ valueFormatter: v => v == null ? '—' : nf(v) + '%' }), legend: { top: 0, textStyle: { color: MUTE, fontSize: 11 } }, grid: { left: 48, right: 24, top: 40, bottom: 70 },
         dataZoom: [{ type: 'inside' }, { type: 'slider', height: 18, bottom: 8, borderColor: RULE }],

@@ -1,7 +1,7 @@
 /* District explorer. Loads /geo/india-districts.json and /api/districts.json. */
 (function () {
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078';
-  const RAMP = ['#F4EFE6', '#D9E4D0', '#A9CBA6', '#6FA77D', '#3A7F57', '#0B5A2F'], RAMP_BAD = ['#F6F0E8', '#F2D3C4', '#E5A08A', '#CF6B55', '#AF3B2C', '#7A1A12'];
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61';
+  const RAMP = ['#F5F0E9', '#E6D6C3', '#CDAE8C', '#A67D57', '#7B4B2A', '#4E2E18'], RAMP_BAD = ['#F7EFF3', '#EDCFDE', '#DB9CBD', '#C4689A', '#A23E76', '#6F1F4D'];
   const BAD = new Set(['stunt', 'anae', 'agri']);
   const slug = s => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const go = async () => { if (!window.echarts) return setTimeout(go, 60);
@@ -16,8 +16,8 @@
       const ramp = BAD.has(K) ? RAMP_BAD : RAMP;
       const mapName = st ? 'IND_' + st : 'IND'; if (st && !echarts.getMap(mapName)) echarts.registerMap(mapName, { type: 'FeatureCollection', features: geo.features.filter(f => f.properties.st === st) });
       ch.setOption({ textStyle: { fontFamily: FONT }, tooltip: { formatter: p => { const d = D.districts[p.name]; return d ? `<b>${d.n}</b>, ${d.st}<br>${I.label}: ${fmt(K, I.values[p.name])}` : ''; } },
-        visualMap: { type: 'piecewise', pieces: pieces.map((p, i) => ({ ...p, color: ramp[i + 1], label: `${fmt(K, p.min)} – ${fmt(K, p.max)}` })), left: 6, bottom: 6, itemWidth: 14, itemHeight: 10, textStyle: { color: MUTE, fontFamily: MONO, fontSize: 10 }, outOfRange: { color: '#E8E5DE' } },
-        series: [{ type: 'map', map: mapName, roam: true, scaleLimit: { min: 0.8, max: 20 }, selectedMode: 'single', itemStyle: { borderColor: '#fff', borderWidth: 0.4, areaColor: '#E8E5DE' }, emphasis: { label: { show: false }, itemStyle: { areaColor: '#F59E0B' } }, select: { label: { show: false }, itemStyle: { areaColor: '#F59E0B', borderColor: INK, borderWidth: 1 } },
+        visualMap: { type: 'piecewise', pieces: pieces.map((p, i) => ({ ...p, color: ramp[i + 1], label: `${fmt(K, p.min)} – ${fmt(K, p.max)}` })), left: 6, bottom: 6, itemWidth: 14, itemHeight: 10, textStyle: { color: MUTE, fontFamily: MONO, fontSize: 10 }, outOfRange: { color: '#E6EAE2' } },
+        series: [{ type: 'map', map: mapName, roam: true, scaleLimit: { min: 0.8, max: 20 }, selectedMode: 'single', itemStyle: { borderColor: '#fff', borderWidth: 0.4, areaColor: '#E6EAE2' }, emphasis: { label: { show: false }, itemStyle: { areaColor: '#D4A03A' } }, select: { label: { show: false }, itemStyle: { areaColor: '#D4A03A', borderColor: INK, borderWidth: 1 } },
           data: Object.keys(D.districts).filter(c => !st || D.districts[c].st === st).map(c => ({ name: c, value: I.values[c] ?? NaN })) }] }, true);
       $('ds-src').textContent = `${I.label}, ${I.unit}. Source: ${I.source}. Grey: no data. Darker = ${BAD.has(K) ? 'worse' : 'higher'}. Scroll to zoom, drag to pan.`;
       const ranked = Object.entries(I.values).filter(([c]) => !st || D.districts[c]?.st === st).sort((a, b) => b[1] - a[1]);

@@ -1,9 +1,9 @@
 /* Entity pages: series chart with compare, state locator map, and the explore network. */
 (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078', RULE = '#E2DFD8', RED = '#B42318', BLUE = '#1D4ED8';
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61', RULE = '#D9DED3', RED = '#B5367A', BLUE = '#1C7C99';
   const nf = (v, d = 2) => v == null ? '—' : Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
-  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...x });
+  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...x });
   const slug = t => t.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => navigator.clipboard?.writeText(b.dataset.copy).then(() => { const t = b.textContent; b.textContent = 'Copied'; setTimeout(() => b.textContent = t, 1400); })));
   const ready = fn => { if (window.echarts) fn(); else setTimeout(() => ready(fn), 60); };
@@ -58,7 +58,7 @@
   /* ---- explore: network of co-mentions ---- */
   if (window.__NET) ready(() => {
     const N = window.__NET, c = echarts.init($('#ex-net')); addEventListener('resize', () => c.resize());
-    const COL = { state: '#F59E0B', country: '#60A5FA', series: '#F87171' };
+    const COL = { state: '#D4A03A', country: '#60A5FA', series: '#F87171' };
     c.setOption({ tooltip: { formatter: p => p.dataType === 'node' ? `<b>${p.data.name}</b><br>${p.data.value} articles` : `${p.data.source} — ${p.data.target}: ${p.data.value} articles together` },
       legend: { data: ['state', 'country', 'series'].map(n => ({ name: n })), formatter: n => ({ state: 'States', country: 'Countries', series: 'Commodities and indicators' }[n]), textStyle: { color: '#D1D5DB' }, top: 10 },
       series: [{ type: 'graph', layout: 'force', roam: true, draggable: true, categories: ['state', 'country', 'series'].map(n => ({ name: n, itemStyle: { color: COL[n] } })),

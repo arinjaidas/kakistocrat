@@ -29,16 +29,16 @@
     const i0 = meta.freq === 'annual' ? 0 : startFor(d, range); d = d.slice(i0); v = v.slice(i0);
     const proj = meta.freq === 'annual' ? d.findIndex(x => x > today) : -1;
     const first = v.find(x => x != null), last = v.filter(x => x != null).at(-1), chg = first ? (last / first - 1) * 100 : null;
-    const col = chg == null || chg >= 0 ? '#22C55E' : '#EF4444';
+    const col = chg == null || chg >= 0 ? '#22C55E' : '#B5367A';
     $('#t-ct').textContent = (meta.name || cur).toUpperCase();
     $('#t-cs').innerHTML = `${meta.unit || ''} · ${meta.freq || ''} · ${meta.source || ''} · last ${nf(last)}${chg != null && meta.freq !== 'annual' ? ` · <span class="${chg >= 0 ? 't-up' : 't-dn'}">${chg >= 0 ? '+' : '−'}${Math.abs(chg).toFixed(2)}% over ${range}</span>` : ''}${proj > 0 ? ' · dashed = projection' : ''} · ${meta.hidden ? '' : `<a href="/s/${cur}/">full page →</a>`} · <a href="/charts/#s=${cur}:lvl">workbench →</a>`;
     const lbl = meta.freq === 'annual' ? d.map(x => x.slice(0, 4)) : meta.freq === 'monthly' ? d.map(x => x.slice(0, 7)) : d;
     const split = proj > 0 ? [v.map((x, i) => i < proj ? x : null), v.map((x, i) => i >= proj - 1 ? x : null)] : [v];
     chart.setOption({ backgroundColor: 'transparent', animationDuration: 300, grid: { left: 58, right: 16, top: 12, bottom: 28 },
-      tooltip: { trigger: 'axis', backgroundColor: '#0B0D10', borderColor: '#F59E0B', textStyle: { color: '#E5E7EB', fontFamily: MONO, fontSize: 12 }, valueFormatter: x => nf(x) },
+      tooltip: { trigger: 'axis', backgroundColor: '#0B0D10', borderColor: '#D4A03A', textStyle: { color: '#E5E7EB', fontFamily: MONO, fontSize: 12 }, valueFormatter: x => nf(x) },
       xAxis: { type: 'category', data: lbl, boundaryGap: false, axisLine: { lineStyle: { color: '#374151' } }, axisLabel: { color: '#9CA3AF', fontFamily: MONO, fontSize: 10 }, axisTick: { show: false } },
       yAxis: { type: 'value', scale: true, axisLabel: { color: '#9CA3AF', fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#1F2937' } } },
-      series: split.map((data, k) => ({ type: 'line', data, showSymbol: false, connectNulls: false, markLine: k ? undefined : (() => { const ev = EVT.filter(e => !e.series.length || e.series.some(t => t.endsWith('*') ? cur.startsWith(t.slice(0, -1)) : t === cur)).map(e => [e, lbl.find(x => x >= e.date.slice(0, lbl[0].length))]).filter(x => x[1] && x[1] !== lbl[0]); return ev.length ? { symbol: 'none', lineStyle: { color: '#F59E0B', type: 'dashed', opacity: 0.5 }, label: { formatter: p => p.name, color: '#F59E0B', fontFamily: MONO, fontSize: 10, position: 'insideEndTop' }, data: ev.map(([e, x]) => ({ xAxis: x, name: e.short })) } : undefined; })(), lineStyle: { color: col, width: 1.8, type: k ? 'dashed' : 'solid' }, itemStyle: { color: col },
+      series: split.map((data, k) => ({ type: 'line', data, showSymbol: false, connectNulls: false, markLine: k ? undefined : (() => { const ev = EVT.filter(e => !e.series.length || e.series.some(t => t.endsWith('*') ? cur.startsWith(t.slice(0, -1)) : t === cur)).map(e => [e, lbl.find(x => x >= e.date.slice(0, lbl[0].length))]).filter(x => x[1] && x[1] !== lbl[0]); return ev.length ? { symbol: 'none', lineStyle: { color: '#D4A03A', type: 'dashed', opacity: 0.5 }, label: { formatter: p => p.name, color: '#D4A03A', fontFamily: MONO, fontSize: 10, position: 'insideEndTop' }, data: ev.map(([e, x]) => ({ xAxis: x, name: e.short })) } : undefined; })(), lineStyle: { color: col, width: 1.8, type: k ? 'dashed' : 'solid' }, itemStyle: { color: col },
         areaStyle: k ? undefined : { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: col + '44' }, { offset: 1, color: col + '00' }] } } })) }, true);
     $$('tr[data-s]').forEach(r => r.classList.toggle('on', r.dataset.s === cur));
   };

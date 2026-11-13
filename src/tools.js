@@ -3,7 +3,7 @@
   const T = window.__T; if (!T) return;
   const $ = s => document.querySelector(s), num = el => parseFloat(el.value);
   const fmt = (v, d = 2) => Number.isFinite(v) ? v.toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
-  const C = ['#b3261e', '#1f4e79', '#c98a1b', '#2e7d5b'];
+  const C = ['#B5367A', '#1C7C99', '#c98a1b', '#5F7F14'];
   const chart = id => { const el = document.getElementById(id); if (!el || !window.echarts) return null; const c = echarts.init(el); addEventListener('resize', () => c.resize()); return c; };
   const ready = f => window.echarts ? f() : addEventListener('load', f);
 
@@ -19,7 +19,7 @@
       const c = T.divisions.map((d, i) => ({ n: d.short || d.name, v: sp[i] / tot * d.inflation, o: d.weight / 100 * d.inflation })).sort((a, b) => b.v - a.v);
       bars && bars.setOption({ grid: { left: 110, right: 20, top: 26, bottom: 20 }, legend: { top: 0, textStyle: { fontSize: 11 } }, tooltip: { trigger: 'axis', valueFormatter: v => fmt(v) + ' pts' },
         xAxis: { type: 'value', name: 'points of inflation', nameLocation: 'middle', nameGap: 22 }, yAxis: { type: 'category', inverse: true, data: c.map(x => x.n), axisLabel: { fontSize: 11 } },
-        series: [{ name: 'You', type: 'bar', data: c.map(x => +x.v.toFixed(3)), color: C[0] }, { name: 'Official basket', type: 'bar', data: c.map(x => +x.o.toFixed(3)), color: '#c9c3b4' }] }, true);
+        series: [{ name: 'You', type: 'bar', data: c.map(x => +x.v.toFixed(3)), color: C[0] }, { name: 'Official basket', type: 'bar', data: c.map(x => +x.o.toFixed(3)), color: '#C9CFC3' }] }, true);
     };
     ins.forEach(i => i.addEventListener('input', run));
     $('#tl-official').addEventListener('click', () => { ins.forEach((i, k) => i.value = Math.round(T.divisions[k].weight * 1000)); run(); });

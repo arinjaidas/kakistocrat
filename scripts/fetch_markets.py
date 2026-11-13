@@ -339,11 +339,12 @@ def rbi_money(limit=150):
             d = _fortnight(t)
             if d:
                 row = cache['fortnights'].setdefault(d, {})
+                ok = lambda v: v if v is not None and -60 < v < 80 and v != 0 else None  # growth columns only: older layouts end rows with a ₹ crore change
                 if sec == 3:
-                    row.update({k: v for k, v in {'deposits': _first_num(t, r'2\.1 Aggregate Deposits'), 'deposits_yoy': _last_num(t, r'2\.1a Growth \(Per cent\)'), 'credit': _first_num(t, r'\|\s*7 Bank Credit'),
-                                'credit_yoy': _last_num(t, r'7\.1a Growth \(Per cent\)'), 'nonfood': _first_num(t, r'7a\.2 Non-food credit'), 'gsec': _first_num(t, r'6\.1 Government Securities')}.items() if v is not None})
+                    row.update({k: v for k, v in {'deposits': _first_num(t, r'2\.1 Aggregate Deposits'), 'deposits_yoy': ok(_last_num(t, r'2\.1a Growth \(Per cent\)')), 'credit': _first_num(t, r'\|\s*7 Bank Credit'),
+                                'credit_yoy': ok(_last_num(t, r'7\.1a Growth \(Per cent\)')), 'nonfood': _first_num(t, r'7a\.2 Non-food credit'), 'gsec': _first_num(t, r'6\.1 Government Securities')}.items() if v is not None})
                 else:
-                    row.update({k: v for k, v in {'m3': _nth_num(t, r'\|\s*M3\s', 1), 'm3_yoy': _last_num(t, r'\|\s*M3\s'), 'cic_yoy': _last_num(t, r'1\.1 Currency with the Public'), 'bccs_yoy': _last_num(t, r'2\.2 Bank Credit to Commercial Sector')}.items() if v is not None})
+                    row.update({k: v for k, v in {'m3': _nth_num(t, r'\|\s*M3\s', 1), 'm3_yoy': ok(_last_num(t, r'\|\s*M3\s')), 'cic_yoy': ok(_last_num(t, r'1\.1 Currency with the Public')), 'bccs_yoy': ok(_last_num(t, r'2\.2 Bank Credit to Commercial Sector'))}.items() if v is not None})
             seen.add(f'{sec}:{i}')
             if n % 50 == 49: cache['seen'] = sorted(seen); json.dump(cache, open(path, 'w')); print(f'  rbi_money s{sec} {n + 1}/{len(ids)}')
             time.sleep(0.25)

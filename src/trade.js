@@ -1,9 +1,9 @@
 /* India's trade page charts. Data: window.__TR */
 (function () {
   const T = window.__TR; if (!T) return;
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078', RULE = '#E2DFD8', G = '#0F6B3A', R = '#B42318';
-  const PAL = ['#1D4ED8', '#B42318', '#0F766E', '#B45309', '#7C3AED', '#3F6212', '#0E7490', '#9D174D', '#57534E', '#A16207', '#4338CA', '#15803D'];
-  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...x });
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61', RULE = '#D9DED3', G = '#5F7F14', R = '#B5367A';
+  const PAL = ['#1C7C99', '#B5367A', '#5F7F14', '#B87708', '#6D5BA8', '#5E6B4E', '#1C7C99', '#8A2457', '#57534E', '#B87708', '#6D5BA8', '#5F7F14'];
+  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...x });
   const tip = { trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontFamily: FONT, fontSize: 12 }, valueFormatter: v => v == null ? '—' : '$' + v.toFixed(1) + 'bn' };
   const b = v => v == null ? null : +(v / 1e9).toFixed(2);
   const go = () => { if (!window.echarts) return setTimeout(go, 60);

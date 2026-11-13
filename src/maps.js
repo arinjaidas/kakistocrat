@@ -2,7 +2,7 @@
 (function () {
   const POSTERS = window.__MAPS || [], W = 1080, H = 1350;
   const SERIF = 'Newsreader, Georgia, serif', SANS = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace';
-  const BG = '#FAF6EE', INK = '#15171A', MUTE = '#6B7078', NODATA = '#DCD6CA';
+  const BG = '#FAF6EE', INK = '#17202C', MUTE = '#555A61', NODATA = '#DCD6CA';
   const POS = { 'Jammu & Kashmir': [74.9, 33.5], 'Himachal Pradesh': [77.3, 31.9], 'Punjab': [75.3, 30.8], 'Haryana': [76.1, 29.2], 'Uttarakhand': [79.3, 30.1], 'Rajasthan': [73.6, 26.7],
     'Uttar Pradesh': [80.4, 27.1], 'Bihar': [85.7, 25.8], 'Gujarat': [71.5, 22.8], 'Madhya Pradesh': [77.9, 23.6], 'Jharkhand': [85.4, 23.6], 'West Bengal': [88.2, 23.3], 'Chhattisgarh': [81.9, 21.6],
     'Odisha': [84.4, 20.4], 'Maharashtra': [75.8, 19.4], 'Telangana': [79.1, 17.9], 'Andhra Pradesh': [79.4, 15.4], 'Karnataka': [76.0, 14.7], 'Tamil Nadu': [78.4, 11.0],

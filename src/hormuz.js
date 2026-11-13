@@ -1,11 +1,11 @@
 /* Chokepoint watch charts (Apache ECharts). Data: /api/markets/portwatch.json and /api/markets/fred.json */
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078', RULE = '#E2DFD8';
-  const TYPE = [['tanker', 'Tankers', '#B42318'], ['container', 'Container ships', '#1D4ED8'], ['bulk', 'Dry bulk', '#B45309'], ['other', 'Other cargo', '#9AA0A8']];
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61', RULE = '#D9DED3';
+  const TYPE = [['tanker', 'Tankers', '#B5367A'], ['container', 'Container ships', '#1C7C99'], ['bulk', 'Dry bulk', '#B87708'], ['other', 'Other cargo', '#9AA0A8']];
   const SH = { 'Strait of Hormuz': 'Hormuz', 'Bab el-Mandeb Strait': 'Bab el-Mandeb', 'Suez Canal': 'Suez', 'Cape of Good Hope': 'Cape of Good Hope', 'Malacca Strait': 'Malacca' };
-  const COL = { 'Strait of Hormuz': '#B42318', 'Bab el-Mandeb Strait': '#B45309', 'Suez Canal': '#1D4ED8', 'Cape of Good Hope': '#0F766E', 'Malacca Strait': '#6B7078' };
-  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...x });
+  const COL = { 'Strait of Hormuz': '#B5367A', 'Bab el-Mandeb Strait': '#B87708', 'Suez Canal': '#1C7C99', 'Cape of Good Hope': '#5F7F14', 'Malacca Strait': '#555A61' };
+  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...x });
   const tip = { trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontFamily: FONT, fontSize: 12 } };
   const ma = (a, n = 7) => a.map((_, i) => { if (i < n - 1) return null; const w = a.slice(i - n + 1, i + 1).filter(x => x != null); return w.length ? +(w.reduce((s, x) => s + x, 0) / w.length).toFixed(1) : null; });
   const startFor = (d, r) => { if (r === 'All') return 0; const t = new Date(d.at(-1)); const n = parseInt(r); r.endsWith('M') ? t.setMonth(t.getMonth() - n) : t.setFullYear(t.getFullYear() - n); const iso = t.toISOString().slice(0, 10); return Math.max(0, d.findIndex(x => x >= iso)); };
@@ -27,7 +27,7 @@
         series: [...TYPE.map(([k, n, col]) => ({ name: n, type: 'bar', stack: 't', data: ser[k].slice(s), itemStyle: { color: col, opacity: 0.55 }, barCategoryGap: '10%' })),
           { name: '7-day average', type: 'line', data: ma(c.total).slice(s), showSymbol: false, lineStyle: { color: INK, width: 2.4 }, itemStyle: { color: INK }, z: 5,
             markLine: window.__HZ.base[cp] ? { silent: true, symbol: 'none', data: [{ yAxis: +window.__HZ.base[cp].toFixed(1) }], lineStyle: { color: MUTE, type: 'dotted' }, label: { formatter: '2025 average', color: MUTE, fontSize: 10, position: 'insideEndTop' } } : undefined },
-          ...(withB ? [{ name: 'Brent, $/bbl', type: 'line', yAxisIndex: 1, data: bv, showSymbol: false, lineStyle: { color: '#B45309', width: 1.6, type: 'dashed' }, itemStyle: { color: '#B45309' } }] : [])] }, true);
+          ...(withB ? [{ name: 'Brent, $/bbl', type: 'line', yAxisIndex: 1, data: bv, showSymbol: false, lineStyle: { color: '#B87708', width: 1.6, type: 'dashed' }, itemStyle: { color: '#B87708' } }] : [])] }, true);
     };
     $('#hz-cp').addEventListener('change', e => { cp = e.target.value; draw(); });
     $('#hz-brent').addEventListener('change', draw);
@@ -46,7 +46,7 @@
     if (h) cap.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 56, right: 20, top: 16, bottom: 56 }, tooltip: { ...tip, valueFormatter: v => v == null ? '—' : Math.round(v).toLocaleString('en-IN') + ' thousand t' },
       dataZoom: [{ type: 'inside' }, { type: 'slider', height: 18, bottom: 8, borderColor: RULE }],
       xAxis: axis({ type: 'category', data: h.d, boundaryGap: false }), yAxis: axis({ type: 'value' }),
-      series: [{ name: 'Tanker deadweight, 7-day avg', type: 'line', data: ma(h.capT.map(v => v == null ? null : v / 1000)), showSymbol: false, lineStyle: { color: '#B42318', width: 1.8 }, itemStyle: { color: '#B42318' }, areaStyle: { color: 'rgba(180,35,24,.12)' } }] });
+      series: [{ name: 'Tanker deadweight, 7-day avg', type: 'line', data: ma(h.capT.map(v => v == null ? null : v / 1000)), showSymbol: false, lineStyle: { color: '#B5367A', width: 1.8 }, itemStyle: { color: '#B5367A' }, areaStyle: { color: 'rgba(180,35,24,.12)' } }] });
   };
   go();
 })();

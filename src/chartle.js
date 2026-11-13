@@ -20,8 +20,8 @@
       ['Unit', ans.unit], ['Values', 'Axis numbers now shown'], ['Source', ans.source], ['First letter', ans.name[0]]].slice(0, k); };
     const draw = () => {
       const show = st.done || st.tries.length >= 4;
-      chart.setOption({ animationDuration: 600, grid: { left: show ? 56 : 16, right: 16, top: 16, bottom: 30 }, xAxis: { type: 'time', axisLabel: { show: st.done || st.tries.length >= 1, fontFamily: '"IBM Plex Mono"', color: '#6B7078' } }, yAxis: { type: 'value', scale: true, axisLabel: { show, fontFamily: '"IBM Plex Mono"', color: '#6B7078' }, splitLine: { lineStyle: { color: '#EEECE7' } } },
-        tooltip: { show }, series: [{ type: 'line', showSymbol: false, data: pts, lineStyle: { width: 2.4, color: st.done ? (st.won ? '#0F6B3A' : '#B42318') : '#15171A' }, areaStyle: { color: 'rgba(21,23,26,.06)' } }] });
+      chart.setOption({ animationDuration: 600, grid: { left: show ? 56 : 16, right: 16, top: 16, bottom: 30 }, xAxis: { type: 'time', axisLabel: { show: st.done || st.tries.length >= 1, fontFamily: '"IBM Plex Mono"', color: '#555A61' } }, yAxis: { type: 'value', scale: true, axisLabel: { show, fontFamily: '"IBM Plex Mono"', color: '#555A61' }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
+        tooltip: { show }, series: [{ type: 'line', showSymbol: false, data: pts, lineStyle: { width: 2.4, color: st.done ? (st.won ? '#5F7F14' : '#B5367A') : '#17202C' }, areaStyle: { color: 'rgba(21,23,26,.06)' } }] });
       $('#ct-clues').innerHTML = clues().map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('') || '<div><span>Clues</span><b>Each wrong guess reveals one.</b></div>';
       $('#ct-tries').innerHTML = st.tries.map(t => `<li class="${t === ans.name ? 'ok' : 'no'}">${t}</li>`).join('');
       $('#ct-in').disabled = $('#ct-go').disabled = st.done;

@@ -1,7 +1,7 @@
 /* India against the world: rankings explorer. Data: /api/world/<indicator>.json */
 (function () {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078', RED = '#B42318', RULE = '#E2DFD8';
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61', RED = '#B5367A', RULE = '#D9DED3';
   const W = window.__WD, cache = {};
   const cslug = t => t.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const ord = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
@@ -20,7 +20,7 @@
     $('#wd-nb').innerHTML = nb.map((r, k) => `<li class="${r.iso === 'IND' ? 'me' : ''}" value="${lo + k + 1}"><span><a href="/country/${W.slugs[r.iso]}/">${name(r.iso)}</a></span><b>${fmt(r.v, meta.unit)}</b></li>`).join('');
     const top = rows.slice(0, 30); if (i >= 30) top.push(rows[i]); lastTop = top;
     bars.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 130, right: 70, top: 6, bottom: 20 }, tooltip: { trigger: 'item', formatter: p => `${p.name}: ${fmt(p.value, meta.unit)} ${meta.unit.startsWith('%') ? '' : meta.unit}` },
-      xAxis: { type: 'value', axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+      xAxis: { type: 'value', axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
       yAxis: { type: 'category', inverse: true, data: top.map((r, k) => `${r.iso === 'IND' && i >= 30 ? i + 1 : k + 1}. ${name(r.iso)}`), axisTick: { show: false }, axisLine: { lineStyle: { color: RULE } }, axisLabel: { color: INK, fontSize: 11, formatter: n => /India$/.test(n) ? `{r|${n}}` : n, rich: { r: { color: RED, fontWeight: 700 } } } },
       series: [{ type: 'bar', barWidth: '70%', data: top.map(r => ({ value: r.v, itemStyle: { color: r.iso === 'IND' ? RED : '#9AA0A8', borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => fmt(p.value, meta.unit) } }] }, true);
     $('#wd-note').textContent = `Top 30 of ${rows.length} countries with data${i >= 30 ? ', plus India' : ''}. ${meta.label}, ${meta.unit}. ${+year >= W.year ? 'IMF projection.' : ''}`;
@@ -30,7 +30,7 @@
     const cut = yrs.indexOf(String(W.year));
     line.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 40, right: 20, top: 16, bottom: 30 }, tooltip: { trigger: 'axis', valueFormatter: v => v == null ? '—' : ord(v) },
       xAxis: { type: 'category', data: yrs, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10 }, axisLine: { lineStyle: { color: RULE } } },
-      yAxis: { type: 'value', inverse: true, min: 1, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+      yAxis: { type: 'value', inverse: true, min: 1, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 10 }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
       series: [{ type: 'line', data: rk.map((v, k) => k < cut ? v : null), lineStyle: { color: RED, width: 2.4 }, itemStyle: { color: RED }, symbolSize: 5 }, { type: 'line', data: rk.map((v, k) => k >= cut - 1 ? v : null), lineStyle: { color: RED, width: 2, type: 'dashed' }, itemStyle: { color: RED }, symbolSize: 4 }] }, true);
   };
   const go = () => { if (!window.echarts) return setTimeout(go, 60);

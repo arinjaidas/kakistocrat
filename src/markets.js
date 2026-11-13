@@ -3,13 +3,13 @@
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const J = u => fetch(u).then(r => r.json());
   const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace';
-  const INK = '#15171A', RULE = '#E2DFD8', MUTE = '#6B7078', UP = '#0F6B3A', DN = '#B42318';
-  const PAL = ['#15171A', '#B42318', '#1D4ED8', '#0F766E', '#B45309', '#7C3AED', '#3F6212'];
+  const INK = '#17202C', RULE = '#D9DED3', MUTE = '#555A61', UP = '#5F7F14', DN = '#B5367A';
+  const PAL = ['#17202C', '#B5367A', '#1C7C99', '#5F7F14', '#B87708', '#6D5BA8', '#5E6B4E'];
   const nf = (v, d = 2) => v == null ? '—' : Number(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
   const charts = [];
   const mk = (el) => { const c = echarts.init(el, null, { renderer: 'canvas' }); charts.push(c); return c; };
   addEventListener('resize', () => charts.forEach(c => c.resize()));
-  const axis = (extra = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...extra });
+  const axis = (extra = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...extra });
   const base = () => ({ textStyle: { fontFamily: FONT }, grid: { left: 56, right: 24, top: 28, bottom: 56 }, tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontFamily: FONT, fontSize: 12 }, axisPointer: { type: 'cross', lineStyle: { color: MUTE } } }, animationDuration: 500 });
   const startFor = (dates, r) => { if (r === 'All') return 0; const last = new Date(dates.at(-1)); const t = new Date(last); if (r === 'YTD') t.setMonth(0, 1); else { const n = parseInt(r); r.endsWith('M') ? t.setMonth(t.getMonth() - n) : t.setFullYear(t.getFullYear() - n); } const iso = t.toISOString().slice(0, 10); const i = dates.findIndex(d => d >= iso); return Math.max(0, i); };
   const seg = (root, cb) => $$('button', root).forEach(b => b.addEventListener('click', () => { $$('button', root).forEach(x => x.removeAttribute('aria-pressed')); b.setAttribute('aria-pressed', 'true'); cb(b.dataset.r); }));
@@ -72,23 +72,23 @@
     // yield curve
     const tenors = [['3M', 'DGS3MO'], ['2Y', 'DGS2'], ['10Y', 'DGS10'], ['30Y', 'DGS30']];
     const lastOf = id => F[id].pts.at(-1)[1], yAgo = id => { const p = F[id].pts, t = new Date(p.at(-1)[0]); t.setFullYear(t.getFullYear() - 1); const iso = t.toISOString().slice(0, 10); return (p.find(x => x[0] >= iso) || p[0])[1]; };
-    mk($('#mk-curve')).setOption({ ...base(), grid: { left: 44, right: 16, top: 30, bottom: 28 }, legend: { top: 0, textStyle: { fontFamily: FONT } }, xAxis: { type: 'category', data: tenors.map(t => t[0]), ...axis() }, yAxis: { type: 'value', scale: true, axisLabel: { formatter: '{value}%', color: MUTE, fontFamily: MONO }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+    mk($('#mk-curve')).setOption({ ...base(), grid: { left: 44, right: 16, top: 30, bottom: 28 }, legend: { top: 0, textStyle: { fontFamily: FONT } }, xAxis: { type: 'category', data: tenors.map(t => t[0]), ...axis() }, yAxis: { type: 'value', scale: true, axisLabel: { formatter: '{value}%', color: MUTE, fontFamily: MONO }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
       series: [{ name: 'Latest (' + F.DGS10.pts.at(-1)[0] + ')', type: 'line', data: tenors.map(t => lastOf(t[1])), lineStyle: { color: DN, width: 2.4 }, itemStyle: { color: DN }, symbolSize: 7, label: { show: true, position: 'top', formatter: '{c}%', fontFamily: MONO, fontSize: 11 } },
         { name: 'A year earlier', type: 'line', data: tenors.map(t => yAgo(t[1])), lineStyle: { color: MUTE, type: 'dashed' }, itemStyle: { color: MUTE }, symbolSize: 5 }] });
 
     // INR
     mk($('#mk-inr')).setOption({ ...base(), grid: { left: 48, right: 16, top: 16, bottom: 48 }, xAxis: { type: 'category', data: X.dates, boundaryGap: false, ...axis() }, yAxis: { type: 'value', scale: true, ...axis() }, dataZoom: [{ type: 'inside', start: 60 }, { type: 'slider', height: 18, bottom: 6, start: 60 }],
-      series: [{ type: 'line', name: '₹ per $', data: X.rates.INR, showSymbol: false, lineStyle: { color: '#1D4ED8', width: 1.8 }, itemStyle: { color: '#1D4ED8' } }] });
+      series: [{ type: 'line', name: '₹ per $', data: X.rates.INR, showSymbol: false, lineStyle: { color: '#1C7C99', width: 1.8 }, itemStyle: { color: '#1C7C99' } }] });
 
     // FX race (dollar price of each currency, rebased)
     const race = mk($('#mk-race')); const CUR = ['INR', 'CNY', 'KRW', 'IDR', 'MYR', 'PHP', 'THB', 'BRL', 'MXN', 'ZAR', 'TRY'];
     const drawRace = r => { const s0 = startFor(X.dates, r); race.setOption({ ...base(), grid: { left: 44, right: 70, top: 16, bottom: 28 }, tooltip: { ...base().tooltip, order: 'valueDesc' }, xAxis: { type: 'category', data: X.dates.slice(s0), boundaryGap: false, ...axis() }, yAxis: { type: 'value', scale: true, ...axis() },
-      series: CUR.map((c, k) => { const a = X.rates[c].slice(s0), f = a.find(v => v); return { name: c, type: 'line', showSymbol: false, data: a.map(v => v ? +(f / v * 100).toFixed(2) : null), lineStyle: { width: c === 'INR' ? 3 : 1.2, color: c === 'INR' ? DN : ['#15171A', '#1D4ED8', '#0F766E', '#B45309', '#7C3AED', '#3F6212', '#6B7078', '#9A5B00', '#334155', '#CFCBC2'][k % 10] }, itemStyle: { color: c === 'INR' ? DN : undefined }, endLabel: { show: true, formatter: '{a}', fontFamily: MONO, fontSize: 10 }, emphasis: { focus: 'series' } }; }) }, true); };
+      series: CUR.map((c, k) => { const a = X.rates[c].slice(s0), f = a.find(v => v); return { name: c, type: 'line', showSymbol: false, data: a.map(v => v ? +(f / v * 100).toFixed(2) : null), lineStyle: { width: c === 'INR' ? 3 : 1.2, color: c === 'INR' ? DN : ['#17202C', '#1C7C99', '#5F7F14', '#B87708', '#6D5BA8', '#5E6B4E', '#555A61', '#7B4B2A', '#4B5563', '#C9CFC3'][k % 10] }, itemStyle: { color: c === 'INR' ? DN : undefined }, endLabel: { show: true, formatter: '{a}', fontFamily: MONO, fontSize: 10 }, emphasis: { focus: 'series' } }; }) }, true); };
     seg($('#fx-range'), drawRace); drawRace('1Y');
 
     // BTC
     mk($('#mk-btc')).setOption({ ...base(), grid: { left: 64, right: 16, top: 16, bottom: 28 }, xAxis: { type: 'category', data: C.bitcoin.map(p => p[0]), boundaryGap: false, ...axis() }, yAxis: { type: 'value', scale: true, ...axis() },
-      series: [{ type: 'line', name: 'Bitcoin $', data: C.bitcoin.map(p => p[1]), showSymbol: false, lineStyle: { color: '#B45309', width: 1.8 }, itemStyle: { color: '#B45309' }, areaStyle: { color: 'rgba(180,83,9,.08)' } }] });
+      series: [{ type: 'line', name: 'Bitcoin $', data: C.bitcoin.map(p => p[1]), showSymbol: false, lineStyle: { color: '#B87708', width: 1.8 }, itemStyle: { color: '#B87708' }, areaStyle: { color: 'rgba(180,83,9,.08)' } }] });
   });
 
   /* ---------- COMMODITIES ---------- */
@@ -115,7 +115,7 @@
     ids.forEach((id, yi) => cols.forEach((m, xi) => { const i = M - 12 + xi, v = W.series[id].v[i], p = W.series[id].v[i - 12]; data.push([xi, yi, v != null && p ? +((v / p - 1) * 100).toFixed(1) : '-']); }));
     mk($('#cm-heat')).setOption({ tooltip: { formatter: p => `${W.series[ids[p.value[1]]].name}, ${cols[p.value[0]]}: ${p.value[2]}% y/y` }, grid: { left: 150, right: 20, top: 10, bottom: 60 },
       xAxis: { type: 'category', data: cols, axisLabel: { fontFamily: MONO, fontSize: 10, color: MUTE }, splitArea: { show: false } }, yAxis: { type: 'category', data: ids.map(id => W.series[id].name), axisLabel: { fontFamily: FONT, fontSize: 11, color: INK }, inverse: true },
-      visualMap: { min: -40, max: 40, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 220, text: ['+40%', '−40%'], textStyle: { fontFamily: MONO, fontSize: 10 }, inRange: { color: ['#0F6B3A', '#7FB894', '#F4F2ED', '#E8968E', '#B42318'] } },
+      visualMap: { min: -40, max: 40, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 220, text: ['+40%', '−40%'], textStyle: { fontFamily: MONO, fontSize: 10 }, inRange: { color: ['#5F7F14', '#7FB894', '#F2F4EF', '#E8968E', '#B5367A'] } },
       series: [{ type: 'heatmap', data, label: { show: true, fontSize: 9, fontFamily: MONO, formatter: p => p.value[2] === '-' ? '' : Math.round(p.value[2]) }, itemStyle: { borderColor: '#fff', borderWidth: 1 } }] });
   });
 })();

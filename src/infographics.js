@@ -1,9 +1,9 @@
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const wait = fn => window.echarts ? fn() : setTimeout(() => wait(fn), 60);
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', SERIF = '"Newsreader", Georgia, serif', INK = '#15171A', MUTE = '#6B7078';
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', SERIF = '"Newsreader", Georgia, serif', INK = '#17202C', MUTE = '#555A61';
   const Y = window.__IGYEAR, charts = {};
-  const FLAG = { IND: '#B42318', CHN: '#B45309', USA: '#1D4ED8', IDN: '#0F766E', VNM: '#3F6212', BRA: '#7C3AED', MEX: '#334155', ZAF: '#9A5B00', TUR: '#6B7078', BGD: '#0F6B3A', PHL: '#1E3A8A', DEU: '#15171A', JPN: '#BE185D', GBR: '#475569' };
+  const FLAG = { IND: '#B5367A', CHN: '#B87708', USA: '#1C7C99', IDN: '#5F7F14', VNM: '#5E6B4E', BRA: '#6D5BA8', MEX: '#4B5563', ZAF: '#7B4B2A', TUR: '#555A61', BGD: '#5F7F14', PHL: '#16506A', DEU: '#17202C', JPN: '#B5367A', GBR: '#4B5563' };
   wait(async () => {
     const [IG, W] = await Promise.all([fetch('/api/infographics.json').then(r => r.json()), fetch('/api/markets/world.json').then(r => r.json())]);
     const mk = id => (charts[id] = echarts.init($('#' + id)));
@@ -13,8 +13,8 @@
     if ($('#ig-rupee')) {
     // 1. Budget rupee sankey
     const R = IG.rupee, MID = 'The Budget rupee';
-    const srcCol = n => /Borrow/.test(n) ? '#B42318' : /tax|Customs|excise/i.test(n) ? '#15171A' : '#6B7078';
-    const useCol = n => /Interest/.test(n) ? '#B42318' : /States|Finance Commission|Centrally/.test(n) ? '#1D4ED8' : /Defence/.test(n) ? '#334155' : '#0F766E';
+    const srcCol = n => /Borrow/.test(n) ? '#B5367A' : /tax|Customs|excise/i.test(n) ? '#17202C' : '#555A61';
+    const useCol = n => /Interest/.test(n) ? '#B5367A' : /States|Finance Commission|Centrally/.test(n) ? '#1C7C99' : /Defence/.test(n) ? '#4B5563' : '#5F7F14';
     mk('ig-rupee').setOption({ textStyle: { fontFamily: FONT }, tooltip: { formatter: p => p.dataType === 'edge' ? `${p.data.source === MID ? p.data.target : p.data.source}: <b>${p.data.value} paise</b> in every rupee` : `<b>${p.name}</b>` },
       series: [{ type: 'sankey', left: 10, right: 300, top: 20, bottom: 20, nodeWidth: 16, nodeGap: 10, layoutIterations: 0, draggable: false, emphasis: { focus: 'adjacency' },
         label: { fontFamily: FONT, fontSize: 13, color: INK, formatter: p => p.name === MID ? '' : `{n|${p.name}}  {v|${p.value}p}`, rich: { n: { fontFamily: FONT, fontSize: 13 }, v: { fontFamily: MONO, fontSize: 12, fontWeight: 700, color: INK } } },
@@ -33,7 +33,7 @@
     const years = Array.from({ length: Y + 5 - 1990 + 1 }, (_, i) => 1990 + i);
     const race = mk('ig-race');
     const drawYear = y => { const rows = Object.keys(C).map(k => ({ k, n: C[k], v: G[k]?.[String(y)] })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
-      race.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 130, right: 90, top: 20, bottom: 30 }, xAxis: { max: 'dataMax', axisLabel: { fontFamily: MONO, color: MUTE, formatter: v => v >= 1000 ? `$${(v / 1000).toFixed(0)}tn` : `$${v}bn` }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+      race.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 130, right: 90, top: 20, bottom: 30 }, xAxis: { max: 'dataMax', axisLabel: { fontFamily: MONO, color: MUTE, formatter: v => v >= 1000 ? `$${(v / 1000).toFixed(0)}tn` : `$${v}bn` }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
         yAxis: { type: 'category', inverse: true, data: rows.map(r => r.n), animationDuration: 300, animationDurationUpdate: 300, axisLabel: { fontFamily: FONT, fontSize: 13, color: INK, fontWeight: 600 } },
         series: [{ type: 'bar', realtimeSort: true, data: rows.map(r => ({ value: +r.v.toFixed(0), itemStyle: { color: FLAG[r.k] || INK } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 12, formatter: p => p.value >= 1000 ? `$${(p.value / 1000).toFixed(2)}tn` : `$${p.value}bn` }, barCategoryGap: '22%' }],
         graphic: [{ type: 'text', right: 30, bottom: 50, style: { text: String(y) + (y >= Y ? ' (IMF projection)' : ''), font: `600 ${y >= Y ? 34 : 54}px ${MONO}`, fill: 'rgba(21,23,26,.18)' } }],
@@ -49,8 +49,8 @@
     const bub = mk('ig-bub');
     const drawBub = y => { const pts = Object.keys(C).map(k => ({ k, n: C[k], g: W.imf.NGDP_RPCH.data[k]?.[String(y)], i: W.imf.PCPIPCH.data[k]?.[String(y)], s: G[k]?.[String(y)] })).filter(p => p.g != null && p.i != null && p.s != null);
       bub.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 60, right: 30, top: 30, bottom: 50 }, tooltip: { formatter: p => `<b>${p.data.n}</b> ${y}${y >= Y ? ' (projection)' : ''}<br>Growth ${p.data.value[1]}%<br>Inflation ${p.data.raw}%<br>GDP $${(p.data.value[2] / 1000).toFixed(2)}tn` },
-        xAxis: { name: 'Consumer price inflation, % (log scale)', type: 'log', logBase: 2, min: 0.5, nameLocation: 'middle', nameGap: 30, nameTextStyle: { fontFamily: FONT, color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#EEECE7' } } },
-        yAxis: { name: 'Real GDP growth, %', nameTextStyle: { fontFamily: FONT, color: MUTE }, scale: true, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+        xAxis: { name: 'Consumer price inflation, % (log scale)', type: 'log', logBase: 2, min: 0.5, nameLocation: 'middle', nameGap: 30, nameTextStyle: { fontFamily: FONT, color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
+        yAxis: { name: 'Real GDP growth, %', nameTextStyle: { fontFamily: FONT, color: MUTE }, scale: true, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
         series: [{ type: 'scatter', data: pts.map(p => ({ n: p.n, value: [Math.max(0.5, p.i), p.g, p.s], raw: p.i, itemStyle: { color: FLAG[p.k], opacity: p.k === 'IND' ? 0.95 : 0.6, borderColor: '#fff', borderWidth: 1 } })), symbolSize: d => 10 + Math.sqrt(d[2] / 32000) * 70,
           label: { show: true, formatter: p => p.data.n, position: 'top', fontFamily: FONT, fontSize: 11, color: INK }, animationDurationUpdate: 600 }] }, true); };
     drawBub(Y); $('#ig-by').addEventListener('change', e => drawBub(+e.target.value));
@@ -61,10 +61,10 @@
     const yy = String(Y);
     const pts = Object.keys(C).map(k => ({ k, n: C[k], d: W.imf.GGXWDG_NGDP.data[k]?.[yy], b: W.imf.GGXCNL_NGDP.data[k]?.[yy] })).filter(p => p.d != null && p.b != null);
     mk('ig-debt').setOption({ textStyle: { fontFamily: FONT }, grid: { left: 70, right: 30, top: 40, bottom: 50 }, tooltip: { formatter: p => `<b>${p.data.n}</b> ${Y} (IMF projection)<br>Debt ${p.data.value[0]}% of GDP<br>Overall balance ${p.data.value[1]}% of GDP` },
-      xAxis: { name: 'General government gross debt, % of GDP', nameLocation: 'middle', nameGap: 30, nameTextStyle: { color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#EEECE7' } } },
-      yAxis: { name: 'Overall balance, % of GDP (negative = deficit)', nameTextStyle: { color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#EEECE7' } } },
+      xAxis: { name: 'General government gross debt, % of GDP', nameLocation: 'middle', nameGap: 30, nameTextStyle: { color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
+      yAxis: { name: 'Overall balance, % of GDP (negative = deficit)', nameTextStyle: { color: MUTE }, axisLabel: { fontFamily: MONO, color: MUTE }, splitLine: { lineStyle: { color: '#E6EAE2' } } },
       series: [{ type: 'scatter', symbolSize: 16, data: pts.map(p => ({ n: p.n, value: [p.d, p.b], itemStyle: { color: FLAG[p.k], opacity: p.k === 'IND' ? 1 : 0.7 } })), label: { show: true, position: 'right', formatter: p => p.data.n, fontFamily: FONT, fontSize: 11, color: INK },
-        markLine: { symbol: 'none', silent: true, lineStyle: { color: '#CFCBC2', type: 'dashed' }, label: { fontFamily: MONO, fontSize: 10 }, data: [{ xAxis: 60, name: '60% of GDP' }, { yAxis: -3, name: '−3% deficit' }] } }] });
+        markLine: { symbol: 'none', silent: true, lineStyle: { color: '#C9CFC3', type: 'dashed' }, label: { fontFamily: MONO, fontSize: 10 }, data: [{ xAxis: 60, name: '60% of GDP' }, { yAxis: -3, name: '−3% deficit' }] } }] });
     }
   });
 })();
@@ -72,7 +72,7 @@
 /* Inflation basket treemap, contributions and item movers */
 (function () {
   const el = document.getElementById('ig-cpi'); if (!el) return;
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078';
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61';
   const scale = v => { // diverging: low = teal, ~4% target = sand, high = deep red
     const stops = [[0, [15, 118, 110]], [2, [94, 160, 150]], [4, [232, 224, 205]], [7, [222, 120, 90]], [10, [180, 35, 24]], [14, [110, 20, 14]]];
     const x = Math.max(0, Math.min(14, v)); let i = 0; while (i < stops.length - 2 && x > stops[i + 1][0]) i++;
@@ -89,14 +89,14 @@
         label: { show: true, formatter: p => `{n|${p.data.name}}\n{v|${p.data.inf.toFixed(1)}%}\n{w|${p.data.value.toFixed(1)}% of basket}`, rich: { n: { fontFamily: FONT, fontSize: 14, fontWeight: 600, lineHeight: 20 }, v: { fontFamily: MONO, fontSize: 22, fontWeight: 700, lineHeight: 30 }, w: { fontFamily: MONO, fontSize: 11, lineHeight: 16, opacity: 0.85 } } },
         data: B.divisions.map(d => ({ name: d.short, full: d.name, value: d.weight, inf: d.inflation, itemStyle: { color: scale(d.inflation) }, label: { color: txt(d.inflation) } })) }] });
     const con = B.divisions.map(d => ({ n: d.short, v: +(d.weight * d.inflation / 100).toFixed(3), inf: d.inflation })).sort((a, b) => a.v - b.v);
-    const axis = { axisLine: { lineStyle: { color: '#E2DFD8' } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } } };
+    const axis = { axisLine: { lineStyle: { color: '#D9DED3' } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } } };
     cc.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 200, right: 50, top: 6, bottom: 24 }, tooltip: { trigger: 'item', formatter: p => `${p.name}: ${p.value.toFixed(2)} points` },
       xAxis: { type: 'value', ...axis }, yAxis: { type: 'category', data: con.map(c => c.n), ...axis, axisLabel: { color: INK, fontSize: 11, fontFamily: FONT } },
       series: [{ type: 'bar', barWidth: '64%', data: con.map(c => ({ value: c.v, itemStyle: { color: scale(c.inf), borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => p.value.toFixed(2) } }] });
     const it = [...B.items].sort((a, b) => a.inflation - b.inflation);
     ii.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 110, right: 60, top: 6, bottom: 24 }, tooltip: { trigger: 'item', formatter: p => `${p.name}: ${p.value > 0 ? '+' : ''}${p.value.toFixed(1)}% a year<br>Basket weight ${it[p.dataIndex].weight.toFixed(2)}%` },
       xAxis: { type: 'value', ...axis, axisLabel: { ...axis.axisLabel, formatter: v => v + '%' } }, yAxis: { type: 'category', data: it.map(x => x.name), ...axis, axisLabel: { color: INK, fontSize: 11, fontFamily: FONT } },
-      series: [{ type: 'bar', barWidth: '64%', data: it.map(x => ({ value: x.inflation, itemStyle: { color: x.inflation >= 0 ? '#B42318' : '#0F766E', borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => (p.value > 0 ? '+' : '') + p.value.toFixed(1) + '%' } }] });
+      series: [{ type: 'bar', barWidth: '64%', data: it.map(x => ({ value: x.inflation, itemStyle: { color: x.inflation >= 0 ? '#B5367A' : '#5F7F14', borderRadius: 2 } })), label: { show: true, position: 'right', fontFamily: MONO, fontSize: 10, color: MUTE, formatter: p => (p.value > 0 ? '+' : '') + p.value.toFixed(1) + '%' } }] });
   };
   go();
 })();

@@ -1,9 +1,9 @@
 /* Real-economy tracker charts. Data: window.__EC */
 (function () {
   const E = window.__EC; if (!E) return;
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#15171A', MUTE = '#6B7078', RULE = '#E2DFD8';
-  const PAL = ['#15171A', '#1D4ED8', '#B45309', '#0F766E', '#B42318', '#7C3AED'];
-  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#EEECE7' } }, ...x });
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', INK = '#17202C', MUTE = '#555A61', RULE = '#D9DED3';
+  const PAL = ['#17202C', '#1C7C99', '#B87708', '#5F7F14', '#B5367A', '#6D5BA8'];
+  const axis = (x = {}) => ({ axisLine: { lineStyle: { color: RULE } }, axisTick: { show: false }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { lineStyle: { color: '#E6EAE2' } }, ...x });
   const tip = { trigger: 'axis', backgroundColor: '#fff', borderColor: INK, borderWidth: 1, textStyle: { color: INK, fontFamily: FONT, fontSize: 12 } };
   const go = () => { if (!window.echarts) return setTimeout(go, 60);
     const mk = id => { const el = document.getElementById(id); if (!el) return null; const c = echarts.init(el); addEventListener('resize', () => c.resize()); return c; };
@@ -25,8 +25,8 @@
     if (t) { const k = E.trade.d.findIndex(d => d >= '2019-01-01'), d = E.trade.d.slice(k), x = E.trade.x.slice(k), m = E.trade.m.slice(k);
       t.setOption({ textStyle: { fontFamily: FONT }, grid: { left: 50, right: 20, top: 36, bottom: 30 }, tooltip: { ...tip, valueFormatter: v => v == null ? '—' : '$' + v + 'bn' }, legend: { top: 0, textStyle: { color: MUTE } },
         xAxis: axis({ type: 'category', data: d.map(s => s.slice(0, 7)) }), yAxis: axis({ type: 'value', axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11, formatter: '${value}bn' } }),
-        series: [{ name: 'Exports', type: 'line', showSymbol: false, data: x, lineStyle: { color: '#0F6B3A', width: 2 }, itemStyle: { color: '#0F6B3A' } }, { name: 'Imports', type: 'line', showSymbol: false, data: m, lineStyle: { color: '#B42318', width: 2 }, itemStyle: { color: '#B42318' } },
-          { name: 'Deficit', type: 'bar', data: x.map((v, i) => v == null || m[i] == null ? null : +(v - m[i]).toFixed(2)), itemStyle: { color: '#C9C5BC' } }] }); }
+        series: [{ name: 'Exports', type: 'line', showSymbol: false, data: x, lineStyle: { color: '#5F7F14', width: 2 }, itemStyle: { color: '#5F7F14' } }, { name: 'Imports', type: 'line', showSymbol: false, data: m, lineStyle: { color: '#B5367A', width: 2 }, itemStyle: { color: '#B5367A' } },
+          { name: 'Deficit', type: 'bar', data: x.map((v, i) => v == null || m[i] == null ? null : +(v - m[i]).toFixed(2)), itemStyle: { color: '#C9CFC3' } }] }); }
   };
   go();
 })();

@@ -155,9 +155,9 @@
   if (stRoot && window.__STATES) {
     const S = window.__STATES, IND = Object.fromEntries(S.indicators.map(i => [i.id, i]));
     const f = (i, v) => v == null ? '—' : i.fmt === 'inr' ? '₹' + Math.round(v).toLocaleString('en-IN') : v.toFixed(i.fmt === 'pct2' ? 2 : 1) + '%';
-    const PAL = ['#EEF2F7', '#C9D6E8', '#93AED3', '#5A82B8', '#24508F'];
+    const PAL = ['#F3ECE3', '#DEC9B2', '#C29E7B', '#966C48', '#6A4329'];
     const bins = id => { const v = S.states.map(s => s[id]).filter(x => x != null).sort((a, b) => a - b); return [0.2, 0.4, 0.6, 0.8].map(q => v[Math.floor(q * (v.length - 1))]); };
-    const colorOf = (id, v, b) => v == null ? '#E2DFD8' : PAL[b.filter(x => v > x).length];
+    const colorOf = (id, v, b) => v == null ? '#D9DED3' : PAL[b.filter(x => v > x).length];
     const sel = $('#st-ind');
     const draw = () => {
       const id = sel.value, I = IND[id], b = bins(id);
@@ -165,7 +165,7 @@
       const cols = Math.max(...S.states.map(s => s.col)) + 1, rows = Math.max(...S.states.map(s => s.row)) + 1;
       $('#st-map').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
       $('#st-map').innerHTML = S.states.map(s => { const c = colorOf(id, s[id], b), dark = PAL.indexOf(c) >= 3; return `<a class="tile" href="/state/${s.name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/" style="grid-column:${s.col + 1};grid-row:${s.row + 1};background:${c};color:${dark ? '#fff' : 'var(--ink)'}" title="${s.name}: ${f(I, s[id])}" data-code="${s.code}"><b>${s.code}</b><span>${f(I, s[id]).replace('₹', '₹')}</span></a>`; }).join('');
-      $('#st-legend').innerHTML = `<span class="meta">${I.higherIs === 'good' ? 'Higher is better' : 'Higher is worse'} ·</span>` + PAL.map((c, k) => `<span><i style="background:${c}"></i>${k === 0 ? '≤ ' + f(I, b[0]) : k === 4 ? '> ' + f(I, b[3]) : f(I, b[k - 1]) + '–' + f(I, b[k])}</span>`).join('') + '<span><i style="background:#E2DFD8"></i>No data</span>';
+      $('#st-legend').innerHTML = `<span class="meta">${I.higherIs === 'good' ? 'Higher is better' : 'Higher is worse'} ·</span>` + PAL.map((c, k) => `<span><i style="background:${c}"></i>${k === 0 ? '≤ ' + f(I, b[0]) : k === 4 ? '> ' + f(I, b[3]) : f(I, b[k - 1]) + '–' + f(I, b[k])}</span>`).join('') + '<span><i style="background:#D9DED3"></i>No data</span>';
       const ranked = S.states.filter(s => s[id] != null).sort((a, z) => z[id] - a[id]);
       const max = Math.max(...ranked.map(s => Math.abs(s[id])));
       const all = S.allIndia[id];
@@ -184,10 +184,10 @@
       const bb = sxy / sxx, aa = my - bb * mx, r = sxy / Math.sqrt(sxx * syy);
       const tick = (I, v) => I.fmt === 'inr' ? '₹' + Math.round(v / 1000) + 'k' : v.toFixed(1) + '%';
       let g = '';
-      for (let k = 0; k <= 4; k++) { const yv = y0 + (y1 - y0) * k / 4, xv = x0 + (x1 - x0) * k / 4; g += `<line x1="${P.l}" x2="${W - P.r}" y1="${sy(yv)}" y2="${sy(yv)}" stroke="#E2DFD8"/><text class="ax" x="${P.l - 8}" y="${sy(yv) + 4}" text-anchor="end">${tick(Y, yv)}</text><text class="ax" x="${sx(xv)}" y="${H - 26}" text-anchor="middle">${tick(X, xv)}</text>`; }
+      for (let k = 0; k <= 4; k++) { const yv = y0 + (y1 - y0) * k / 4, xv = x0 + (x1 - x0) * k / 4; g += `<line x1="${P.l}" x2="${W - P.r}" y1="${sy(yv)}" y2="${sy(yv)}" stroke="#D9DED3"/><text class="ax" x="${P.l - 8}" y="${sy(yv) + 4}" text-anchor="end">${tick(Y, yv)}</text><text class="ax" x="${sx(xv)}" y="${H - 26}" text-anchor="middle">${tick(X, xv)}</text>`; }
       g += `<text class="axt" x="${(P.l + W - P.r) / 2}" y="${H - 6}" text-anchor="middle">${X.label} (${X.year})</text><text class="axt" transform="rotate(-90 14 ${(P.t + H - P.b) / 2})" x="14" y="${(P.t + H - P.b) / 2}" text-anchor="middle">${Y.label.length > 28 ? Y.label.slice(0, 26) + '…' : Y.label}</text>`;
-      g += `<line x1="${sx(x0)}" y1="${sy(aa + bb * x0)}" x2="${sx(x1)}" y2="${sy(aa + bb * x1)}" stroke="#B42318" stroke-dasharray="4 4" stroke-width="1.5"/>`;
-      const placed = []; pts.forEach(p => { let ly = sy(p.y) + 4; const lx = sx(p.x) + 7; while (placed.some(([x, y]) => Math.abs(x - lx) < 22 && Math.abs(y - ly) < 11)) ly += 11; placed.push([lx, ly]); p.ly = ly; g += `<a href="/state/${p.n.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/"><circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="4.5" fill="#15171A" fill-opacity=".8"><title>${p.n}: ${f(X, p.x)}, ${f(Y, p.y)}</title></circle><text class="pt" x="${sx(p.x) + 7}" y="${p.ly}">${p.c}</text></a>`; });
+      g += `<line x1="${sx(x0)}" y1="${sy(aa + bb * x0)}" x2="${sx(x1)}" y2="${sy(aa + bb * x1)}" stroke="#B5367A" stroke-dasharray="4 4" stroke-width="1.5"/>`;
+      const placed = []; pts.forEach(p => { let ly = sy(p.y) + 4; const lx = sx(p.x) + 7; while (placed.some(([x, y]) => Math.abs(x - lx) < 22 && Math.abs(y - ly) < 11)) ly += 11; placed.push([lx, ly]); p.ly = ly; g += `<a href="/state/${p.n.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/"><circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="4.5" fill="#17202C" fill-opacity=".8"><title>${p.n}: ${f(X, p.x)}, ${f(Y, p.y)}</title></circle><text class="pt" x="${sx(p.x) + 7}" y="${p.ly}">${p.c}</text></a>`; });
       $('#st-scatter').innerHTML = `<svg class="svgchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${Y.label} against ${X.label} across states">${g}</svg>`;
       $('#st-r').textContent = X.id === Y.id ? '' : `Correlation across ${n} states: ${r.toFixed(2)}`;
       draw();

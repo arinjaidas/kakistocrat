@@ -1,8 +1,8 @@
 /* Chart workbench: any series from /api/catalog.json, up to six, with transforms, two axes, events, share link, CSV and PNG. */
 (function () {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const PAL = ['#15171A', '#B42318', '#1D4ED8', '#0F766E', '#B45309', '#7C3AED'];
-  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', MUTE = '#6B7078', RULE = '#E2DFD8';
+  const PAL = ['#17202C', '#B5367A', '#1C7C99', '#5F7F14', '#B87708', '#6D5BA8'];
+  const FONT = '"IBM Plex Sans", system-ui, sans-serif', MONO = '"IBM Plex Mono", monospace', MUTE = '#555A61', RULE = '#D9DED3';
   let EVENTS = []; fetch('/api/events.json').then(r => r.json()).then(j => { EVENTS = j.events.map(e => [e.date, e.short]); }).catch(() => {});
   const TF = { lvl: 'Level', yoy: 'Change on a year earlier, %', rb: 'Rebased, start = 100' };
   let CAT = [], byId = {}, cache = {}, sel = [], range = '3Y', chart;
@@ -25,10 +25,10 @@
     const today = new Date().toISOString().slice(0, 10), lastISO = data.reduce((m, s) => s.d.at(-1) > m ? s.d.at(-1) : m, '1900-01-01'), from = startDate(lastISO > today ? today : lastISO);
     const units = [...new Set(sel.map(unitOf))], dual = $('#wb-dual').checked && units.length >= 2;
     const series = sel.map((x, k) => ({ name: `${byId[x.id].name}${x.t !== 'lvl' ? ` (${x.t === 'yoy' ? '% y/y' : '=100'})` : ''}`, type: 'line', showSymbol: byId[x.id].freq === 'annual', symbolSize: 5, connectNulls: true, yAxisIndex: dual ? (unitOf(x) === units[0] ? 0 : 1) : 0, data: transform(data[k], x.t, from), lineStyle: { width: 2, color: PAL[k] }, itemStyle: { color: PAL[k] } }));
-    if ($('#wb-ev').checked && series.length) series[0].markLine = { symbol: 'none', silent: true, label: { formatter: p => p.name, fontFamily: MONO, fontSize: 10, color: MUTE, position: 'insideEndTop' }, lineStyle: { color: '#CFCBC2', type: 'dashed' }, data: EVENTS.filter(e => e[0] >= from).map((e, i) => ({ xAxis: e[0], name: e[1], label: { distance: [0, (i % 3) * 64] } })) };
-    const ax = (i) => ({ type: 'value', scale: true, name: dual ? (i ? units.slice(1).join(' · ') : units[0]) : units.length === 1 ? units[0] : '', nameTextStyle: { fontFamily: MONO, fontSize: 10, color: MUTE }, position: i ? 'right' : 'left', axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { show: !i, lineStyle: { color: '#EEECE7' } } });
+    if ($('#wb-ev').checked && series.length) series[0].markLine = { symbol: 'none', silent: true, label: { formatter: p => p.name, fontFamily: MONO, fontSize: 10, color: MUTE, position: 'insideEndTop' }, lineStyle: { color: '#C9CFC3', type: 'dashed' }, data: EVENTS.filter(e => e[0] >= from).map((e, i) => ({ xAxis: e[0], name: e[1], label: { distance: [0, (i % 3) * 64] } })) };
+    const ax = (i) => ({ type: 'value', scale: true, name: dual ? (i ? units.slice(1).join(' · ') : units[0]) : units.length === 1 ? units[0] : '', nameTextStyle: { fontFamily: MONO, fontSize: 10, color: MUTE }, position: i ? 'right' : 'left', axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 }, splitLine: { show: !i, lineStyle: { color: '#E6EAE2' } } });
     chart.setOption({ textStyle: { fontFamily: FONT }, animationDuration: 400, color: PAL, grid: { left: 60, right: dual ? 64 : 24, top: 44, bottom: 64 }, legend: { top: 0, textStyle: { fontFamily: FONT, fontSize: 12 } },
-      tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: '#15171A', textStyle: { color: '#15171A', fontFamily: FONT, fontSize: 12 } },
+      tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: '#17202C', textStyle: { color: '#17202C', fontFamily: FONT, fontSize: 12 } },
       xAxis: { type: 'time', axisLine: { lineStyle: { color: RULE } }, axisLabel: { color: MUTE, fontFamily: MONO, fontSize: 11 } }, yAxis: dual ? [ax(0), ax(1)] : [ax(0)],
       dataZoom: [{ type: 'inside' }, { type: 'slider', height: 22, bottom: 8 }], series }, true);
     $('#wb-chips').innerHTML = sel.map((x, k) => `<span class="wb-chip" style="--c:${PAL[k]}"><i></i><b>${byId[x.id].hidden ? byId[x.id].name : `<a href="/s/${x.id}/" style="color:inherit">${byId[x.id].name}</a>`}</b><select data-k="${k}" aria-label="Transform">${Object.entries(TF).map(([v, l]) => `<option value="${v}"${v === x.t ? ' selected' : ''}>${l}</option>`).join('')}</select><small>${byId[x.id].source}</small><button type="button" data-rm="${k}" aria-label="Remove">×</button></span>`).join('') || '<p class="meta">Pick a series from the library to start.</p>';

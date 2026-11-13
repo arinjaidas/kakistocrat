@@ -27,8 +27,8 @@
     const P = v('loan') * 1e5, n = v('years'), sp = v('spread'), e0 = emi(P, B.repo + sp, n), e1 = emi(P, rp + sp, n);
     $('#o-emi').textContent = `₹${nf(e1, 0)}`; $('#o-emi-s').textContent = `${sg(e1 - e0, 0, '₹')} a month at ${nf(rp + sp)}% · ${sg((e1 - e0) * n * 12, 0, '₹')} over the loan`;
     const oilE = bbl * (br - B.brent) * B.inr / 1e12, fxE = bbl * B.brent * (ir - B.inr) / 1e12, both = (lc1 - lc0) - oilE - fxE, tot = Math.abs(oilE) + Math.abs(fxE) + Math.abs(both) || 1;
-    $('#o-bar').innerHTML = `<i style="width:${Math.abs(oilE) / tot * 100}%;background:#15171A"></i><i style="width:${Math.abs(fxE) / tot * 100}%;background:#B42318"></i><i style="width:${Math.abs(both) / tot * 100}%;background:#C9C3B4"></i>`;
-    $('#o-split').innerHTML = `<em style="color:#15171A">Oil ${sg(oilE, 2, '₹', 'L cr')}</em> · <em style="color:#B42318">Rupee ${sg(fxE, 2, '₹', 'L cr')}</em> · both ${sg(both, 2, '₹', 'L cr')}`;
+    $('#o-bar').innerHTML = `<i style="width:${Math.abs(oilE) / tot * 100}%;background:#17202C"></i><i style="width:${Math.abs(fxE) / tot * 100}%;background:#B5367A"></i><i style="width:${Math.abs(both) / tot * 100}%;background:#C9CFC3"></i>`;
+    $('#o-split').innerHTML = `<em style="color:#17202C">Oil ${sg(oilE, 2, '₹', 'L cr')}</em> · <em style="color:#B5367A">Rupee ${sg(fxE, 2, '₹', 'L cr')}</em> · both ${sg(both, 2, '₹', 'L cr')}`;
     const parts = [];
     if (br !== B.brent) parts.push(`Brent at $${nf(br)}`);
     if (ir !== B.inr) parts.push(`the rupee at ₹${nf(ir)} per dollar`);

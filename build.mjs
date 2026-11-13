@@ -46,13 +46,13 @@ const OUT = 'dist';
 const BUILT = new Date();
 
 const TOPICS = {
-  'money-finance':        { name: 'Money & finance',          short: 'Money',           color: '#1D4ED8', blurb: 'Monetary policy, inflation, the rupee, banks and markets.' },
-  'trade-external-sector':{ name: 'Trade & external sector',  short: 'Trade',           color: '#0F766E', blurb: 'Trade deals, tariffs, the current account and capital flows.' },
-  'public-finance':       { name: 'Public finance',           short: 'Public finance',  color: '#7C3AED', blurb: 'Budgets, deficits, taxes and spending.' },
-  'growth-jobs-industry': { name: 'Growth, jobs & industry',  short: 'Growth & jobs',   color: '#B45309', blurb: 'GDP, employment, investment and industrial policy.' },
-  'rural-economy-welfare':{ name: 'Rural economy & welfare',  short: 'Rural & welfare', color: '#3F6212', blurb: 'Farm support, rural jobs, food security and local government.' },
-  'energy-climate':       { name: 'Energy & climate',         short: 'Energy',          color: '#B42318', blurb: 'Oil, power, fuel subsidies and the energy transition.' },
-  'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#334155', blurb: 'Economies, conflicts and export controls beyond India.' },
+  'money-finance':        { name: 'Money & finance',          short: 'Money',           color: '#1C7C99', blurb: 'Monetary policy, inflation, the rupee, banks and markets.' },
+  'trade-external-sector':{ name: 'Trade & external sector',  short: 'Trade',           color: '#5F7F14', blurb: 'Trade deals, tariffs, the current account and capital flows.' },
+  'public-finance':       { name: 'Public finance',           short: 'Public finance',  color: '#6D5BA8', blurb: 'Budgets, deficits, taxes and spending.' },
+  'growth-jobs-industry': { name: 'Growth, jobs & industry',  short: 'Growth & jobs',   color: '#B87708', blurb: 'GDP, employment, investment and industrial policy.' },
+  'rural-economy-welfare':{ name: 'Rural economy & welfare',  short: 'Rural & welfare', color: '#5E6B4E', blurb: 'Farm support, rural jobs, food security and local government.' },
+  'energy-climate':       { name: 'Energy & climate',         short: 'Energy',          color: '#B5367A', blurb: 'Oil, power, fuel subsidies and the energy transition.' },
+  'world-geopolitics':    { name: 'World & geopolitics',      short: 'World',           color: '#4B5563', blurb: 'Economies, conflicts and export controls beyond India.' },
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
 const FEATURED_SERIES = ['the-2026-oil-shock', 'the-politics-of-public-money', 'americas-tariff-reset'];
@@ -262,14 +262,14 @@ const stagesDone = item => Object.values(item.stage).filter(Boolean).length;
 const pips = item => `<div class="pips" aria-label="${stagesDone(item)} of 5 stages reached">${['Announced','Notified','Funded','Implemented','Measured'].map(s => `<i class="${item.stage[s] ? 'on' : ''}"></i>`).join('')}</div>`;
 const OG = new Set(existsSync('static/og') ? readdirSync('static/og').filter(f => f.endsWith('.png')).map(f => f.slice(0, -4)) : []);
 const ogSlug = path => { const seg = (path || '/').split('/').filter(Boolean).pop() || 'default'; return OG.has(seg) ? seg : 'default'; };
-const pageHead = (kick, title, p) => `<div class="wrap"><header class="page-head"><span class="kicker">${kick}</span><h1>${esc(title)}</h1>${p ? `<p>${p}</p>` : ''}</header></div>`;
+const pageHead = (kick, title, p, cards = '') => `<div class="mk-top ip-top ph-top">${ribbon({ cls: 'ip-rib' })}<div class="wrap"><header class="mk-head"><div><span class="kicker">${kick}</span><h1>${esc(title)}</h1>${p ? `<p class="dek sm">${p}</p>` : ''}</div></header>${cards ? `<div class="mk-cards">${cards}</div>` : ''}</div></div>`;
 
 // ---------------------------------------------------------------- pages
 function home(m, tape, ledger, X = {}) {
   const { SD = {}, byId = {} } = X, CO = globalThis.__CONCEPT_OF || {}, url = id => CO[id] || `/s/${id}/`;
   const A = m.articles, lead = A[0], latest = A.slice(1, 7);
   const byTopic = Object.fromEntries(TOPIC_ORDER.map(t => [t, A.filter(a => a.topic === t)]));
-  const spark = (v, up) => { const s = v.slice(-60), lo = Math.min(...s), hi = Math.max(...s), W = 100, H = 28; return `<svg class="hn-sp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${s.map((x, i) => `${i ? 'L' : 'M'}${(i / Math.max(1, s.length - 1) * W).toFixed(1)},${(H - 2 - (hi === lo ? .5 : (x - lo) / (hi - lo)) * (H - 4)).toFixed(1)}`).join('')}" fill="none" stroke="#15171a" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>`; };
+  const spark = (v, up) => { const s = v.slice(-60), lo = Math.min(...s), hi = Math.max(...s), W = 100, H = 28; return `<svg class="hn-sp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${s.map((x, i) => `${i ? 'L' : 'M'}${(i / Math.max(1, s.length - 1) * W).toFixed(1)},${(H - 2 - (hi === lo ? .5 : (x - lo) / (hi - lo)) * (H - 4)).toFixed(1)}`).join('')}" fill="none" stroke="#17202C" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>`; };
   const NUMS = [['india-cpi', 'Inflation (CPI)', '%', '/economy/prices/'], ['india-repo', 'Repo rate', '%', '/economy/rates/'], ['rbi-gsec10', '10-year G-Sec', '%', '/economy/rates/#gsec'], ['fx-usdinr', 'Rupee per dollar', '', '/external/', -1],
     ['nse-nifty-50', 'Nifty 50', '', '/markets/', 1], ['rbi-fx-total', 'FX reserves', 'bn', '/external/#xt-res', 1], ['iip-general', 'Industrial output', '%', '/economy/industry/'], ['fred-dcoilbrenteu', 'Brent crude', '$', url('fred-dcoilbrenteu'), -1]];
   const nums = NUMS.filter(([id]) => SD[id] && byId[id]).map(([id, label, u, href, inverse]) => {
@@ -298,7 +298,7 @@ function home(m, tape, ledger, X = {}) {
  <aside class="hp-col hp-rail">
   <section><h2 class="hp-h">Coming up <a href="/desk/calendar/">Calendar →</a></h2>${(() => { const nx = (globalThis.__EVENTS || []).find(e => e.kind === 'official' || /CPI|GDP|IIP|WPI/.test(e.name)); return nx ? `<p class="hp-cd" data-at="${nx.date}T${nx.time || '16:00'}:00+05:30">${esc(nx.name)}${nx.ref ? ' for ' + esc(nx.ref) : ''} in <b>…</b></p><script>(function(){var el=document.querySelector('.hp-cd');if(!el)return;var t=Date.parse(el.dataset.at),b=el.querySelector('b');function f(){var d=t-Date.now();if(d<=0){b.textContent='now';return}var D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5),M=Math.floor(d%36e5/6e4);b.textContent=(D?D+'d ':'')+H+'h '+M+'m';}f();setInterval(f,30000)})();</script>` : ''; })()}<div class="hr-t">${(globalThis.__EVENTS || []).filter(e => e.rule !== 'weekday' && !/Weekly Statistical/.test(e.name)).slice(0, 6).map(e => `<a class="hr hc" href="${e.url}"><span class="hr-n">${esc(e.name)}${e.ref ? ` <em>${esc(e.ref)}</em>` : ''}</span><span class="hr-p">${esc(new Date(e.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }))}</span><span class="hr-v">${esc(e.time || '')}</span></a>`).join('')}</div></section>
   <section><h2 class="hp-h">Latest data</h2><div class="hr-t"><div class="hr hr-hd"><span class="hr-n">Indicator</span><span class="hr-p">Period</span><span class="hr-v">Latest</span><span class="hr-o">Prior</span></div>${rel}</div></section>
-  <a class="hp-desk" href="/desk/"><span class="kicker" style="color:#F0A39B">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><b>What moved today, and why</b><span>Markets, rates and the releases of the day, written up every evening →</span></a>
+  <a class="hp-desk" href="/desk/"><span class="kicker" style="color:#E3A9C6">The Daily Desk${DESK ? ' · ' + esc(longDate(DESK.date + 'T00:00:00Z')) : ''}</span><b>What moved today, and why</b><span>Markets, rates and the releases of the day, written up every evening →</span></a>
   ${MK?.unusual?.length ? `<div class="module"><span class="kicker">Unusual moves</span><h3>What just moved more than usual</h3><ul class="mini-moves">${MK.unusual.slice(0, 6).map(u => `<li><a href="/s/${u.id}/">${esc(u.name)}</a><span class="${u.ch > 0 ? 'up' : 'dn'}">${u.ch > 0 ? '+' : '−'}${Math.abs(u.ch).toFixed(u.rate ? 2 : 1)}${u.rate ? ' pts' : '%'}</span></li>`).join('')}</ul><a class="more" href="/explore/">Explore everything →</a></div>` : ''}
  </aside>
 </div>
@@ -331,7 +331,7 @@ function articlePage(a, m) {
  ${(a.connected || []).length ? `<div class="module"><span class="kicker">Connected stories</span><p class="meta" style="margin:4px 0 6px">Other pieces about the same things.</p><div class="rule-list">${a.connected.map(c => `<a class="story" href="${c.b.url}"><h3 class="h-4">${esc(c.b.title)}</h3><div class="meta">${esc(c.shared.join(' · '))}</div></a>`).join('')}</div></div>` : ''}
  ${(a.storyItems || []).length ? `<div class="module story-data"><span class="kicker">Data in this story</span><p class="meta" style="margin:4px 0 8px">Live pages for what this piece discusses.</p><div class="en-chips">${a.storyItems.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
  <div class="module"><span class="kicker desk" style="--desk:${t.color}">More in ${esc(t.short)}</span><div class="rule-list" style="margin-top:8px">${sameTopic.map(x => `<a class="story" href="${x.url}"><h3 class="h-4">${esc(x.title)}</h3><div class="meta">${esc(shortDate(x.date))}</div></a>`).join('')}</div></div>
- <div class="module dark"><span class="kicker" style="color:#F0A39B">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/what-if/">Open</a></div>
+ <div class="module dark"><span class="kicker" style="color:#E3A9C6">Scenario engine</span><h3>What if oil hits $140?</h3><p>One shock through the pump, the import bill and your EMI.</p><a class="btn" style="background:#fff;color:var(--ink)" href="/what-if/">Open</a></div>
 </div></aside>
 </article></div>`;
 }
@@ -527,6 +527,11 @@ async function main() {
   Object.assign(api, { tape: 'India macro tape: CPI, repo, rupee, 10-year yield, Brent, Nifty, with sources', ledger: 'Policy Ledger items and stages', budget: 'Union Budget 2026-27: estimates and April–September actuals', states: 'State indicators: income, growth, inflation, debt, interest burden', exposure: 'Import exposure: crude suppliers, DAP, China shares', twocharts: 'Two-Chart Test data', forecasts: 'Forecast Book calls' });
   // ---- series catalogue for the chart workbench
   const catalog = [], SD = {};
+  // Growth rates parsed from the RBI supplement: older table layouts end some rows with a ₹ crore change, and a few parse as 0.
+  // Drop (never fill) points outside a plausible range or far from their neighbours.
+  const screenYoy = vs => { const a = vs.map(v => v == null || v === 0 || v <= -60 || v >= 120 ? null : v);
+    return a.map((v, i) => { if (v == null) return null; const nb = [...a.slice(Math.max(0, i - 3), i), ...a.slice(i + 1, i + 4)].filter(x => x != null).sort((x, y) => x - y);
+      if (nb.length < 2) return v; const md = nb.length % 2 ? nb[nb.length >> 1] : (nb[nb.length / 2 - 1] + nb[nb.length / 2]) / 2; return Math.abs(v - md) > 6 ? null : v; }); };
   const addSeries = async (id, name, group, unit, freq, source, dates, values, extra = {}) => {
     const pts = dates.map((d, i) => [d, values[i]]).filter(p => p[1] != null && Number.isFinite(p[1]));
     if (pts.length < 3) return;
@@ -553,9 +558,21 @@ async function main() {
     for (const n of IIP_ORDER) { const sr = MK.iip?.series?.[n]; if (!sr) continue; const P8 = Object.entries(sr.pts);
       await addSeries(iipId(n), `IIP: ${n.replace('Infrastructure/construction Goods', 'Infrastructure & construction goods')}, growth`, 'India: industry (IIP, monthly)', '% y/y', 'monthly', 'MoSPI', P8.map(x => x[0]), P8.map(x => x[1].growth)); }
     if (MK.rbiMoney?.fortnights) { const F8 = Object.entries(MK.rbiMoney.fortnights), d = F8.map(x => x[0]);
-      for (const [k, n, u] of [['credit_yoy', 'Bank credit, year on year', '% y/y'], ['deposits_yoy', 'Bank deposits, year on year', '% y/y'], ['m3_yoy', 'Money supply (M3), year on year', '% y/y'], ['cic_yoy', 'Currency with the public, year on year', '% y/y'], ['bccs_yoy', 'Bank credit to the commercial sector, year on year', '% y/y']])
-        await addSeries(`rbi-${k.replace('_yoy', '')}-yoy`, n, 'India: money and credit (RBI, fortnightly)', u, 'fortnightly', 'RBI Weekly Statistical Supplement', d, F8.map(x => x[1][k] ?? null));
-      for (const [k, n] of [['credit', 'Bank credit outstanding'], ['deposits', 'Bank deposits outstanding']]) await addSeries(`rbi-${k}`, n, 'India: money and credit (RBI, fortnightly)', '₹ lakh crore', 'fortnightly', 'RBI Weekly Statistical Supplement', d, F8.map(x => x[1][k] == null ? null : +(x[1][k] / 1e5).toFixed(2))); }
+      // Validate parsed RBI tables. Levels: drop a point more than 8% from the median of its neighbours.
+      // Growth rates: keep a published y/y only where it matches the change in the published levels over a year (±1 pt);
+      // currency and commercial-sector credit sit in the same table as M3, so they are kept only where that table's M3 check passes.
+      const T = s => Date.parse(s) / 864e5, lv = {};
+      for (const k of ['credit', 'deposits', 'm3']) { const a = F8.map(x => x[1][k] == null ? null : x[1][k] < 1e6 ? x[1][k] * 100 : x[1][k]); lv[k] = a.map((v, i) => { if (v == null) return null; const nb = [...a.slice(Math.max(0, i - 3), i), ...a.slice(i + 1, i + 4)].filter(x => x != null).sort((x, y) => x - y); if (nb.length < 2) return v; const md = nb[nb.length >> 1]; return Math.abs(v / md - 1) > 0.08 ? null : v; }); }
+      const yAgo = i => { const t = T(d[i]) - 364; let b = -1; for (let j = i - 1; j >= 0 && T(d[j]) > t - 9; j--) if (Math.abs(T(d[j]) - t) <= 8) b = j; return b; };
+      const pass = (k, i) => { const v = F8[i][1][k + '_yoy'], j = yAgo(i); if (v == null || j < 0 || lv[k][i] == null || lv[k][j] == null) return false; return Math.abs((lv[k][i] / lv[k][j] - 1) * 100 - v) <= 1; };
+      const okRow = { credit: d.map((_, i) => pass('credit', i)), deposits: d.map((_, i) => pass('deposits', i)), m3: d.map((_, i) => pass('m3', i)) };
+      const cr = d.map((_, i) => okRow.credit[i] ? F8[i][1].credit_yoy : null), near = i => { for (let o = 0; o <= 2; o++) for (const j of [i - o, i + o]) if (cr[j] != null) return cr[j]; return null; };
+      const checked = k => F8.map((x, i) => { const v = x[1][k] ?? null; if (v == null) return null;
+        if (k === 'bccs_yoy') { const c = near(i); return okRow.m3[i] && c != null && Math.abs(v - c) <= 4 ? v : null; }
+        return okRow[k.replace('_yoy', '')][i] ? v : null; });
+      for (const [k, n, u] of [['credit_yoy', 'Bank credit, year on year', '% y/y'], ['deposits_yoy', 'Bank deposits, year on year', '% y/y'], ['m3_yoy', 'Money supply (M3), year on year', '% y/y'], ['bccs_yoy', 'Bank credit to the commercial sector, year on year', '% y/y']])
+        await addSeries(`rbi-${k.replace('_yoy', '')}-yoy`, n, 'India: money and credit (RBI, fortnightly)', u, 'fortnightly', 'RBI Weekly Statistical Supplement', d, screenYoy(checked(k)));
+      for (const [k, n] of [['credit', 'Bank credit outstanding'], ['deposits', 'Bank deposits outstanding']]) await addSeries(`rbi-${k}`, n, 'India: money and credit (RBI, fortnightly)', '₹ lakh crore', 'fortnightly', 'RBI Weekly Statistical Supplement', d, lv[k].map(v => v == null ? null : +(v / 1e5).toFixed(2))); }
     for (const [k, id] of [['XTEXVA01INM667S', 'in-exports'], ['XTIMVA01INM667S', 'in-imports']]) { const sr = MK.inMonthly?.[k]; if (sr) await addSeries(id, sr.label, 'India: trade (monthly)', 'US$ bn', 'monthly', 'OECD MEI via FRED', sr.pts.map(p => p[0]), sr.pts.map(p => +(p[1] / 1e9).toFixed(2))); }
     for (const [n, c] of Object.entries(MK.portwatch?.chokepoints || {})) { const sl = n.toLowerCase().replace(/[^a-z]+/g, '-').replace(/-$/, '');
       await addSeries('pw-' + sl, `Ships through the ${n.replace(/ Strait$/, ' Strait')}, a day`, 'Shipping chokepoints', 'ships a day', 'daily', 'IMF PortWatch', c.d, c.total);
@@ -865,11 +882,11 @@ async function main() {
       key: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-m3-yoy', 'rbi-cd-ratio'],
       panels: [
         { anchor: 'growth', title: 'Credit and deposit growth', ids: ['rbi-credit-yoy', 'rbi-deposits-yoy', 'rbi-bccs-yoy'], range: '10Y' },
-        { anchor: 'money', title: 'Money supply and currency', ids: ['rbi-m3-yoy', 'rbi-cic-yoy'], range: '5Y' },
+        { anchor: 'money', title: 'Money supply (M3)', ids: ['rbi-m3-yoy'], range: '10Y', note: 'Currency with the public is not shown: the supplement’s older tables cannot be checked against a published level, and some readings were plainly wrong.' },
         { anchor: 'cd-ratio', title: 'Credit-deposit ratio', ids: ['rbi-cd-ratio'], range: 'All', note: 'Bank credit as a share of deposits. A rising ratio means lending is outrunning deposit growth, which pushes banks towards certificates of deposit and higher deposit rates.' },
         { anchor: 'levels', title: 'Outstanding credit and deposits', ids: ['rbi-credit', 'rbi-deposits'], range: 'All' },
       ],
-      method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li></ul>',
+      method: '<ul><li>The July 2023 merger of HDFC with HDFC Bank added about ₹6 lakh crore of loans to bank credit; year-on-year rates from July 2023 to June 2024 are inflated by it. RBI publishes ex-merger growth separately; these series do not adjust for it.</li><li>Growth rates are read from the RBI supplement’s tables. Where an older table layout gave a ₹ crore change instead of a growth rate, that fortnight is left blank rather than estimated. Each growth rate shown has been checked against the change in the RBI’s own outstanding amounts over the year.</li></ul>',
       related: [['/economy/rates/', 'Interest rates and yields'], ['/economy/prices/', 'Inflation'], ['/markets/', 'Bank shares']] },
     { path: '/external/', defer: true, title: 'Rupee and reserves', kicker: 'External · Rupee and reserves', desc: 'The rupee against the dollar since 2005, India’s foreign exchange reserves every week since 1998, the cost of hedging dollars, reserve cover, and the 2013 and 2026 FCNR(B) episodes side by side.',
       dek: 'The exchange rate, the reserves the RBI holds to defend it, and the forward premium that prices the cost of hedging. The episode comparison sets the 2026 defence against the 2013 one.',
