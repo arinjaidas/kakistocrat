@@ -407,6 +407,12 @@ def _k(r, *names):
         if n.lower() in low: return low[n.lower()]
 def ogd():
     os.makedirs('data/ogd', exist_ok=True)
+    for _ in range(16):   # each call refreshes the stalest dataset (the function runs in Mumbai, so data.gov.in answers)
+        try:
+            r = json.loads(get(OGD + 'refresh', timeout=120))
+            print('  ogd refresh', r.get('did') or r)
+            if not r.get('due'): break
+        except Exception as e: print('  ogd refresh error', e); break
     got = {}
     for name in ['mandi', 'aqi', 'wpi', 'core8', 'petcons', 'pettrade', 'crudeprod', 'refprod', 'steel', 'msme', 'mgnrega', 'fci']:
         try: meta, rows = _ogd_rows(name)
