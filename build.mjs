@@ -761,6 +761,7 @@ async function main() {
   const CONCEPT_OF = {};
   for (const C of CONCEPTS) for (const p of C.panels) for (const id of p.ids) if (byId[id] && !CONCEPT_OF[id]) CONCEPT_OF[id] = `${C.path}#${p.anchor}`;
   for (const id of ['imf-ggxwdg-ngdp-ind', 'imf-ggxcnl-ngdp-ind']) if (byId[id]) CONCEPT_OF[id] = '/economy/budget/#fiscal';
+  for (const id of ['iip-general', 'iip-manufacturing']) if (byId[id]) CONCEPT_OF[id] = '/economy/industry/#sectors';
   for (const c of catalog) { if (CONCEPT_OF[c.id]) continue;
     if (/^(rbi-fx-|rbi-inr|rbi-fwd)/.test(c.id)) CONCEPT_OF[c.id] = '/external/';
     else if (/^wdi-fi-res/.test(c.id)) CONCEPT_OF[c.id] = '/external/balance-of-payments/#cover'; }
