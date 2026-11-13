@@ -34,6 +34,26 @@
    },
    "history": [
     {
+     "t": "Jan 2026",
+     "v": 2.74
+    },
+    {
+     "t": "Feb 2026",
+     "v": 3.21
+    },
+    {
+     "t": "Mar 2026",
+     "v": 3.4
+    },
+    {
+     "t": "Apr 2026",
+     "v": 3.48
+    },
+    {
+     "t": "May 2026",
+     "v": 3.93
+    },
+    {
      "t": "Jun 2026",
      "v": 4.38
     },
@@ -75,6 +95,9 @@
     "india-july-2026-inflation-gap",
     "india-new-inflation-basket",
     "rbi-october-hike"
+   ],
+   "notes": [
+    "Jan-May 2026 from MoSPI releases on the 2024 base as reported (Jan first printed 2.75, revised 2.74)."
    ]
   },
   {

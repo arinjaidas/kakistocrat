@@ -37,7 +37,7 @@ for (const f of pages) {
 // stale series: how far each series' last observation is behind what its frequency implies
 const now = Date.now(), cat = existsSync(join(OUT, 'api/catalog.json')) ? JSON.parse(readFileSync(join(OUT, 'api/catalog.json'), 'utf8')) : [];
 const LIMIT = { daily: 12, weekly: 21, fortnightly: 40, monthly: 75, quarterly: 200, annual: 800 };
-const stale = cat.filter(c => c.last && !c.id.startsWith('wdi-') && LIMIT[c.freq] && (now - Date.parse(c.last)) / 864e5 > LIMIT[c.freq] * (/OECD/.test(c.source || '') ? 1.8 : 1))
+const stale = cat.filter(c => c.last && !c.ended && !c.id.startsWith('wdi-') && LIMIT[c.freq] && (now - Date.parse(c.last)) / 864e5 > LIMIT[c.freq] * (/OECD/.test(c.source || '') ? 1.8 : 1))
   .map(c => ({ id: c.id, name: c.name, freq: c.freq, last: c.last, days: Math.round((now - Date.parse(c.last)) / 864e5) })).sort((a, b) => b.days - a.days);
 
 const health = { checked: new Date().toISOString(), pages: pages.length, links, broken: [...broken].map(([url, from]) => ({ url, from })), stale, missing };
