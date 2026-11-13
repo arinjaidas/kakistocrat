@@ -1,0 +1,18 @@
+{
+  "period": "April–June 2026",
+  "release": "2026-08-31",
+  "baseYear": "2022–23",
+  "source": "https://static.pib.gov.in/WriteReadData/userfiles/image/2026/aug/Screenshot2026-08-31154041_20260831154150_11d4eb.png",
+  "priorGDP": 7546230,
+  "currentGDP": 8136153,
+  "rows": [
+    ["Private consumption", 4176184, 4474278, 1],
+    ["Government consumption", 819411, 854877, 1],
+    ["Fixed investment", 2497280, 2795605, 1],
+    ["Changes in stocks", 142862, 123063, 1],
+    ["Valuables", 38179, 31090, 1],
+    ["Exports", 1708025, 1913790, 1],
+    ["Imports", 1972239, 1950544, -1],
+    ["Statistical discrepancy", 136528, -106005, 1]
+  ]
+}

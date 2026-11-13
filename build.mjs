@@ -488,8 +488,8 @@ async function main() {
   const [wp, tape, ledger, fc, budget, states, twocharts, exposure] = await Promise.all([loadWordPress(), ...['tape', 'ledger', 'forecasts', 'budget', 'states', 'twocharts', 'exposure'].map(f => readFile(`data/${f}.json`, 'utf8').then(JSON.parse))]);
   __tapeRef = tape; HAS_CALLS = (fc.calls || []).length > 0;
   const m = model(wp);
-  const [review, fiscal, repoCsv, repoScript] = await Promise.all([
-    ...['year-review', 'fiscal-room'].map(name => readFile(`data/${name}.json`, 'utf8').then(JSON.parse)),
+  const [review, fiscal, gdp, repoCsv, repoScript] = await Promise.all([
+    ...['year-review', 'fiscal-room', 'gdp-contributions'].map(name => readFile(`data/${name}.json`, 'utf8').then(JSON.parse)),
     readFile('data/repo-transmission.csv', 'utf8'),
     readFile('scripts/repo_transmission.py', 'utf8'),
   ]);
@@ -1028,7 +1028,7 @@ async function main() {
 
 
   const reviewPaths = await writeYearReview({
-    review, wp: m.articles, fiscal, repoCsv, repoScript,
+    review, wp: m.articles, fiscal, gdp, repoCsv, repoScript,
     repoResults: execSync('python3 scripts/repo_transmission.py data/repo-transmission.csv', { encoding: 'utf8' }),
     pageHead, publish: P, write,
   });

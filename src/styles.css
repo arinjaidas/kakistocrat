@@ -1029,3 +1029,11 @@ a.yr-card:hover, a.yr-card:focus-visible { background: var(--paper, #f4eee7); bo
 .yr-case-figure strong { display: block; font: 500 24px var(--mono); }
 .yr-case-bar { background: #ddd0c9; height: 8px; margin: 6px 0; }
 .yr-case-bar span { display: block; height: 100%; background: #a33c70; }
+
+.yr-gdp-bars { list-style: none; padding: 0; max-width: 740px; }
+.yr-gdp-bars li { display: grid; align-items: center; grid-template-columns: minmax(135px, 1fr) minmax(65px, 2fr) 50px; gap: 8px; margin: 8px 0; }
+.yr-gdp-bars strong { text-align: right; font: 500 14px var(--mono); }
+.yr-gdp-track { position: relative; height: 12px; background: linear-gradient(to right, transparent calc(50% - 1px), #8d817a calc(50% - 1px), #8d817a 50%, transparent 50%); }
+.yr-gdp-track i { position: absolute; height: 10px; top: 1px; }
+.yr-gdp-track .positive { left: 50%; background: #197e8e; }
+.yr-gdp-track .negative { right: 50%; background: #a33c70; }

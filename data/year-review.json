@@ -343,6 +343,10 @@
       "source": "https://www.whitehouse.gov/briefings-statements/2026/02/united-states-india-joint-statement/",
       "articles": [
         {
+          "id": 1796,
+          "url": "https://thekakisto.wordpress.com/2026/02/07/india-us-february-2026-trade-framework-oil-duty/"
+        },
+        {
           "id": 1083,
           "url": "https://thekakisto.wordpress.com/2026/02/27/india-us-tariffs-section-122-exporter-bargaining/"
         }
@@ -456,7 +460,12 @@
       "detail": "Government reported commercial LPG allocation at 70% of pre-crisis levels. Supply restrictions could reach restaurants and commercial users through quantities.",
       "priority": 1,
       "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2246464&lang=1&reg=3",
-      "articles": []
+      "articles": [
+        {
+          "id": 1795,
+          "url": "https://thekakisto.wordpress.com/2026/03/28/india-commercial-lpg-allocation-march-2026-oil-shock/"
+        }
+      ]
     },
     {
       "id": "S25",
@@ -622,7 +631,12 @@
       "detail": "April–June GDP release reported 7.8% real growth. Composition and employment matter for interpreting the headline.",
       "priority": 1,
       "source": "https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2304949&lang=2&reg=48",
-      "articles": []
+      "articles": [
+        {
+          "id": 1794,
+          "url": "https://thekakisto.wordpress.com/2026/08/31/india-april-june-2026-gdp-private-investment-test/"
+        }
+      ]
     },
     {
       "id": "S40",
