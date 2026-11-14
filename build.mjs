@@ -44,6 +44,7 @@ import { gettingToWorkPage } from './lib/getting-to-work.mjs';
 import { chinaInputsData, chinaInputsCsv, chinaInputsPage } from './lib/china-inputs.mjs';
 import { thaliData, thaliCsv, thaliPage } from './lib/thali.mjs';
 import { dollarCushionCsv, dollarCushionPage } from './lib/dollar-cushion.mjs';
+import { fcnrFinancingPage, fcnrCsv, financingCsv } from './lib/fcnr-financing.mjs';
 import { outcomesPage } from './lib/outcome-scorecard.mjs';
 import { writeOilWeekArchive } from './lib/oil-rupee-archive.mjs';
 import { gstPassThroughPage } from './lib/gst-pass-through.mjs';
@@ -70,7 +71,7 @@ const TOPIC_ORDER = Object.keys(TOPICS);
 const FEATURED_SERIES = ['the-2026-oil-shock', 'the-politics-of-public-money', 'americas-tariff-reset'];
 // Editorially selected companions only. These links do not retroactively change the canonical WordPress article.
 const ARTICLE_RESEARCH = {
-  1814: [['/desk/outcomes/', 'Five measured economic outcomes'], ['/desk/chronology/', 'Historical chronology'], ['/research/oil-rupee-weekly/', '52-week oil and rupee archive'], ['/desk/commissions/', 'Research pipeline']],
+  1814: [['/research/fcnr-2026/', 'NRI deposit financing and RBI swap facility'], ['/desk/outcomes/', 'Five measured economic outcomes'], ['/desk/chronology/', 'Historical chronology'], ['/research/oil-rupee-weekly/', '52-week oil and rupee archive'], ['/desk/commissions/', 'Research pipeline']],
   1797: [['/what-if/gst-pass-through/', 'GST statutory rate pass-through'], ['/desk/india-year-in-review/public-money/', 'Historical public money timeline']],
   1799: [['/research/repo-transmission/', 'Reproduce RBI loan-rate transmission']],
   1803: [['/what-if/landed-cost/', 'Tariff landed-cost scenario'], ['/desk/india-year-in-review/tariffs/', 'Tariff policy timeline']],
@@ -78,7 +79,7 @@ const ARTICLE_RESEARCH = {
   1808: [['/desk/chronology/', 'Dated labour-rule milestones']],
   1809: [['/research/fy26-capex/', 'FY26 public capital spending audit']],
   1079: [['/research/fy26-capex/', 'Budget commitments versus outturn']],
-  1097: [['/research/dollar-cushion/', 'RBI current account and financing ledger']],
+  1097: [['/research/dollar-cushion/', 'RBI current account and financing ledger'], ['/research/fcnr-2026/', 'FCNR(B) deposit finance bridge']],
   1109: [['/research/dollar-cushion/', 'External account financing ledger']],
   1410: [['/what-if/landed-cost/', 'Product tariff cost calculator']],
   1081: [['/research/thali/', 'Ingredient-price model (wholesale, illustrative)']],
@@ -108,6 +109,7 @@ const TOOLS = [
   { url: '/desk/outcomes/', kicker: 'Year-in-review', title: 'Five outcomes: evidence scorecard', blurb: 'Household prices, jobs, investment, fiscal execution and external resilience, each with a source date and a falsifiable next test.' },
   { url: '/research/china-inputs/', kicker: 'Trade research', title: 'India’s China-origin import exposure', blurb: 'The 2025 China share of India’s goods imports, HS chapter by chapter, from UN Comtrade.' },
   { url: '/research/thali/', kicker: 'Food research', title: 'Price of a thali: wholesale ingredients', blurb: 'Agmarknet modal-price snapshot turned into a transparent illustrative ingredient budget.' },
+  { url: '/research/fcnr-2026/', kicker: 'External financing', title: 'The 2026 NRI dollar deposit bridge', blurb: 'Compare the RBI FCNR(B) swap facility with the half-year balance-of-payments financing table, without double counting bank deposits.' },
   { url: '/research/dollar-cushion/', kicker: 'External accounts', title: 'India’s dollar cushion', blurb: 'RBI September 2026 goods, services, income, transfers and financing in one reproducible ledger.' },
   { url: '/research/getting-to-work/', kicker: 'Field lab', title: 'The economics of getting to work', blurb: 'Compare job access after rent, commuting cash, travel time and care costs, with a reproducible survey framework.' },
   { url: '/desk/commissions/', kicker: 'Research queue', title: 'Nineteen investigations, tracked', blurb: 'Every commission from the historical blueprint, its published coverage and the empirical work outstanding.' },
@@ -121,7 +123,7 @@ const SECTIONS = [
   { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology'], ['/desk/commissions/', 'Research queue'], ['/desk/outcomes/', 'Five outcomes'], ['/research/oil-rupee-weekly/', '52-week archive']], match: ['/desk/', '/research/oil-rupee-weekly/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
   { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs'], ['/research/fy26-capex/', 'FY26 capex'], ['/research/thali/', 'Thali prices']], match: ['/economy/', '/research/fy26-capex/', '/research/thali/'] },
-  { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix'], ['/research/china-inputs/', 'China imports'], ['/research/dollar-cushion/', 'Dollar cushion']], match: ['/external/', '/trade/', '/hormuz/', '/research/china-inputs/', '/research/dollar-cushion/'] },
+  { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix'], ['/research/china-inputs/', 'China imports'], ['/research/dollar-cushion/', 'Dollar cushion'], ['/research/fcnr-2026/', 'NRI deposit bridge']], match: ['/external/', '/trade/', '/hormuz/', '/research/china-inputs/', '/research/dollar-cushion/', '/research/fcnr-2026/'] },
   { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/states/fiscal-room/', 'State budgets'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
   { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/my-inflation/', 'Your inflation'], ['/what-if/rupee-value/', 'Rupee value'], ['/what-if/policy-rule/', 'Policy rule'], ['/what-if/debt-path/', 'Debt path'], ['/what-if/pump-price/', 'Pump price'], ['/what-if/landed-cost/', 'Landed cost'], ['/what-if/gst-pass-through/', 'GST pass-through'], ['/research/getting-to-work/', 'Commute economics']], match: ['/what-if/', '/research/getting-to-work/'] },
   { name: 'Charts', url: '/charts/', blurb: 'Plot any series against any other', tabs: [], match: ['/charts/', '/s/'] },
@@ -286,7 +288,7 @@ ${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; co
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/desk/chronology/">Chronology</a></li><li><a href="/desk/commissions/">Research queue</a></li><li><a href="/research/fy26-capex/">Capex audit</a></li><li><a href="/research/getting-to-work/">Commute research lab</a></li><li><a href="/research/china-inputs/">China import map</a></li><li><a href="/research/thali/">Thali research</a></li><li><a href="/research/dollar-cushion/">Dollar cushion</a></li><li><a href="/desk/outcomes/">Annual outcome scorecard</a></li><li><a href="https://thekakisto.wordpress.com/2026/11/14/india-economic-year-in-review-2025-2026-growth-jobs-inflation-capital-flows/">Annual economic investigation</a></li><li><a href="/research/oil-rupee-weekly/">52-week historical archive</a></li><li><a href="https://${SITE}/corrections-and-methodology/">Corrections policy</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/desk/chronology/">Chronology</a></li><li><a href="/desk/commissions/">Research queue</a></li><li><a href="/research/fy26-capex/">Capex audit</a></li><li><a href="/research/getting-to-work/">Commute research lab</a></li><li><a href="/research/china-inputs/">China import map</a></li><li><a href="/research/thali/">Thali research</a></li><li><a href="/research/dollar-cushion/">Dollar cushion</a></li><li><a href="/research/fcnr-2026/">NRI dollar deposit bridge</a></li><li><a href="/desk/outcomes/">Annual outcome scorecard</a></li><li><a href="https://thekakisto.wordpress.com/2026/11/14/india-economic-year-in-review-2025-2026-growth-jobs-inflation-capital-flows/">Annual economic investigation</a></li><li><a href="/research/oil-rupee-weekly/">52-week historical archive</a></li><li><a href="https://${SITE}/corrections-and-methodology/">Corrections policy</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
 <div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
@@ -550,6 +552,8 @@ async function main() {
   await cp('src/thali.css', join(OUT, 'thali.css'));
   await cp('src/dollar-cushion.js', join(OUT, 'dollar-cushion.js'));
   await cp('src/dollar-cushion.css', join(OUT, 'dollar-cushion.css'));
+  await cp('src/fcnr-2026.js', join(OUT, 'fcnr-2026.js'));
+  await cp('src/fcnr-2026.css', join(OUT, 'fcnr-2026.css'));
   await cp('src/outcomes.js', join(OUT, 'outcomes.js'));
   await cp('src/outcomes.css', join(OUT, 'outcomes.css'));
   await cp('src/oil-weekly.js', join(OUT, 'oil-weekly.js'));
@@ -583,7 +587,7 @@ async function main() {
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
   // ---- public data API (static JSON, CORS open)
-  const api = { 'india-year-in-review': 'Dated India policy milestones, primary documents and related coverage', 'research/getting-to-work-schema': 'Anonymised commute research field definitions, output formulas and privacy limitations', 'research/china-inputs': '2025 HS2 merchandise import exposure from India-reported UN Comtrade', 'research/thali-snapshot': 'Agmarknet wholesale modal average snapshot, not retail CPI', 'research/dollar-cushion': 'RBI September and April-September 2026 BoP components and source vintages', 'research/year-outcome-scorecard': 'Five original-source economic indicators with time windows and attribution limits', 'research/oil-rupee-weekly': 'Fifty-two historical weekly oil, rupee and trade essays, complete source-vintage manuscript and EIA/Fed benchmark CSV' };
+  const api = { 'india-year-in-review': 'Dated India policy milestones, primary documents and related coverage', 'research/getting-to-work-schema': 'Anonymised commute research field definitions, output formulas and privacy limitations', 'research/china-inputs': '2025 HS2 merchandise import exposure from India-reported UN Comtrade', 'research/thali-snapshot': 'Agmarknet wholesale modal average snapshot, not retail CPI', 'research/dollar-cushion': 'RBI September and April-September 2026 BoP components and source vintages', 'research/fcnr-2026': 'RBI FCNR(B) facility snapshot dates versus balance-of-payments financing and a nonforecast net-deposit counterfactual', 'research/year-outcome-scorecard': 'Five original-source economic indicators with time windows and attribution limits', 'research/oil-rupee-weekly': 'Fifty-two historical weekly oil, rupee and trade essays, complete source-vintage manuscript and EIA/Fed benchmark CSV' };
   if (MK) {
     const I = { dates: MK.dates, series: MK.series, pe: MK.pe, pb: MK.pb, dy: MK.dy };
     await write('api/markets/indices.json', JSON.stringify(I));
@@ -1117,8 +1121,13 @@ async function main() {
   const yearOutcomes = JSON.parse(await readFile('data/year-outcome-scorecard.json','utf8'));
   await write('api/research/year-outcome-scorecard.json', JSON.stringify(yearOutcomes));
   await write('desk/outcomes/index.html', P({ title: 'Five outcomes that shaped India’s year', path: '/desk/outcomes/', description: 'Five outcome dimensions with dated MoSPI, RBI and CGA evidence and their interpretation limits, without an invented composite score.', body: outcomesPage({data: yearOutcomes, pageHead}) }));
+  const fcnrFinancing = JSON.parse(await readFile('data/fcnr-financing-2026.json','utf8'));
+  await write('api/research/fcnr-2026.json', JSON.stringify(fcnrFinancing));
+  await write('research/fcnr-2026/facility.csv', fcnrCsv(fcnrFinancing));
+  await write('research/fcnr-2026/bop-financing.csv', financingCsv(fcnrFinancing));
+  await write('research/fcnr-2026/index.html', P({ title: '2026 NRI deposit financing: RBI facility and balance-of-payments bridge', path: '/research/fcnr-2026/', description: 'Original-source RBI FCNR(B) facility mobilisation snapshots versus distinct net balance-of-payments NRI deposits, with an accounting stress test.', body: fcnrFinancingPage({data:fcnrFinancing,pageHead}) }));
   await write('desk/chronology/index.html', P({ title: 'Economic chronology: 2025–26', path: '/desk/chronology/', description: 'Search source-linked milestones across eight Indian economic storylines, with dated policy decisions and analysis.', body: chronologyPage({ review, articles: m.articles, pageHead }) }));
-  reviewPaths.push('/desk/chronology/', '/desk/commissions/', '/desk/outcomes/', '/research/fy26-capex/', '/research/getting-to-work/', '/research/china-inputs/', '/research/thali/', '/research/dollar-cushion/');
+  reviewPaths.push('/desk/chronology/', '/desk/commissions/', '/desk/outcomes/', '/research/fy26-capex/', '/research/getting-to-work/', '/research/china-inputs/', '/research/thali/', '/research/dollar-cushion/', '/research/fcnr-2026/');
   const oilWeekPaths = await writeOilWeekArchive({ source: await readFile('docs/oil-rupee-52-week-retrospective.md','utf8'), pageHead, publish: P, write });
   reviewPaths.push(...oilWeekPaths);
   await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
