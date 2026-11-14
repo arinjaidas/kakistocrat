@@ -2,6 +2,7 @@ name: Site checks
 # Builds the site and checks for broken links, stale data and pages that break on phones.
 on:
   push: { branches: [main] }
+  pull_request: { branches: [main] }
   schedule: [{ cron: '30 3 * * *' }]
   workflow_dispatch:
 jobs:
@@ -16,6 +17,8 @@ jobs:
         with: { python-version: '3.12' }
       - name: Build
         run: SKIP_IMG=1 node build.mjs
+      - name: Chronology register
+        run: node scripts/check_chronology.mjs
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones

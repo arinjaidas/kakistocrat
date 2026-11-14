@@ -1,0 +1,113 @@
+{
+  "version": "2026-11-14",
+  "status": "proposed, not published",
+  "rule": "Publish only after primary documents have been independently rechecked, chronology reconciled, and the relevant claims supported. Never backdate the actual publication timestamp merely to match the event date.",
+  "commissions": [
+    {
+      "id": "C01",
+      "event": "S04",
+      "priority": "P0",
+      "title": "Did India's GST rate reset reach consumer prices or only tax collections?",
+      "question": "What changed in comparable retail prices after the September 2025 rate changes, and what happened to domestic GST receipts?",
+      "methods": "Use matched CPI items and retailer price series where available; separate category composition, pre/post price movements and seasonal shifts. Do not infer causal pass-through from a national time series alone.",
+      "primary": [
+        "GST Council decision and notifications",
+        "MoSPI CPI item/group series",
+        "GSTN monthly collection releases"
+      ],
+      "artifact": "GST announcement-to-consumer-price timeline; receipts chart",
+      "status": "research"
+    },
+    {
+      "id": "C02",
+      "event": "S31",
+      "priority": "P0",
+      "title": "When forced-labour tariffs hit supply chains, who paid the compliance bill?",
+      "question": "Which covered product lines and competitor countries faced different rules, and how might documentation change delivered cost?",
+      "methods": "Reconcile proposal, comment period, final action, scope and effective dates; compare matched product-specific duties and compliance expenses.",
+      "primary": [
+        "USTR Section 301 proposal",
+        "Federal Register notices",
+        "USITC HTS data and customs guidance"
+      ],
+      "artifact": "Country/product exposure matrix and landed-cost scenario",
+      "status": "research"
+    },
+    {
+      "id": "C03",
+      "event": "S53",
+      "priority": "P0",
+      "title": "The tariff announcement is not the factory-gate price",
+      "question": "How did the July 2026 final action change importer duties and exporters' relative position compared with the proposal?",
+      "methods": "Build legal action-to-effective date matrix with exclusion and textile quota flags. Avoid assuming all product lines are covered.",
+      "primary": [
+        "USTR final action",
+        "Federal Register implementing documents",
+        "US customs notices",
+        "Indian product-level trade statistics"
+      ],
+      "artifact": "Before/after tariff table by product and comparator",
+      "status": "research"
+    },
+    {
+      "id": "C04",
+      "event": "S33",
+      "priority": "P0",
+      "title": "What India's revised GDP series changes about the investment story",
+      "question": "Does the revised base alter the relative contributions of consumption, public investment, private investment and inventories?",
+      "methods": "Reconcile series vintages and levels, compare component contributions to real GDP and do not splice incompatible base years.",
+      "primary": [
+        "MoSPI June 2026 GDP press note",
+        "MoSPI GDP back series",
+        "Economic Survey tables"
+      ],
+      "artifact": "Reproducible GDP contribution notebook",
+      "status": "research"
+    },
+    {
+      "id": "C05",
+      "event": "S12",
+      "priority": "P1",
+      "title": "Labour rules are not labour rights until they operate in the workplace",
+      "question": "What changed between draft and final rules, and which workers and states are covered?",
+      "methods": "Compare delegated rulemaking, promulgation, effective dates and state-level implementation. Separate proposed from operative text.",
+      "primary": [
+        "Ministry of Labour draft rules",
+        "Gazette final notifications",
+        "State labour department rules"
+      ],
+      "artifact": "Worker coverage and implementation tracker",
+      "status": "research"
+    },
+    {
+      "id": "C06",
+      "event": "S14",
+      "priority": "P1",
+      "title": "Where the Economic Survey's investment case can be tested",
+      "question": "Which public capital projects and private investment claims can be checked against subsequent expenditure, financing and commissioning?",
+      "methods": "Cross-check baseline forecasts against later CAG/CGA, capex disbursement and production reports.",
+      "primary": [
+        "Economic Survey 2025-26",
+        "Union Budget capital expenditure tables",
+        "CGA expenditure data"
+      ],
+      "artifact": "Forecast-versus-outturn table with vintage dates",
+      "status": "research"
+    },
+    {
+      "id": "C07",
+      "event": "S17",
+      "priority": "P1",
+      "title": "A rate hold is not a pause in interest-rate transmission",
+      "question": "How did bank lending and deposit rates continue to adjust after the February 2026 hold?",
+      "methods": "Compare floating/fixed contracts, fresh versus outstanding weighted averages, and reset lags without causal claims.",
+      "primary": [
+        "RBI MPC resolution and minutes",
+        "RBI weighted average lending rate tables",
+        "RBI deposit rate data"
+      ],
+      "artifact": "Update RBI transmission notebook",
+      "status": "research"
+    }
+  ]
+}
