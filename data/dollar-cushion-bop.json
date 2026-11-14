@@ -1,0 +1,70 @@
+{
+  "as_of": "2026-11-14",
+  "source": "Reserve Bank of India, Developments in India's Balance of Payments for the Month of September 2026",
+  "source_release_date": "2026-11-13",
+  "source_url": "https://www.rbi.org.in/SCRIPTS/BS_PressReleaseDisplay.aspx?prid=63974",
+  "units": "US$ billion",
+  "sign_convention": "Net credits and inflows are positive; net deficits and outflows are negative. RBI Monetary Movements column uses negative for reserve increase and positive for decrease. Reserve valuation effects are not computed.",
+  "rows": [
+    {
+      "id": "sep2026",
+      "period": "September 2026",
+      "stage": "Preliminary (P)",
+      "merchandise": -30,
+      "services": 19.2,
+      "transfers": 10.9,
+      "income": -7.6,
+      "current": -7.4,
+      "capital": 16.2,
+      "overall": 8.8,
+      "monetary": -8.8
+    },
+    {
+      "id": "sep2025",
+      "period": "September 2025",
+      "stage": "Partially Revised (PR)",
+      "merchandise": -33.4,
+      "services": 18.8,
+      "transfers": 11.5,
+      "income": -2.2,
+      "current": -5.2,
+      "capital": -0.4,
+      "overall": -5.6,
+      "monetary": 5.6
+    },
+    {
+      "id": "aprsep2026",
+      "period": "April–September 2026",
+      "stage": "Preliminary (P)",
+      "merchandise": -176.1,
+      "services": 105,
+      "transfers": 77.7,
+      "income": -32.4,
+      "current": -25.8,
+      "capital": 92.6,
+      "overall": 66.8,
+      "monetary": -66.8
+    },
+    {
+      "id": "aprsep2025",
+      "period": "April–September 2025",
+      "stage": "Partially Revised (PR)",
+      "merchandise": -158.1,
+      "services": 98.8,
+      "transfers": 67.2,
+      "income": -25.8,
+      "current": -18,
+      "capital": 11.6,
+      "overall": -6.4,
+      "monetary": 6.4
+    }
+  ],
+  "caveats": [
+    "The current account is merchandise, services, transfers and primary income; component totals can differ by 0.1 US$ billion due to release rounding.",
+    "The RBI's table calls B 'Capital Account (Net)' and includes FDI, FPI, banking capital, other capital and related flows. It is not a standalone measure of permanent or discretionary finance.",
+    "The overall BoP is the current account plus RBI's B aggregate. Its balancing monetary movement has the inverse sign; this is a transaction-flow identity, not a change in gross FX reserves including valuation.",
+    "Compare September with September and April–September with April–September; monthly and half-year magnitudes cannot be interpreted interchangeably.",
+    "Preliminary and partially revised vintages may change in later RBI releases.",
+    "A financial-flow surplus can coexist with a current-account deficit; it does not imply no external risks."
+  ]
+}
