@@ -364,7 +364,12 @@
       "detail": "RBI kept repo at 5.25%. A checkpoint in measuring lending rate pass-through.",
       "priority": 2,
       "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62169",
-      "articles": []
+      "articles": [
+        {
+          "id": 1799,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/rbi-february-2026-hold-loan-rate-transmission-retrospective/"
+        }
+      ]
     },
     {
       "id": "S18",
