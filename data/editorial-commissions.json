@@ -35,7 +35,11 @@
         "USITC HTS data and customs guidance"
       ],
       "artifact": "Country/product exposure matrix and landed-cost scenario",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1803,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "remaining_work": "Build a matched HS-level proposal-to-final tariff exposure table and compliance-cost estimates."
     },
     {
       "id": "C03",
@@ -51,7 +55,11 @@
         "Indian product-level trade statistics"
       ],
       "artifact": "Before/after tariff table by product and comparator",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1803,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "remaining_work": "Track any subsequent TRQ implementation, actual covered customs-line imports and exemptions; do not assume quota activation."
     },
     {
       "id": "C04",
