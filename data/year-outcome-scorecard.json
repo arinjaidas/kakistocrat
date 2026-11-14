@@ -2,7 +2,7 @@
   "title": "What shaped India's economy: five measured outcomes",
   "as_of": "2026-11-14",
   "review_window": "2025-11-14 to 2026-11-13",
-  "status": "Evidence-based scorecard supporting the annual synthesis. Not a causal ranking and not the completed C18 flagship article.",
+  "status": "Five-outcome source ledger supporting the annual flagship published 14 November 2026. The independent causal research follow-ups remain open.",
   "method": "Each row keeps its own observation period, source publication date and measurement vintage. Do not combine the indicators into an arbitrary weighted total. Source-specific descriptions take precedence over narrative labels.",
   "dimensions": [
     {
@@ -293,5 +293,11 @@
       ]
     }
   ],
-  "editorial_decision": "Do not assign a composite score or rank the five dimensions by subjective importance or incomparable numerical magnitudes. An annual flagship article is a separate editorial deliverable and should be published only after its mechanisms, comparisons and contrary evidence are verified."
+  "editorial_decision": "The annual flagship has been published using the five distinct source-vintage outcomes. Do not assign an arbitrary composite score, rank incomparable measures numerically, or present simultaneous trends as identified causal policy effects. Subsequent research will add matched comparisons, contrary evidence and explicitly dated updates.",
+  "flagship": {
+    "id": 1814,
+    "url": "https://thekakisto.wordpress.com/2026/11/14/india-economic-year-in-review-2025-2026-growth-jobs-inflation-capital-flows/",
+    "title": "India grew through a year of shocks. Who paid the bill?",
+    "date": "2026-11-14"
+  }
 }

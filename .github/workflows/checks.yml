@@ -41,6 +41,8 @@ jobs:
         run: |
           node scripts/check_oil_weekly.mjs
           node --check src/oil-weekly.js
+      - name: Canonical annual flagship integration
+        run: node scripts/check_annual_flagship.mjs
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones
