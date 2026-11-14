@@ -19,6 +19,8 @@ jobs:
         run: SKIP_IMG=1 node build.mjs
       - name: Chronology register
         run: node scripts/check_chronology.mjs
+      - name: Editorial research source checks
+        run: node scripts/check_editorial_research.mjs
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones
