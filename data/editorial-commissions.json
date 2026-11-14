@@ -74,7 +74,11 @@
         "Economic Survey tables"
       ],
       "artifact": "Reproducible GDP contribution notebook",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1804,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/",
+      "remaining_work": "Create a reproducible cross-vintage workbook from MoSPI release tables and test how the extra release-calendar time affects later revision sizes."
     },
     {
       "id": "C05",
