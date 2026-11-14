@@ -2,6 +2,7 @@ name: Site checks
 # Builds the site and checks for broken links, stale data and pages that break on phones.
 on:
   push: { branches: [main] }
+  pull_request: { branches: [main] }
   schedule: [{ cron: '30 3 * * *' }]
   workflow_dispatch:
 jobs:
