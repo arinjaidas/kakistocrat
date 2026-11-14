@@ -544,7 +544,12 @@
       "detail": "USTR forced-labour proposal creates potential compliance costs and differential textile exposure. Later actions require separate legal checks.",
       "priority": 1,
       "source": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/june/ustr-makes-findings-and-proposes-action-60-section-301-investigations-relating-failures-take-action",
-      "articles": []
+      "articles": [
+        {
+          "id": 1803,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/"
+        }
+      ]
     },
     {
       "id": "S32",
@@ -618,7 +623,12 @@
       "detail": "USTR final action puts India in the 10% group for covered goods. Compare applicable product exemptions and the announced textile quota treatment for competing suppliers.",
       "priority": 1,
       "source": "https://www.ustr.gov/about/policy-offices/press-office/press-releases/2026/july/ustr-takes-action-forced-labor-section-301-investigations",
-      "articles": []
+      "articles": [
+        {
+          "id": 1803,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/"
+        }
+      ]
     },
     {
       "id": "S38",
