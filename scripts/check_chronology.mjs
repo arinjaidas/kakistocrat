@@ -26,7 +26,10 @@ for (const s of review.series) {
 const commissioned = new Set();
 for (const c of editorial.commissions) {
   if (!events.has(c.event)) fail.push('Commission references unknown event: ' + c.event);
-  else if ((events.get(c.event).articles || []).length) fail.push('Commission is no longer an unlinked milestone: ' + c.event);
+  else if ((events.get(c.event).articles || []).length) {
+    if (!c.status?.startsWith('published') || !events.get(c.event).articles.some(a => a.id === c.article_id && a.url === c.article_url))
+      fail.push('Completed commission must match its published milestone: ' + c.event);
+  } else if (c.status?.startsWith('published')) fail.push('Published commission has no linked article: ' + c.event);
   if (!['P0','P1','P2'].includes(c.priority)) fail.push('Unknown priority for commission: ' + c.id);
   if (!c.question || !c.methods || !c.primary?.length || !c.artifact) fail.push('Incomplete commission: ' + c.id);
   if (commissioned.has(c.event)) fail.push('Duplicate commission: ' + c.event);
