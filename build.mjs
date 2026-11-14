@@ -66,6 +66,21 @@ const TOPICS = {
 };
 const TOPIC_ORDER = Object.keys(TOPICS);
 const FEATURED_SERIES = ['the-2026-oil-shock', 'the-politics-of-public-money', 'americas-tariff-reset'];
+// Editorially selected companions only. These links do not retroactively change the canonical WordPress article.
+const ARTICLE_RESEARCH = {
+  1797: [['/what-if/gst-pass-through/', 'GST statutory rate pass-through'], ['/desk/india-year-in-review/public-money/', 'Historical public money timeline']],
+  1799: [['/research/repo-transmission/', 'Reproduce RBI loan-rate transmission']],
+  1803: [['/what-if/landed-cost/', 'Tariff landed-cost scenario'], ['/desk/india-year-in-review/tariffs/', 'Tariff policy timeline']],
+  1804: [['/economy/divergence/', 'GDP contribution analysis']],
+  1808: [['/desk/chronology/', 'Dated labour-rule milestones']],
+  1809: [['/research/fy26-capex/', 'FY26 public capital spending audit']],
+  1079: [['/research/fy26-capex/', 'Budget commitments versus outturn']],
+  1097: [['/research/dollar-cushion/', 'RBI current account and financing ledger']],
+  1109: [['/research/dollar-cushion/', 'External account financing ledger']],
+  1410: [['/what-if/landed-cost/', 'Product tariff cost calculator']],
+  1081: [['/research/thali/', 'Ingredient-price model (wholesale, illustrative)']],
+  1613: [['/research/china-inputs/', 'China-origin imports and supplier exposure']],
+};
 let HAS_CALLS = false, DESK = null;
 export const TAPE_S = { cpi: 'india-cpi', repo: 'india-repo', inr: 'fx-usdinr', g10: 'nse-nifty-10-yr-benchmark-g-sec', brent: 'fred-dcoilbrenteu', nifty: 'nse-nifty-50' };
 const TOOLS = [
@@ -332,6 +347,7 @@ function home(m, tape, ledger, X = {}) {
 function articlePage(a, m) {
   const t = TOPICS[a.topic];
   const sameTopic = m.articles.filter(x => x.topic === a.topic && x.id !== a.id).slice(0, 5);
+  const researchCompanions = ARTICLE_RESEARCH[a.id] || [];
   const seriesBoxes = a.series.map(s => { const S = m.series.find(x => x.slug === s.slug); if (!S) return ''; return `<aside class="series-box"><span class="kicker">Part of a series</span><h2 style="margin:6px 0 4px;font:500 24px/1.2 var(--serif)"><a href="/series/${S.slug}/">${esc(S.name)}</a></h2><p class="dek sm">${esc(S.description)}</p><ol>${S.items.map(x => `${x.id === a.id ? `<li class="here"><span>${esc(x.title)}</span> <small>(you are reading this)</small></li>` : `<li><a href="${x.url}">${esc(x.title)}</a></li>`}`).join('')}</ol></aside>`; }).join('');
   return `<div class="wrap"><article class="art">
 <div>
@@ -339,6 +355,7 @@ function articlePage(a, m) {
  <h1>${esc(a.title)}</h1><p class="dek">${esc(a.excerpt)}</p>
  <div class="byline"><span>By <b>Arinjai Das</b></span><span>${esc(longDate(a.date))}</span><span>${a.minutes} min read</span><a href="${esc(a.wpLink)}">Comment or subscribe on WordPress →</a></div></header>
  <div class="prose">${a.linkedHtml || a.html}</div>
+ ${researchCompanions.length ? `<section class="story-space"><div class="ss-head"><span class="kicker">Explore the evidence</span><a href="/desk/chronology/">Full chronology</a></div><div class="ss-places"><span>Research companions</span><div class="en-chips">${researchCompanions.map(([u, label]) => `<a href="${esc(u)}">${esc(label)}</a>`).join('')}</div></div><p class="meta">The research tools have their own observation periods and assumptions. Check the source vintage before comparing them with this article.</p></section>` : ''}
  ${a.dataCards || (a.places || []).length ? `<section class="story-space"><div class="ss-head"><span class="kicker">${a.dataFallback ? `Data on ${esc(TOPICS[a.topic].short.toLowerCase())}` : 'The data behind this story'}</span><a href="/explore/">Explore everything →</a></div>
   ${a.dataCards ? `<div class="sd-cards">${a.dataCards}</div>` : ''}
   ${(a.places || []).length ? `<div class="ss-places"><span>Places in this story</span><div class="en-chips">${a.places.map(x => `<a href="${x.u}" class="sd-${x.type}">${esc(x.t)}</a>`).join('')}</div></div>` : ''}
