@@ -111,7 +111,11 @@
         "RBI deposit rate data"
       ],
       "artifact": "Update RBI transmission notebook",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1799,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/rbi-february-2026-hold-loan-rate-transmission-retrospective/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Extend matched monthly rates across loan categories and update the source-coded dataset with revised vintages; the article establishes the historical checkpoint, not a causal estimate."
     }
   ]
 }
