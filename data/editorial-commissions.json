@@ -16,7 +16,11 @@
         "GSTN monthly collection releases"
       ],
       "artifact": "GST announcement-to-consumer-price timeline; receipts chart",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1797,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Publish transaction-level matched-price and receipts data notebook; current article includes a simple illustrative scenario and research synthesis, not a causal estimate."
     },
     {
       "id": "C02",
