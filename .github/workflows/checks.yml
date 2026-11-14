@@ -33,6 +33,10 @@ jobs:
           node --check src/china-inputs.js
           node --check src/thali.js
           node --check src/dollar-cushion.js
+      - name: Annual economic outcome evidence checks
+        run: |
+          node scripts/check_outcomes.mjs
+          node --check src/outcomes.js
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones
