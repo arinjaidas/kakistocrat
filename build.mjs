@@ -37,6 +37,7 @@ import { rosette, ribbon } from './lib/guilloche.mjs';
 import { myInflationPage, rupeeValuePage, policyRulePage, debtPathPage, calendarEvents, calendarPage } from './lib/tools.mjs';
 import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
 import { seriesUpdate, writeYearReview } from './lib/year-review.mjs';
+import { chronologyPage } from './lib/chronology.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
 let MK = null;
@@ -83,7 +84,7 @@ const TOOLS = [
 ];
 // The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
 const SECTIONS = [
-  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review']], match: ['/desk/'] },
+  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology']], match: ['/desk/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
   { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs']], match: ['/economy/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix']], match: ['/external/', '/trade/', '/hormuz/'] },
@@ -498,6 +499,8 @@ async function main() {
   await cp('src/styles.css', join(OUT, 'styles.css'));
   await cp('src/app.js', join(OUT, 'app.js'));
   await cp('src/landed-cost.js', join(OUT, 'landed-cost.js'));
+  await cp('src/chronology.js', join(OUT, 'chronology.js'));
+  await cp('src/chronology.css', join(OUT, 'chronology.css'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
   await cp('src/workbench.js', join(OUT, 'workbench.js'));
   await cp('src/chartle.js', join(OUT, 'chartle.js'));
@@ -1032,6 +1035,8 @@ async function main() {
     repoResults: execSync('python3 scripts/repo_transmission.py data/repo-transmission.csv', { encoding: 'utf8' }),
     pageHead, publish: P, write,
   });
+  await write('desk/chronology/index.html', P({ title: 'Economic chronology: 2025–26', path: '/desk/chronology/', description: 'Search source-linked milestones across eight Indian economic storylines, with dated policy decisions and analysis.', body: chronologyPage({ review, articles: m.articles, pageHead }) }));
+  reviewPaths.push('/desk/chronology/');
   await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
   const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
   const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
