@@ -271,7 +271,7 @@
       "observed": "RBI reported a preliminary first-half current-account deficit of US$25.8bn, compared with a partially revised US$18.0bn deficit a year earlier. Services and transfers offset part of a larger net goods deficit.",
       "mechanism": "Service exports and transfers create foreign-currency receipts; private and official financing transactions can fund the remaining current-account gap.",
       "cannot_infer": "Financing inflows do not prove external sustainability, nor do recorded monetary movements capture changes in foreign exchange reserve stocks due to valuation.",
-      "next_test": "Maturity and currency composition of liabilities, cost of financing, reserve-cover definition and matching goods/services observations over several quarters.",
+      "next_test": "Identify the maturity, roll-over and cost structure of the large 2026 net NRI deposit inflow, distinguish the RBI swap facility's gross mobilisations from the BoP net deposits, and compare persistent services exports with temporary financing. Also examine reserve-cover definitions.",
       "primary": {
         "title": "RBI September 2026 Balance of Payments release",
         "release": "2026-11-13",
@@ -281,6 +281,10 @@
         {
           "title": "Dollar cushion research notebook",
           "url": "/research/dollar-cushion/"
+        },
+        {
+          "title": "FCNR(B) dollar deposit finance bridge",
+          "url": "/research/fcnr-2026/"
         },
         {
           "title": "External accounts dashboard",

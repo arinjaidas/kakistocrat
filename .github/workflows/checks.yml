@@ -43,6 +43,10 @@ jobs:
           node --check src/oil-weekly.js
       - name: Canonical annual flagship integration
         run: node scripts/check_annual_flagship.mjs
+      - name: RBI FCNR and net-financing source checks
+        run: |
+          node scripts/check_fcnr_financing.mjs
+          node --check src/fcnr-2026.js
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones

@@ -1,0 +1,11 @@
+(()=>{const payload=document.getElementById('fc-data'),slider=document.getElementById('fc-nri');if(!payload||!slider)return;
+ const d=JSON.parse(payload.textContent),b=d.bop,id=x=>document.getElementById(x);
+ const item=b.financial_flow_components.find(x=>x.id==='banking'),baseline=item.of_which_nri_deposits;
+ const usd=x=>(x<0?'−':x>0?'+':'')+'US$'+Math.abs(x).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+'bn';
+ const run=()=>{const val=Number(slider.value);if(!Number.isFinite(val))return;
+  const difference=val-baseline,finance=b.financial_aggregate+difference,overall=b.current_account.total+finance;
+  id('fc-nri-num').textContent=usd(val);id('fc-b').textContent=usd(finance);id('fc-overall').textContent=usd(overall);id('fc-gap').textContent=usd(difference);
+  id('fc-explain').textContent='Holding all other published net flows fixed, changing net NRI deposits by '+usd(difference)+' changes the computed overall balance one-for-one. Other flows and intervention would likely respond in reality. No reserve stock or exchange rate is forecast.';
+ };
+ slider.addEventListener('input',run);id('fc-reset').addEventListener('click',()=>{slider.value=baseline;run()});run();
+})();
