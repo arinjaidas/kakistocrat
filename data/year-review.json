@@ -184,7 +184,12 @@
       "detail": "GST Council rate changes. Household prices and domestic tax receipts become separate empirical questions.",
       "priority": 1,
       "source": "https://www.gstcouncil.gov.in/sites/default/files/2025-09/press_release_press_information_bureau_0.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1797,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/"
+        }
+      ]
     },
     {
       "id": "S05",
