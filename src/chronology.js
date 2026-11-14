@@ -17,11 +17,10 @@
   if (['core','context'].includes(params.get('priority'))) priority.value = params.get('priority');
   const run = () => {
     const term = q.value.trim().toLocaleLowerCase();
-    const all = !term || term.split(/\s+/).every(word => true);
+    const words = term.split(/\s+/).filter(Boolean);
     let shown = 0;
     for (const card of cards) {
-      const words = term.split(/\s+/).filter(Boolean);
-      const matchText = all && words.every(word => card.dataset.search.includes(word));
+      const matchText = words.every(word => card.dataset.search.includes(word));
       const matchSeries = series.value === 'all' || card.dataset.series.split(/\s+/).includes(series.value);
       const matchCovered = covered.value === 'all' || card.dataset.covered === covered.value;
       const matchPriority = priority.value === 'all' || card.dataset.priority === priority.value;
