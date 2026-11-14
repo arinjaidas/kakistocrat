@@ -27,7 +27,7 @@ for(const row of commodity.rows){
 }
 const raw=commodity.rows.reduce((s,r)=>s+r.quantity_kg*r.wholesale_rupees_per_kg,0);
 if(!(raw>0&&Number.isFinite(raw)))throw Error('Impossible ingredient-cost default');
-if(!thaliCsv(commodity).includes('wholesale_rupees_per_quintal'))throw Error('Thali CSV missing unit');
+if(!thaliCsv(commodity).includes('wholesale_modal_rupees_per_quintal'))throw Error('Thali CSV missing unit');
 const bop=read('data/dollar-cushion-bop.json');
 if(bop.source_release_date!=='2026-11-13'||bop.rows.length!==4)throw Error('Unexpected RBI source vintage');
 for(const r of bop.rows){
