@@ -27,6 +27,12 @@ jobs:
           node --check src/getting-to-work.js
           python -m py_compile scripts/getting_to_work_analysis.py
           python scripts/getting_to_work_analysis.py static/research/getting-to-work/field-template.csv --output /tmp/gw-results.csv
+      - name: Historical reading-path source and arithmetic checks
+        run: |
+          node scripts/check_four_labs.mjs
+          node --check src/china-inputs.js
+          node --check src/thali.js
+          node --check src/dollar-cushion.js
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones
