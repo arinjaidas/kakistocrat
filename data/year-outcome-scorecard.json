@@ -1,0 +1,297 @@
+{
+  "title": "What shaped India's economy: five measured outcomes",
+  "as_of": "2026-11-14",
+  "review_window": "2025-11-14 to 2026-11-13",
+  "status": "Evidence-based scorecard supporting the annual synthesis. Not a causal ranking and not the completed C18 flagship article.",
+  "method": "Each row keeps its own observation period, source publication date and measurement vintage. Do not combine the indicators into an arbitrary weighted total. Source-specific descriptions take precedence over narrative labels.",
+  "dimensions": [
+    {
+      "id": "households",
+      "name": "Household purchasing power",
+      "question": "How much did prices change, and for whom?",
+      "main": {
+        "label": "Headline CPI inflation",
+        "value": 6.09,
+        "previous": 5.54,
+        "unit": "%",
+        "current_period": "October 2026",
+        "previous_period": "September 2026",
+        "note": "Both figures are year-on-year inflation rates, not the month-on-month change in the index."
+      },
+      "supporting": [
+        {
+          "label": "Food inflation",
+          "value": 8.94,
+          "unit": "% YoY",
+          "period": "October 2026"
+        },
+        {
+          "label": "Rural headline CPI",
+          "value": 6.63,
+          "unit": "% YoY",
+          "period": "October 2026"
+        },
+        {
+          "label": "Urban headline CPI",
+          "value": 5.41,
+          "unit": "% YoY",
+          "period": "October 2026"
+        }
+      ],
+      "observed": "MoSPI recorded provisional combined CPI inflation of 6.09% in October, with food inflation at 8.94% and higher rural headline inflation than urban. The variation matters for household expenditure burdens.",
+      "mechanism": "Different consumption baskets, food costs, fuel and transport changes can alter households' real purchasing power even when the national headline rate is identical.",
+      "cannot_infer": "This release does not tell us the distribution of real wage changes, the tax-cut pass-through to specific goods or which household suffered the largest welfare loss.",
+      "next_test": "Matched household expenditure weights, observed real earnings, commodity-level retail prices and consistent prior-period inflation vintages.",
+      "primary": {
+        "title": "MoSPI CPI October 2026, 2024 base",
+        "release": "2026-11-12",
+        "url": "https://mospi.gov.in/uploads/latestreleasesfiles/1794480048335-Press%20Release%20of%20CPI%20for%20October%202026%20.pdf"
+      },
+      "related": [
+        {
+          "title": "GST consumer prices",
+          "url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/"
+        },
+        {
+          "title": "Thali wholesale-cost research",
+          "url": "/research/thali/"
+        },
+        {
+          "title": "Inflation dashboard",
+          "url": "/economy/prices/"
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "name": "Work and job quality",
+      "question": "Were more people working, and in what jobs?",
+      "main": {
+        "label": "PLFS unemployment rate",
+        "value": 5.1,
+        "previous": 5.4,
+        "unit": "%",
+        "current_period": "July–September 2026",
+        "previous_period": "April–June 2026",
+        "note": "Age 15+, Current Weekly Status, all India; quarterly not monthly unemployment."
+      },
+      "supporting": [
+        {
+          "label": "Worker-population ratio",
+          "value": 52.7,
+          "previous": 51.7,
+          "unit": "%",
+          "period": "July–September vs April–June 2026"
+        },
+        {
+          "label": "Rural self-employed workers",
+          "value": 62.7,
+          "previous": 61.4,
+          "unit": "% of rural employed",
+          "period": "July–September vs April–June 2026"
+        }
+      ],
+      "observed": "Overall unemployment declined to 5.1% from 5.4%; worker-population ratio increased to 52.7% from 51.7%. Rural self-employment expanded in the composition of work.",
+      "mechanism": "Rising participation and employment together change the interpretation of a falling unemployment rate. Job status and hours also affect income security.",
+      "cannot_infer": "The unemployment and employment ratios alone do not establish higher real wages, improved hours, formal employment or durable career progression.",
+      "next_test": "Comparable worker earnings, paid hours, contract security, urban/rural job transitions, cohort composition and confidence intervals.",
+      "primary": {
+        "title": "MoSPI PLFS Quarterly Bulletin July–September 2026",
+        "release": "2026-11-10",
+        "url": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1794295684925_f604faa2-d13d-4df0-b9b7-2454962048b9_Press_note_July-Sept_2026_PLFS_QB.pdf"
+      },
+      "related": [
+        {
+          "title": "Employment quality analysis",
+          "url": "https://thekakisto.wordpress.com/2026/11/11/india-plfs-july-september-2026-jobs-quality/"
+        },
+        {
+          "title": "Labour rules history",
+          "url": "https://thekakisto.wordpress.com/2026/11/14/india-industrial-relations-draft-final-central-rules-2025-2026/"
+        },
+        {
+          "title": "Urban job access lab",
+          "url": "/research/getting-to-work/"
+        }
+      ]
+    },
+    {
+      "id": "investment",
+      "name": "Growth and investment",
+      "question": "Did expansion represent productive investment?",
+      "main": {
+        "label": "Real GDP growth",
+        "value": 7.8,
+        "unit": "% YoY",
+        "current_period": "April–June 2026",
+        "previous": null,
+        "previous_period": null,
+        "note": "Quarterly constant-price GDP, base year 2022–23."
+      },
+      "supporting": [
+        {
+          "label": "Real GFCF growth",
+          "value": 11.9,
+          "unit": "% YoY",
+          "period": "April–June 2026"
+        },
+        {
+          "label": "Consumption contribution",
+          "value": 3.95,
+          "unit": "percentage points",
+          "period": "April–June 2026"
+        },
+        {
+          "label": "Fixed-investment contribution",
+          "value": 3.95,
+          "unit": "percentage points",
+          "period": "April–June 2026"
+        }
+      ],
+      "observed": "Real GDP grew 7.8% and gross fixed capital formation grew 11.9% year on year in April–June. Consumption and fixed investment each contributed approximately four percentage points of measured growth on the expenditure side.",
+      "mechanism": "Stronger demand can make additional capacity attractive, but national accounts measure total investment by public, private and household sectors.",
+      "cannot_infer": "Total GFCF is not private corporate capital expenditure. A growth contribution is accounting, not an identified causal effect of a policy or project.",
+      "next_test": "Company and small-firm actual capital expenditure, project commissioning and utilisation, sector jobs and vintage-consistent GDP revisions.",
+      "primary": {
+        "title": "MoSPI expenditure-side GDP release, April–June 2026",
+        "release": "2026-08-31",
+        "url": "https://static.pib.gov.in/WriteReadData/userfiles/image/2026/aug/Screenshot2026-08-31154041_20260831154150_11d4eb.png"
+      },
+      "related": [
+        {
+          "title": "Private investment test",
+          "url": "https://thekakisto.wordpress.com/2026/08/31/india-april-june-2026-gdp-private-investment-test/"
+        },
+        {
+          "title": "Growth divergence",
+          "url": "/economy/divergence/"
+        },
+        {
+          "title": "GDP release vintage investigation",
+          "url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/"
+        }
+      ]
+    },
+    {
+      "id": "public-finance",
+      "name": "Public investment and fiscal capacity",
+      "question": "How much of the public investment plan was realised?",
+      "main": {
+        "label": "FY26 Union capital expenditure, provisional",
+        "value": 1069119,
+        "previous": 1121090,
+        "unit": "₹ crore",
+        "current_period": "FY2025–26 provisional accounts",
+        "previous_period": "Original FY2025–26 Budget Estimate",
+        "note": "The comparison is actual provisional outturn against an earlier plan, not two time-series observations."
+      },
+      "supporting": [
+        {
+          "label": "FY26 revised capex estimate",
+          "value": 1095755,
+          "unit": "₹ crore",
+          "period": "2025–26 RE"
+        },
+        {
+          "label": "PA minus original BE",
+          "value": -51971,
+          "unit": "₹ crore",
+          "period": "FY2025–26"
+        },
+        {
+          "label": "Shortfall versus BE",
+          "value": -4.64,
+          "unit": "% of BE",
+          "period": "FY2025–26"
+        }
+      ],
+      "observed": "CGA provisional, unaudited accounts recorded ₹10,69,119 crore in Union capital expenditure against the original ₹11,21,090 crore budget, a shortfall of ₹51,971 crore.",
+      "mechanism": "An allocation, a loan disbursement, a contractor payment, a commissioned asset and reliable user access are different stages of public capital formation.",
+      "cannot_infer": "The shortfall does not establish project inefficiency or failure. Spending does not establish completed roads, capacity utilised or private investment crowded in.",
+      "next_test": "Matched project awards, releases, construction milestones, physical asset commissioning and service quality, with final audited fiscal accounts.",
+      "primary": {
+        "title": "Controller General of Accounts FY2025–26 provisional accounts",
+        "release": "2026-06-01",
+        "url": "https://cga.nic.in/writereaddata/MonthAccount/32026/DATA2526.htm"
+      },
+      "related": [
+        {
+          "title": "Capital expenditure research notebook",
+          "url": "/research/fy26-capex/"
+        },
+        {
+          "title": "Economic Survey investment audit",
+          "url": "https://thekakisto.wordpress.com/2026/11/14/economic-survey-2026-capex-budget-provisional-accounts-execution/"
+        },
+        {
+          "title": "State fiscal room comparison",
+          "url": "/states/fiscal-room/"
+        }
+      ]
+    },
+    {
+      "id": "external",
+      "name": "External resilience",
+      "question": "How did India pay for its goods deficit?",
+      "main": {
+        "label": "Current-account balance",
+        "value": -25.8,
+        "previous": -18,
+        "unit": "US$ billion",
+        "current_period": "April–September 2026",
+        "previous_period": "April–September 2025",
+        "note": "Preliminary current vs partially revised comparison; both same half-year."
+      },
+      "supporting": [
+        {
+          "label": "Goods trade balance",
+          "value": -176.1,
+          "unit": "US$bn",
+          "period": "April–September 2026"
+        },
+        {
+          "label": "Net services receipts",
+          "value": 105,
+          "unit": "US$bn",
+          "period": "April–September 2026"
+        },
+        {
+          "label": "Net transfers",
+          "value": 77.7,
+          "unit": "US$bn",
+          "period": "April–September 2026"
+        },
+        {
+          "label": "RBI capital-account aggregate B",
+          "value": 92.6,
+          "unit": "US$bn",
+          "period": "April–September 2026"
+        }
+      ],
+      "observed": "RBI reported a preliminary first-half current-account deficit of US$25.8bn, compared with a partially revised US$18.0bn deficit a year earlier. Services and transfers offset part of a larger net goods deficit.",
+      "mechanism": "Service exports and transfers create foreign-currency receipts; private and official financing transactions can fund the remaining current-account gap.",
+      "cannot_infer": "Financing inflows do not prove external sustainability, nor do recorded monetary movements capture changes in foreign exchange reserve stocks due to valuation.",
+      "next_test": "Maturity and currency composition of liabilities, cost of financing, reserve-cover definition and matching goods/services observations over several quarters.",
+      "primary": {
+        "title": "RBI September 2026 Balance of Payments release",
+        "release": "2026-11-13",
+        "url": "https://www.rbi.org.in/SCRIPTS/BS_PressReleaseDisplay.aspx?prid=63974"
+      },
+      "related": [
+        {
+          "title": "Dollar cushion research notebook",
+          "url": "/research/dollar-cushion/"
+        },
+        {
+          "title": "External accounts dashboard",
+          "url": "/external/"
+        },
+        {
+          "title": "External sector investigation",
+          "url": "https://thekakisto.wordpress.com/2026/06/12/india-current-account-surplus-non-oil-trade-june-2026/"
+        }
+      ]
+    }
+  ],
+  "editorial_decision": "Do not assign a composite score or rank the five dimensions by subjective importance or incomparable numerical magnitudes. An annual flagship article is a separate editorial deliverable and should be published only after its mechanisms, comparisons and contrary evidence are verified."
+}

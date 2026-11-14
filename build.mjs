@@ -44,6 +44,8 @@ import { gettingToWorkPage } from './lib/getting-to-work.mjs';
 import { chinaInputsData, chinaInputsCsv, chinaInputsPage } from './lib/china-inputs.mjs';
 import { thaliData, thaliCsv, thaliPage } from './lib/thali.mjs';
 import { dollarCushionCsv, dollarCushionPage } from './lib/dollar-cushion.mjs';
+import { outcomesPage } from './lib/outcome-scorecard.mjs';
+import { writeOilWeekArchive } from './lib/oil-rupee-archive.mjs';
 import { gstPassThroughPage } from './lib/gst-pass-through.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
@@ -100,6 +102,8 @@ const TOOLS = [
   { url: '/world/', kicker: 'World', title: 'Where India ranks', blurb: 'Every economy ranked on size, income, growth, inflation and debt, the GDP race since 1990, and India among its peers.' },
   { url: '/what-if/', kicker: 'What if?', title: 'One shock, every consequence', blurb: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, the import bill, the current account and your EMI change together.' },
   { url: '/research/fy26-capex/', kicker: 'Research', title: 'The FY26 capital spending audit', blurb: 'Original Budget, Revised Estimate and provisional accounts, source by source, in one reproducible comparison.' },
+  { url: '/research/oil-rupee-weekly/', kicker: 'Historical archive', title: '52 weeks of oil, the rupee and trade', blurb: 'The original complete weekly retrospective, source dated and searchable, with EIA and Fed benchmark accounting.' },
+  { url: '/desk/outcomes/', kicker: 'Year-in-review', title: 'Five outcomes: evidence scorecard', blurb: 'Household prices, jobs, investment, fiscal execution and external resilience, each with a source date and a falsifiable next test.' },
   { url: '/research/china-inputs/', kicker: 'Trade research', title: 'India’s China-origin import exposure', blurb: 'The 2025 China share of India’s goods imports, HS chapter by chapter, from UN Comtrade.' },
   { url: '/research/thali/', kicker: 'Food research', title: 'Price of a thali: wholesale ingredients', blurb: 'Agmarknet modal-price snapshot turned into a transparent illustrative ingredient budget.' },
   { url: '/research/dollar-cushion/', kicker: 'External accounts', title: 'India’s dollar cushion', blurb: 'RBI September 2026 goods, services, income, transfers and financing in one reproducible ledger.' },
@@ -112,7 +116,7 @@ const TOOLS = [
 ];
 // The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
 const SECTIONS = [
-  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology'], ['/desk/commissions/', 'Research queue']], match: ['/desk/'] },
+  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology'], ['/desk/commissions/', 'Research queue'], ['/desk/outcomes/', 'Five outcomes'], ['/research/oil-rupee-weekly/', '52-week archive']], match: ['/desk/', '/research/oil-rupee-weekly/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
   { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs'], ['/research/fy26-capex/', 'FY26 capex'], ['/research/thali/', 'Thali prices']], match: ['/economy/', '/research/fy26-capex/', '/research/thali/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix'], ['/research/china-inputs/', 'China imports'], ['/research/dollar-cushion/', 'Dollar cushion']], match: ['/external/', '/trade/', '/hormuz/', '/research/china-inputs/', '/research/dollar-cushion/'] },
@@ -280,7 +284,7 @@ ${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; co
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/desk/chronology/">Chronology</a></li><li><a href="/desk/commissions/">Research queue</a></li><li><a href="/research/fy26-capex/">Capex audit</a></li><li><a href="/research/getting-to-work/">Commute research lab</a></li><li><a href="/research/china-inputs/">China import map</a></li><li><a href="/research/thali/">Thali research</a></li><li><a href="/research/dollar-cushion/">Dollar cushion</a></li><li><a href="https://${SITE}/corrections-and-methodology/">Corrections policy</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/desk/chronology/">Chronology</a></li><li><a href="/desk/commissions/">Research queue</a></li><li><a href="/research/fy26-capex/">Capex audit</a></li><li><a href="/research/getting-to-work/">Commute research lab</a></li><li><a href="/research/china-inputs/">China import map</a></li><li><a href="/research/thali/">Thali research</a></li><li><a href="/research/dollar-cushion/">Dollar cushion</a></li><li><a href="/desk/outcomes/">Annual outcome scorecard</a></li><li><a href="/research/oil-rupee-weekly/">52-week historical archive</a></li><li><a href="https://${SITE}/corrections-and-methodology/">Corrections policy</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
 <div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
@@ -543,6 +547,10 @@ async function main() {
   await cp('src/thali.css', join(OUT, 'thali.css'));
   await cp('src/dollar-cushion.js', join(OUT, 'dollar-cushion.js'));
   await cp('src/dollar-cushion.css', join(OUT, 'dollar-cushion.css'));
+  await cp('src/outcomes.js', join(OUT, 'outcomes.js'));
+  await cp('src/outcomes.css', join(OUT, 'outcomes.css'));
+  await cp('src/oil-weekly.js', join(OUT, 'oil-weekly.js'));
+  await cp('src/oil-weekly.css', join(OUT, 'oil-weekly.css'));
   await cp('src/gst-pass-through.js', join(OUT, 'gst-pass-through.js'));
   await cp('src/gst-pass-through.css', join(OUT, 'gst-pass-through.css'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
@@ -572,7 +580,7 @@ async function main() {
   MK = await loadMarkets();
   const P = (o) => layout({ tape, ...o });
   // ---- public data API (static JSON, CORS open)
-  const api = { 'india-year-in-review': 'Dated India policy milestones, primary documents and related coverage', 'research/getting-to-work-schema': 'Anonymised commute research field definitions, output formulas and privacy limitations', 'research/china-inputs': '2025 HS2 merchandise import exposure from India-reported UN Comtrade', 'research/thali-snapshot': 'Agmarknet wholesale modal average snapshot, not retail CPI', 'research/dollar-cushion': 'RBI September and April-September 2026 BoP components and source vintages' };
+  const api = { 'india-year-in-review': 'Dated India policy milestones, primary documents and related coverage', 'research/getting-to-work-schema': 'Anonymised commute research field definitions, output formulas and privacy limitations', 'research/china-inputs': '2025 HS2 merchandise import exposure from India-reported UN Comtrade', 'research/thali-snapshot': 'Agmarknet wholesale modal average snapshot, not retail CPI', 'research/dollar-cushion': 'RBI September and April-September 2026 BoP components and source vintages', 'research/year-outcome-scorecard': 'Five original-source economic indicators with time windows and attribution limits', 'research/oil-rupee-weekly': 'Fifty-two historical weekly oil, rupee and trade essays, complete source-vintage manuscript and EIA/Fed benchmark CSV' };
   if (MK) {
     const I = { dates: MK.dates, series: MK.series, pe: MK.pe, pb: MK.pb, dy: MK.dy };
     await write('api/markets/indices.json', JSON.stringify(I));
@@ -1103,8 +1111,13 @@ async function main() {
   await write('research/china-inputs/index.html', P({ title: 'India’s China-origin inputs by HS chapter', path: '/research/china-inputs/', description: 'Source-linked India-reported UN Comtrade 2025 merchandise imports from China at HS2, with distinct hypothetical supplier cost calculations.', body: chinaInputsPage({ data: chinaExposure, pageHead }) }));
   await write('research/thali/index.html', P({ title: 'The price of a thali: ingredient accounting', path: '/research/thali/', description: 'Dated Agmarknet wholesale-market averages and a transparent, illustrative cost calculation for selected rice, dal and vegetables.', body: thaliPage({ data: thaliInputs, pageHead }) }));
   await write('research/dollar-cushion/index.html', P({ title: 'India’s dollar cushion: RBI balance of payments', path: '/research/dollar-cushion/', description: 'RBI September and April–September 2026 balance-of-payments ledger for goods, services, transfers and financing with hypothetical scenario controls.', body: dollarCushionPage({ data: dollarBoP, pageHead }) }));
+  const yearOutcomes = JSON.parse(await readFile('data/year-outcome-scorecard.json','utf8'));
+  await write('api/research/year-outcome-scorecard.json', JSON.stringify(yearOutcomes));
+  await write('desk/outcomes/index.html', P({ title: 'Five outcomes that shaped India’s year', path: '/desk/outcomes/', description: 'Five outcome dimensions with dated MoSPI, RBI and CGA evidence and their interpretation limits, without an invented composite score.', body: outcomesPage({data: yearOutcomes, pageHead}) }));
   await write('desk/chronology/index.html', P({ title: 'Economic chronology: 2025–26', path: '/desk/chronology/', description: 'Search source-linked milestones across eight Indian economic storylines, with dated policy decisions and analysis.', body: chronologyPage({ review, articles: m.articles, pageHead }) }));
-  reviewPaths.push('/desk/chronology/', '/desk/commissions/', '/research/fy26-capex/', '/research/getting-to-work/', '/research/china-inputs/', '/research/thali/', '/research/dollar-cushion/');
+  reviewPaths.push('/desk/chronology/', '/desk/commissions/', '/desk/outcomes/', '/research/fy26-capex/', '/research/getting-to-work/', '/research/china-inputs/', '/research/thali/', '/research/dollar-cushion/');
+  const oilWeekPaths = await writeOilWeekArchive({ source: await readFile('docs/oil-rupee-52-week-retrospective.md','utf8'), pageHead, publish: P, write });
+  reviewPaths.push(...oilWeekPaths);
   await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
   const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
   const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
