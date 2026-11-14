@@ -1,0 +1,116 @@
+{
+  "published_on": "2026-11-14",
+  "observation_period": "FY2025-26",
+  "currency": "INR",
+  "unit": "crore",
+  "rounding": "Original source amounts retained in crore. Lakh crore = crore divided by 100000. Percent variances computed on unrounded source amounts.",
+  "status": "Historical source-vintage comparison; FY2025-26 provisional outturn is unaudited, not final audited accounts.",
+  "sources": [
+    {
+      "key": "BE",
+      "name": "Union Budget 2025-26, Budget at a Glance",
+      "release_date": "2025-02-01",
+      "url": "https://www.indiabudget.gov.in/budget2025-26/doc/Budget_at_Glance/bag1.pdf"
+    },
+    {
+      "key": "RE",
+      "name": "Controller General of Accounts FY2025-26 provisional tables, RE column",
+      "release_date": "2026-06-01",
+      "url": "https://cga.nic.in/writereaddata/MonthAccount/32026/DATA2526.htm",
+      "note": "FY2025-26 Revised Estimates as reported in CGA table"
+    },
+    {
+      "key": "PA",
+      "name": "Controller General of Accounts FY2025-26 provisional accounts",
+      "release_date": "2026-06-01",
+      "url": "https://cga.nic.in/writereaddata/MonthAccount/32026/DATA2526.htm"
+    }
+  ],
+  "observations": [
+    {
+      "code": "capex",
+      "label": "Capital expenditure",
+      "be": 1121090,
+      "re": 1095755,
+      "pa": 1069119,
+      "note": "Includes Union capital-account loans disbursed. A budgeted rupee is not a completed project."
+    },
+    {
+      "code": "loans",
+      "label": "Of which loans disbursed",
+      "be": null,
+      "re": 208391,
+      "pa": 199691,
+      "note": "Component of capital expenditure, not additive to it."
+    },
+    {
+      "code": "total_expenditure",
+      "label": "Total expenditure",
+      "be": 5065345,
+      "re": 4964842,
+      "pa": 4905151,
+      "note": "Revenue plus capital expenditure."
+    },
+    {
+      "code": "revenue_expenditure",
+      "label": "Revenue expenditure",
+      "be": null,
+      "re": 3869087,
+      "pa": 3836032,
+      "note": "Expenditure classified on the Union revenue account."
+    },
+    {
+      "code": "interest",
+      "label": "Of which interest payments",
+      "be": null,
+      "re": 1274338,
+      "pa": 1242575,
+      "note": "A component of revenue expenditure."
+    },
+    {
+      "code": "subsidies",
+      "label": "Major subsidies",
+      "be": null,
+      "re": null,
+      "pa": 453854,
+      "note": "Separate CGA provisional disclosure; not directly comparable with absent BE/RE values in this source table."
+    },
+    {
+      "code": "nondebt_receipts",
+      "label": "Total non-debt receipts",
+      "be": null,
+      "re": 3406350,
+      "pa": 3385982,
+      "note": "Revenue receipts plus non-debt capital receipts as presented in CGA."
+    },
+    {
+      "code": "net_tax",
+      "label": "Net tax revenue to Centre",
+      "be": null,
+      "re": 2674661,
+      "pa": 2623264,
+      "note": "Excludes states' share as defined by Union accounts."
+    },
+    {
+      "code": "fiscal_deficit",
+      "label": "Fiscal deficit",
+      "be": 1568936,
+      "re": 1558492,
+      "pa": 1519169,
+      "note": "CGA provisional financing need; not a measure of physical investment."
+    }
+  ],
+  "effective_capex": {
+    "be": 1548282,
+    "definition": "Capital expenditure plus grants-in-aid for capital asset creation at the original Budget Estimate; no matching provisional value is assumed here.",
+    "source": "BE"
+  },
+  "research_notes": [
+    "Fiscal-year snapshots must preserve announcement, estimate stage and source date.",
+    "CGA provisional accounts are unaudited and can change in final accounts.",
+    "Effective capex includes grants for creation of assets; comparing its BE directly to direct capex PA is invalid.",
+    "Loans disbursed are a component of capex but not proof assets were commissioned or utilised.",
+    "Cross-sectional public investment cannot identify private investment crowd-in without a counterfactual."
+  ],
+  "related_article": "https://thekakisto.wordpress.com/2026/11/14/economic-survey-2026-capex-budget-provisional-accounts-execution/"
+}
