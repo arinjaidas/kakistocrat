@@ -1,0 +1,80 @@
+{
+  "project": "The Economics of Getting to Work",
+  "version": "2026-11-14",
+  "status": "Blank research instrument and model specification; no observed survey results or location-specific facts are bundled.",
+  "pii_policy": "Do not collect names, exact home locations, phone numbers, email addresses, employer IDs, or raw GPS coordinates. Use opaque case identifiers. Obtain participant consent and a retention/deletion plan for any field survey.",
+  "unit": "INR, minutes and workdays per month",
+  "fields": [
+    [
+      "case_id",
+      "Opaque record code, no personal identity",
+      "string"
+    ],
+    [
+      "city",
+      "City-level field only",
+      "string"
+    ],
+    [
+      "period",
+      "ISO month YYYY-MM",
+      "string"
+    ],
+    [
+      "scenario",
+      "A or B comparison label; not necessarily treatment/control",
+      "string"
+    ],
+    [
+      "take_home_wage_inr",
+      "Monthly pay after payroll deductions",
+      "number>=0"
+    ],
+    [
+      "housing_inr_month",
+      "Monthly rent and housing charges",
+      "number>=0"
+    ],
+    [
+      "commute_cash_inr_day",
+      "Total daily commute expense, both ways",
+      "number>=0"
+    ],
+    [
+      "roundtrip_minutes_day",
+      "Door-to-door travel minutes per day, both ways",
+      "number>=0"
+    ],
+    [
+      "buffer_minutes_day",
+      "Additional planned daily time for unreliable travel",
+      "number>=0"
+    ],
+    [
+      "care_inr_month",
+      "Monthly work-related childcare or care cost",
+      "number>=0"
+    ],
+    [
+      "workdays_month",
+      "Workdays in typical month",
+      "integer between 0 and 31"
+    ],
+    [
+      "value_time_inr_hour",
+      "Researcher or respondent-assumed value of time per hour",
+      "number>=0"
+    ]
+  ],
+  "outputs": [
+    "cash_remaining_inr_month = take_home_wage_inr - housing_inr_month - commute_cash_inr_day * workdays_month - care_inr_month",
+    "commute_hours_month = (roundtrip_minutes_day + buffer_minutes_day) * workdays_month / 60",
+    "time_adjusted_remaining_inr_month = cash_remaining_inr_month - commute_hours_month * value_time_inr_hour"
+  ],
+  "caveats": [
+    "Cash remaining excludes food, utilities, health, taxes outside take-home pay and other expenditures.",
+    "Value of time is a user assumption, not an observed welfare parameter unless estimated independently.",
+    "Comparing observed wage groups is not a causal effect of transit or housing without credible identification.",
+    "A blank field template contains no actual data and must not be presented as a representative sample."
+  ]
+}
