@@ -572,7 +572,12 @@
       "detail": "MoSPI published provisional full-year GDP estimates on the revised base.",
       "priority": 1,
       "source": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1780655857536_5ac01869-ca4a-422d-b7a7-57b81da60932_Press_Note_on_GDP_Estimates_for_Q4_2025-26_and_PE_FY_2025-26_F.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1804,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/"
+        }
+      ]
     },
     {
       "id": "S35",
