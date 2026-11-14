@@ -38,6 +38,8 @@ import { myInflationPage, rupeeValuePage, policyRulePage, debtPathPage, calendar
 import { scoreCalls, forecastsPage as fcPage } from './lib/forecasts.mjs';
 import { seriesUpdate, writeYearReview } from './lib/year-review.mjs';
 import { chronologyPage } from './lib/chronology.mjs';
+import { capexAuditPage, capexAuditCsv } from './lib/capex-audit.mjs';
+import { commissioningPage } from './lib/commissioning.mjs';
 import { gstPassThroughPage } from './lib/gst-pass-through.mjs';
 import { deskSnapshot, deskPage, deskArchive } from './lib/desk.mjs';
 import { slugify, cleanCountry, mentions, correlations, seriesPage as entitySeriesPage, statePage, countryPage, explorePage, STATE_ALIAS, COUNTRY_ALIAS, SKIP_COUNTRY, SERIES_KW, rx, unusualMoves, movesHTML, autolink, storyCards } from './lib/entities.mjs';
@@ -78,6 +80,8 @@ const TOOLS = [
   { url: '/districts/', kicker: 'Districts', title: 'India, district by district', blurb: '640 districts on one map: literacy, women at work, toilets, tap water, gas, the internet, stunting and anaemia.' },
   { url: '/world/', kicker: 'World', title: 'Where India ranks', blurb: 'Every economy ranked on size, income, growth, inflation and debt, the GDP race since 1990, and India among its peers.' },
   { url: '/what-if/', kicker: 'What if?', title: 'One shock, every consequence', blurb: 'Move oil, the rupee and the repo rate; see the pump price, your fuel bill, the import bill, the current account and your EMI change together.' },
+  { url: '/research/fy26-capex/', kicker: 'Research', title: 'The FY26 capital spending audit', blurb: 'Original Budget, Revised Estimate and provisional accounts, source by source, in one reproducible comparison.' },
+  { url: '/desk/commissions/', kicker: 'Research queue', title: 'Nineteen investigations, tracked', blurb: 'Every commission from the historical blueprint, its published coverage and the empirical work outstanding.' },
   { url: '/what-if/pump-price/', kicker: 'Pump price', title: 'What’s in a litre of petrol', blurb: 'The Delhi pump price split into oil company price, excise, dealer commission and VAT.' },
   { url: '/charts/', kicker: 'Charts', title: 'Plot anything against anything', blurb: 'Overlay up to six series, transform, zoom, share and download.' },
   { url: '/explore/', kicker: 'Explore', title: 'Everything on the site, connected', blurb: 'Search, the directory of every series, state, country and company, and the data API.' },
@@ -85,9 +89,9 @@ const TOOLS = [
 ];
 // The site's eight front doors. Each section owns its tabs; the menu, sub-menu, footer and Explore are all drawn from this list.
 const SECTIONS = [
-  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology']], match: ['/desk/'] },
+  { name: 'Desk', url: '/desk/', blurb: 'What moved today, and the state of the economy', tabs: [['/desk/', 'Today'], ['/desk/calendar/', 'Calendar'], ['/desk/archive/', 'Every day'], ['/desk/india-year-in-review/', 'Year in review'], ['/desk/chronology/', 'Chronology'], ['/desk/commissions/', 'Research queue']], match: ['/desk/'] },
   { name: 'Markets', url: '/markets/', blurb: 'Prices, valuations and India’s 500 largest companies', tabs: [['/markets/', 'Equities'], ['/markets/flows/', 'Flows'], ['/companies/', 'Companies'], ['/commodities/', 'Commodities'], ['/terminal/', 'Terminal']], match: ['/markets/', '/companies/', '/company/', '/commodities/', '/terminal/'] },
-  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs']], match: ['/economy/'] },
+  { name: 'Economy', url: '/economy/', blurb: 'How fast factories, credit and prices are growing', tabs: [['/economy/', 'Dashboard'], ['/economy/activity/', 'Activity'], ['/economy/growth/', 'Growth'], ['/economy/industry/', 'Industry'], ['/economy/prices/', 'Inflation'], ['/economy/money/', 'Money & credit'], ['/economy/rates/', 'Rates'], ['/economy/mpc/', 'MPC'], ['/economy/budget/', 'Budget & debt'], ['/economy/divergence/', 'Growth & jobs'], ['/research/fy26-capex/', 'FY26 capex']], match: ['/economy/', '/research/fy26-capex/'] },
   { name: 'External', url: '/external/', blurb: 'India’s money and goods dealings with the world', tabs: [['/external/', 'Rupee & reserves'], ['/external/balance-of-payments/', 'Balance of payments'], ['/trade/', 'Trade'], ['/hormuz/', 'Shipping & oil'], ['/external/data/', 'Data appendix']], match: ['/external/', '/trade/', '/hormuz/'] },
   { name: 'Places', url: '/states/', blurb: 'Every state, district and country, compared', tabs: [['/states/', 'States'], ['/states/fiscal-room/', 'State budgets'], ['/districts/', 'Districts'], ['/world/', 'World']], match: ['/states/', '/state/', '/districts/', '/world/', '/country/'] },
   { name: 'What if?', url: '/what-if/', blurb: 'Shock oil, the rupee or interest rates and follow the effects', tabs: [['/what-if/', 'Scenario'], ['/what-if/my-inflation/', 'Your inflation'], ['/what-if/rupee-value/', 'Rupee value'], ['/what-if/policy-rule/', 'Policy rule'], ['/what-if/debt-path/', 'Debt path'], ['/what-if/pump-price/', 'Pump price'], ['/what-if/landed-cost/', 'Landed cost'], ['/what-if/gst-pass-through/', 'GST pass-through']], match: ['/what-if/'] },
@@ -253,7 +257,7 @@ ${(() => { const S = sectionOf(path); if (!S || S.tabs.length < 2) return ''; co
 <footer class="foot"><div class="wrap foot-grid">
 <div><div class="brandline">The Kakistocrat</div><p>Independent analysis of India’s economy and the politics around it, by Arinjai Das. Articles are published on <a href="https://${SITE}/" style="text-decoration:underline">thekakisto.wordpress.com</a> and appear here automatically.</p><p class="meta" style="margin-top:12px">Site built ${esc(longDate(new Date(BUILT.getTime() + 330 * 60000).toISOString()))}</p></div>
 <div><h4>Topics</h4><ul>${TOPIC_ORDER.map(s => `<li><a href="/topic/${s}/">${esc(TOPICS[s].name)}</a></li>`).join('')}</ul></div>
-<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
+<div><h4>Read</h4><ul><li><a href="/series/">Series</a></li><li><a href="/desk/india-year-in-review/">Year in review</a></li><li><a href="/archive/">Archive</a></li><li><a href="/archive/#explainers">Explainers</a></li><li><a href="/stories/hormuz/">Data stories</a></li><li><a href="/ledger/">Policy Ledger</a></li><li><a href="/desk/chronology/">Chronology</a></li><li><a href="/desk/commissions/">Research queue</a></li><li><a href="/research/fy26-capex/">Capex audit</a></li><li><a href="https://${SITE}/corrections-and-methodology/">Corrections policy</a></li>${HAS_CALLS ? '<li><a href="/forecasts/">Forecast Book</a></li>' : ''}<li><a href="https://${SITE}/about/">About</a></li><li><a href="https://${SITE}/contact/">Contact</a></li></ul></div>
 <div><h4>Data</h4><ul>${SECTIONS.map(S => `<li><a href="${S.url}">${esc(S.name)}</a></li>`).join('')}<li><a href="https://${SITE}/feed/">RSS</a></li></ul></div>
 </div></footer>
 <script>window.__TAPE=${JSON.stringify(tape).replace(/</g, '\\u003c')};</script>
@@ -502,6 +506,10 @@ async function main() {
   await cp('src/landed-cost.js', join(OUT, 'landed-cost.js'));
   await cp('src/chronology.js', join(OUT, 'chronology.js'));
   await cp('src/chronology.css', join(OUT, 'chronology.css'));
+  await cp('src/capex-audit.css', join(OUT, 'capex-audit.css'));
+  await cp('src/capex-audit.js', join(OUT, 'capex-audit.js'));
+  await cp('src/commissioning.css', join(OUT, 'commissioning.css'));
+  await cp('src/commissioning.js', join(OUT, 'commissioning.js'));
   await cp('src/gst-pass-through.js', join(OUT, 'gst-pass-through.js'));
   await cp('src/gst-pass-through.css', join(OUT, 'gst-pass-through.css'));
   await cp('src/markets.js', join(OUT, 'markets.js'));
@@ -1039,8 +1047,15 @@ async function main() {
     pageHead, publish: P, write,
   });
   await write('what-if/gst-pass-through/index.html', P({ title: 'GST rate-cut pass-through calculator', path: '/what-if/gst-pass-through/', description: 'Model how a statutory GST rate cut is split between the consumer, seller and gross GST tax on an illustrative transaction.', body: gstPassThroughPage({ pageHead }) }));
+  const capexAudit = JSON.parse(await readFile('data/fy26-capex-audit.json','utf8'));
+  const blueprintCommissions = JSON.parse(await readFile('data/blueprint-commissions.json','utf8'));
+  await write('api/research/fy26-capex.json', JSON.stringify(capexAudit));
+  await write('research/fy26-capex/data.csv', capexAuditCsv(capexAudit));
+  await write('api/blueprint-commissions.json', JSON.stringify(blueprintCommissions));
+  await write('research/fy26-capex/index.html', P({ title: 'FY2025–26 Union capex execution audit', path: '/research/fy26-capex/', description: 'Source-linked Union capital expenditure, from original Budget to provisional FY26 accounts, with interactive variance comparisons and downloadable data.', body: capexAuditPage({ data: capexAudit, pageHead }) }));
+  await write('desk/commissions/index.html', P({ title: 'The Kakistocrat research queue', path: '/desk/commissions/', description: 'The original 19 economic-history investigations, their available published coverage and remaining empirical tests.', body: commissioningPage({ data: blueprintCommissions, articles: m.articles, pageHead }) }));
   await write('desk/chronology/index.html', P({ title: 'Economic chronology: 2025–26', path: '/desk/chronology/', description: 'Search source-linked milestones across eight Indian economic storylines, with dated policy decisions and analysis.', body: chronologyPage({ review, articles: m.articles, pageHead }) }));
-  reviewPaths.push('/desk/chronology/');
+  reviewPaths.push('/desk/chronology/', '/desk/commissions/', '/research/fy26-capex/');
   await write('index.html', P({ title: 'India’s economy, in data', path: '/', description: 'Source-linked Indian economic data, market snapshots, policy research and interactive scenario tools from The Kakistocrat.', body: home(m, tape, ledger, { SD, byId }) }));
   const stressInputs = await readFile('data/rupee-stress.json', 'utf8');
   const stress = rupeeStress({ data: JSON.parse(stressInputs), pageHead });
