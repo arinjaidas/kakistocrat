@@ -21,6 +21,12 @@ jobs:
         run: node scripts/check_chronology.mjs
       - name: Editorial research source checks
         run: node scripts/check_editorial_research.mjs
+      - name: Commute model and Python reproduction
+        run: |
+          node scripts/check_getting_to_work.mjs
+          node --check src/getting-to-work.js
+          python -m py_compile scripts/getting_to_work_analysis.py
+          python scripts/getting_to_work_analysis.py static/research/getting-to-work/field-template.csv --output /tmp/gw-results.csv
       - name: Links and freshness
         run: node scripts/check_site.mjs dist --strict
       - name: Phones
