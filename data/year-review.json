@@ -296,7 +296,12 @@
       "detail": "Draft central industrial relations rules. Verify final instruments and state coverage before claims about employer obligations.",
       "priority": 2,
       "source": "https://www.labour.gov.in/static/uploads/2026/01/0ea4e7d1b8f264a8cd27bb4560e9202c.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1808,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/india-industrial-relations-draft-final-central-rules-2025-2026/"
+        }
+      ]
     },
     {
       "id": "S13",
@@ -319,7 +324,12 @@
       "detail": "Economic Survey sets out evidence on investment and infrastructure. Use its tables as a baseline for actual spending and private capex.",
       "priority": 2,
       "source": "https://www.indiabudget.gov.in/economicsurvey/",
-      "articles": []
+      "articles": [
+        {
+          "id": 1809,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/economic-survey-2026-capex-budget-provisional-accounts-execution/"
+        }
+      ]
     },
     {
       "id": "S15",
@@ -825,5 +835,6 @@
         }
       ]
     }
-  ]
+  ],
+  "coverageLinkedThrough": "2026-11-14"
 }

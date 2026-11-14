@@ -1,0 +1,242 @@
+{
+  "as_of": "2026-11-14",
+  "purpose": "Transparent audit of the original 19 commissions in The Kakistocrat editorial blueprint. A published anchor does not by itself complete the quantitative follow-up.",
+  "taxonomy": {
+    "published-anchor": "A directly relevant article exists, but its supporting visual or deeper comparison may still be outstanding.",
+    "partial": "Substantial related coverage exists, but the precise original research question has not been fully answered.",
+    "evidence-gate": "Requires new matched or independently verified data before a defensible new investigation.",
+    "synthesis-pending": "Editorial synthesis reserved until constituent evidence can sustain comparisons."
+  },
+  "commissions": [
+    {
+      "id": "C01",
+      "title": "What America's first tariff schedule meant for Indian exporters",
+      "series": "Tariffs",
+      "event_date": "2025-04-03",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1790
+      ],
+      "next_evidence": "Product-by-product customs costs under the original Annex I, MFN rates and exclusions. Verify any discrepancy in initial India and US rate statements."
+    },
+    {
+      "id": "C02",
+      "title": "Import receipts masked weaker domestic GST revenue",
+      "series": "Public money",
+      "event_date": "2025-12-01",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1792,
+        1797
+      ],
+      "next_evidence": "Add a consistent gross-to-net GST revenue bridge with domestic, import, refunds and matching release vintages."
+    },
+    {
+      "id": "C03",
+      "title": "Who kept the savings from India's GST rate cuts?",
+      "series": "Public money",
+      "event_date": "2025-09-22",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1797
+      ],
+      "next_evidence": "Obtain comparable transaction/shelf prices by SKU; calculate matched product pass-through with appropriate control products; CPI alone cannot establish incidence."
+    },
+    {
+      "id": "C04",
+      "title": "What the India-US trade framework actually offered exporters",
+      "series": "Tariffs",
+      "event_date": "2026-02-07",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1796
+      ],
+      "next_evidence": "Continue tracking legally effective product-specific terms and changes in instruments after court rulings."
+    },
+    {
+      "id": "C05",
+      "title": "The US textile tariff proposal makes supplier traceability matter",
+      "series": "Tariffs",
+      "event_date": "2026-06-02",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1803
+      ],
+      "next_evidence": "Build product-line exposure to the June proposal and the July final action; verify actual exemptions and quota operation."
+    },
+    {
+      "id": "C06",
+      "title": "When India rationed commercial LPG, who lost supply first?",
+      "series": "Oil shock",
+      "event_date": "2026-03-28",
+      "status": "evidence-gate",
+      "related_wp_ids": [
+        1085,
+        1087
+      ],
+      "next_evidence": "Match official commercial allocations with physical uplift and delivered volumes, by channel and period, before claiming customer shortfalls."
+    },
+    {
+      "id": "C07",
+      "title": "Fertiliser subsidies protected prices. Did they protect access?",
+      "series": "Oil shock and farms",
+      "event_date": "2026-04-08",
+      "status": "partial",
+      "related_wp_ids": [
+        1095,
+        1120,
+        1406
+      ],
+      "next_evidence": "Use matched nutrient rates, feedstock costs, stocks and retail availability to estimate support and actual access."
+    },
+    {
+      "id": "C08",
+      "title": "What paid India's oil bill when dollar demand rose?",
+      "series": "External accounts",
+      "event_date": "2026-10-16",
+      "status": "partial",
+      "related_wp_ids": [
+        1097,
+        1109,
+        1115
+      ],
+      "next_evidence": "Reconcile oil imports, services credits, remittances, financial account and reserves on a common frequency; distinguish OMC market-liquidity support."
+    },
+    {
+      "id": "C09",
+      "title": "What India's 2026 monsoon meant for prices and farm incomes",
+      "series": "Food and measurement",
+      "event_date": "2026-11-13",
+      "status": "evidence-gate",
+      "related_wp_ids": [
+        1095,
+        1118,
+        1786
+      ],
+      "next_evidence": "Build district-matched rainfall, sowing, market arrival and two crop prices; use seasonal baselines and source harmonisation."
+    },
+    {
+      "id": "C10",
+      "title": "Which state budgets turned fiscal room into investment?",
+      "series": "Public money and states",
+      "event_date": "2026-11-13",
+      "status": "partial",
+      "related_wp_ids": [
+        1490,
+        1489,
+        1500,
+        1113,
+        1809
+      ],
+      "next_evidence": "Match state BE, RE and actual capex; separate borrowing, central loans, grants and project completion."
+    },
+    {
+      "id": "C11",
+      "title": "How much of the RBI's easing reached borrowers?",
+      "series": "Monetary policy",
+      "event_date": "2026-09-30",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1791,
+        1799
+      ],
+      "next_evidence": "Extend the reproducible rate notebook to product/bank-type pairs and loan-mix effects."
+    },
+    {
+      "id": "C12",
+      "title": "Why food and fuel inflation felt different across households",
+      "series": "Household inflation",
+      "event_date": "2026-11-12",
+      "status": "evidence-gate",
+      "related_wp_ids": [
+        1081,
+        1786
+      ],
+      "next_evidence": "Secure real, documented expenditure profiles and compatible item/group inflation; avoid invented household CPI rates."
+    },
+    {
+      "id": "C13",
+      "title": "What drove 7.8% growth and how would private investment follow?",
+      "series": "GDP and investment",
+      "event_date": "2026-08-31",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1794,
+        1804
+      ],
+      "next_evidence": "Build vintage-consistent expenditure contribution panel and matched private capex / commissioning evidence."
+    },
+    {
+      "id": "C14",
+      "title": "India's UK, EU and New Zealand deals are at different legal stages",
+      "series": "Trade deals",
+      "event_date": "2026-07-17",
+      "status": "partial",
+      "related_wp_ids": [
+        1073,
+        1080,
+        1104,
+        1410
+      ],
+      "next_evidence": "Crosswalk signed, concluded and in-force texts, rules of origin, product quotas and legal entry dates."
+    },
+    {
+      "id": "C15",
+      "title": "Can a small exporter afford to claim a UK tariff preference?",
+      "series": "Trade deals",
+      "event_date": "2026-11-11",
+      "status": "partial",
+      "related_wp_ids": [
+        1410
+      ],
+      "next_evidence": "Combine audited shipment-level preference with actual document/verification costs and utilisation, not only illustrative assumptions."
+    },
+    {
+      "id": "C16",
+      "title": "Did India's jobs improvement translate into better work?",
+      "series": "Work and wages",
+      "event_date": "2026-11-11",
+      "status": "partial",
+      "related_wp_ids": [
+        1071,
+        1116,
+        1122,
+        1808
+      ],
+      "next_evidence": "Match PLFS participation, employment status, hours and compatible earnings, with gender/location breakdown and measurement limits."
+    },
+    {
+      "id": "C17",
+      "title": "When does an industrial subsidy buy working capacity?",
+      "series": "Industrial policy",
+      "event_date": "2026-11-13",
+      "status": "partial",
+      "related_wp_ids": [
+        1103,
+        1119,
+        1578
+      ],
+      "next_evidence": "Follow three schemes from approval to funding to commissioned and utilised capacity, without assuming all awards yield operating assets."
+    },
+    {
+      "id": "C18",
+      "title": "What shaped India's economy in 2025-26?",
+      "series": "Annual synthesis",
+      "event_date": "2026-11-13",
+      "status": "synthesis-pending",
+      "related_wp_ids": [],
+      "next_evidence": "Publish a five-outcome evidence scorecard only once primary comparisons, contrary evidence and data-vintage notes are ready."
+    },
+    {
+      "id": "C19",
+      "title": "What the final US forced-labour action changed for textiles",
+      "series": "Tariffs",
+      "event_date": "2026-07-24",
+      "status": "published-anchor",
+      "related_wp_ids": [
+        1803
+      ],
+      "next_evidence": "Create matched HS-line landed-cost comparisons; verify announced versus operational textile TRQ treatment for competitor countries."
+    }
+  ]
+}

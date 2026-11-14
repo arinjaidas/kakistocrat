@@ -93,7 +93,11 @@
         "State labour department rules"
       ],
       "artifact": "Worker coverage and implementation tracker",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1808,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/india-industrial-relations-draft-final-central-rules-2025-2026/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Publish a true clause-by-clause comparison of the draft and final Central Rules and a jurisdiction-appropriate state implementation tracker with enforcement outcomes."
     },
     {
       "id": "C06",
@@ -108,7 +112,11 @@
         "CGA expenditure data"
       ],
       "artifact": "Forecast-versus-outturn table with vintage dates",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1809,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/economic-survey-2026-capex-budget-provisional-accounts-execution/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Keep a vintage-consistent FY26 budget-to-outturn dataset and add project commissioning and private investment evidence; a fiscal shortfall is not proof of project failure."
     },
     {
       "id": "C07",
