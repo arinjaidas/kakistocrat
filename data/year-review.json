@@ -184,7 +184,12 @@
       "detail": "GST Council rate changes. Household prices and domestic tax receipts become separate empirical questions.",
       "priority": 1,
       "source": "https://www.gstcouncil.gov.in/sites/default/files/2025-09/press_release_press_information_bureau_0.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1797,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/"
+        }
+      ]
     },
     {
       "id": "S05",
@@ -359,7 +364,12 @@
       "detail": "RBI kept repo at 5.25%. A checkpoint in measuring lending rate pass-through.",
       "priority": 2,
       "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62169",
-      "articles": []
+      "articles": [
+        {
+          "id": 1799,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/rbi-february-2026-hold-loan-rate-transmission-retrospective/"
+        }
+      ]
     },
     {
       "id": "S18",
@@ -534,7 +544,12 @@
       "detail": "USTR forced-labour proposal creates potential compliance costs and differential textile exposure. Later actions require separate legal checks.",
       "priority": 1,
       "source": "https://ustr.gov/about/policy-offices/press-office/press-releases/2026/june/ustr-makes-findings-and-proposes-action-60-section-301-investigations-relating-failures-take-action",
-      "articles": []
+      "articles": [
+        {
+          "id": 1803,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/"
+        }
+      ]
     },
     {
       "id": "S32",
@@ -557,7 +572,12 @@
       "detail": "MoSPI published provisional full-year GDP estimates on the revised base.",
       "priority": 1,
       "source": "https://www.mospi.gov.in/uploads/latestReleases/latest_release_1780655857536_5ac01869-ca4a-422d-b7a7-57b81da60932_Press_Note_on_GDP_Estimates_for_Q4_2025-26_and_PE_FY_2025-26_F.pdf",
-      "articles": []
+      "articles": [
+        {
+          "id": 1804,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/"
+        }
+      ]
     },
     {
       "id": "S35",
@@ -608,7 +628,12 @@
       "detail": "USTR final action puts India in the 10% group for covered goods. Compare applicable product exemptions and the announced textile quota treatment for competing suppliers.",
       "priority": 1,
       "source": "https://www.ustr.gov/about/policy-offices/press-office/press-releases/2026/july/ustr-takes-action-forced-labor-section-301-investigations",
-      "articles": []
+      "articles": [
+        {
+          "id": 1803,
+          "url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/"
+        }
+      ]
     },
     {
       "id": "S38",

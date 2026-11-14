@@ -16,7 +16,11 @@
         "GSTN monthly collection releases"
       ],
       "artifact": "GST announcement-to-consumer-price timeline; receipts chart",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1797,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Publish transaction-level matched-price and receipts data notebook; current article includes a simple illustrative scenario and research synthesis, not a causal estimate."
     },
     {
       "id": "C02",
@@ -31,7 +35,11 @@
         "USITC HTS data and customs guidance"
       ],
       "artifact": "Country/product exposure matrix and landed-cost scenario",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1803,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "remaining_work": "Build a matched HS-level proposal-to-final tariff exposure table and compliance-cost estimates."
     },
     {
       "id": "C03",
@@ -47,7 +55,11 @@
         "Indian product-level trade statistics"
       ],
       "artifact": "Before/after tariff table by product and comparator",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1803,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "remaining_work": "Track any subsequent TRQ implementation, actual covered customs-line imports and exemptions; do not assume quota activation."
     },
     {
       "id": "C04",
@@ -62,7 +74,11 @@
         "Economic Survey tables"
       ],
       "artifact": "Reproducible GDP contribution notebook",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "completed_at": "2026-11-14",
+      "article_id": 1804,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/",
+      "remaining_work": "Create a reproducible cross-vintage workbook from MoSPI release tables and test how the extra release-calendar time affects later revision sizes."
     },
     {
       "id": "C05",
@@ -107,7 +123,11 @@
         "RBI deposit rate data"
       ],
       "artifact": "Update RBI transmission notebook",
-      "status": "research"
+      "status": "published-follow-up-needed",
+      "article_id": 1799,
+      "article_url": "https://thekakisto.wordpress.com/2026/11/14/rbi-february-2026-hold-loan-rate-transmission-retrospective/",
+      "completed_at": "2026-11-14",
+      "remaining_work": "Extend matched monthly rates across loan categories and update the source-coded dataset with revised vintages; the article establishes the historical checkpoint, not a causal estimate."
     }
   ]
 }
