@@ -1,0 +1,109 @@
+{
+  "version": "2026-11-16",
+  "purpose": "Persistent historical research commissioning and publication register. Check event_id, research scope and existing WordPress posts across all statuses before commissioning; do not treat a published anchor as completion of every empirical follow-up.",
+  "rules": [
+    "Unique key per event and differentiated research question.",
+    "Published entries must match a WordPress article in data/year-review.json.",
+    "Entries associated with editorial commissions must match their exact commission record.",
+    "Never backdate actual WordPress publication dates."
+  ],
+  "entries": [
+    {
+      "key": "S04|C01",
+      "event_id": "S04",
+      "scope": "Did India's GST rate reset reach consumer prices or only tax collections?",
+      "commission_id": "C01",
+      "status": "published-follow-up-needed",
+      "post_id": 1797,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/gst-september-2025-rate-cuts-consumer-price-pass-through-evidence/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Publish transaction-level matched-price and receipts data notebook; current article includes a simple illustrative scenario and research synthesis, not a causal estimate."
+    },
+    {
+      "key": "S31|C02",
+      "event_id": "S31",
+      "scope": "When forced-labour tariffs hit supply chains, who paid the compliance bill?",
+      "commission_id": "C02",
+      "status": "published-follow-up-needed",
+      "post_id": 1803,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Build a matched HS-level proposal-to-final tariff exposure table and compliance-cost estimates."
+    },
+    {
+      "key": "S53|C03",
+      "event_id": "S53",
+      "scope": "The tariff announcement is not the factory-gate price",
+      "commission_id": "C03",
+      "status": "published-follow-up-needed",
+      "post_id": 1803,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/us-forced-labour-section-301-india-june-july-2026-tariff-investigation/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Track any subsequent TRQ implementation, actual covered customs-line imports and exemptions; do not assume quota activation."
+    },
+    {
+      "key": "S33|C04",
+      "event_id": "S33",
+      "scope": "What India's revised GDP series changes about the investment story",
+      "commission_id": "C04",
+      "status": "published-follow-up-needed",
+      "post_id": 1804,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/india-june-2026-gdp-release-date-audited-data-provisional-revisions/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Create a reproducible cross-vintage workbook from MoSPI release tables and test how the extra release-calendar time affects later revision sizes."
+    },
+    {
+      "key": "S12|C05",
+      "event_id": "S12",
+      "scope": "Labour rules are not labour rights until they operate in the workplace",
+      "commission_id": "C05",
+      "status": "published-follow-up-needed",
+      "post_id": 1808,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/india-industrial-relations-draft-final-central-rules-2025-2026/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Publish a true clause-by-clause comparison of the draft and final Central Rules and a jurisdiction-appropriate state implementation tracker with enforcement outcomes."
+    },
+    {
+      "key": "S14|C06",
+      "event_id": "S14",
+      "scope": "Where the Economic Survey's investment case can be tested",
+      "commission_id": "C06",
+      "status": "published-follow-up-needed",
+      "post_id": 1809,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/economic-survey-2026-capex-budget-provisional-accounts-execution/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Keep a vintage-consistent FY26 budget-to-outturn dataset and add project commissioning and private investment evidence; a fiscal shortfall is not proof of project failure."
+    },
+    {
+      "key": "S17|C07",
+      "event_id": "S17",
+      "scope": "A rate hold is not a pause in interest-rate transmission",
+      "commission_id": "C07",
+      "status": "published-follow-up-needed",
+      "post_id": 1799,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/14/rbi-february-2026-hold-loan-rate-transmission-retrospective/",
+      "completed_at": "2026-11-14",
+      "remaining_evidence": "Extend matched monthly rates across loan categories and update the source-coded dataset with revised vintages; the article establishes the historical checkpoint, not a causal estimate."
+    },
+    {
+      "key": "S02|2025-07-31-relative-asian-tariff-rates",
+      "event_id": "S02",
+      "scope": "July 31 US IEEPA reciprocal tariff schedule, relative Asian supplier rates, entry and contract timing, and subsequent legal invalidation",
+      "status": "published-verified",
+      "post_id": 1821,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/16/july-2025-us-reciprocal-tariff-india-asian-supplier-gap/",
+      "historical_event_date": "2025-07-31",
+      "actual_publication_date": "2026-11-16",
+      "verified_at": "2026-11-16",
+      "word_count": 1773,
+      "primary_sources": [
+        "https://www.govinfo.gov/content/pkg/FR-2025-08-06/html/2025-15010.htm",
+        "https://content.govdelivery.com/accounts/USDHSCBP/bulletins/3ec7b5e",
+        "https://www.whitehouse.gov/presidential-actions/2025/08/addressing-threats-to-the-united-states-by-the-government-of-the-russian-federation/",
+        "https://www.supremecourt.gov/opinions/25pdf/24-1287_4gcj.pdf",
+        "https://content.govdelivery.com/accounts/USDHSCBP/bulletins/40b11c9"
+      ],
+      "editorial_note": "Separate from the August 27 oil-linked surcharge analysis; scenario calculations are illustrative, not causal estimates."
+    }
+  ]
+}

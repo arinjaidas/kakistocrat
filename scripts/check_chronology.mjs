@@ -37,6 +37,25 @@ for (const c of editorial.commissions) {
 }
 const actual = [...events.values()].filter(e => !(e.articles || []).length).map(e => e.id);
 for (const id of actual) if (!commissioned.has(id)) fail.push('Uncommissioned linked-analysis gap: ' + id);
+// Prevent duplicate historical research commissions and orphaned publication links.
+const register = load('data/historical-research-register.json');
+const registerKeys = new Set();
+const commissionsById = new Map(editorial.commissions.map(c => [c.id, c]));
+for (const r of register.entries) {
+  if (!r.key || registerKeys.has(r.key)) fail.push('Duplicate or missing research register key: ' + r.key);
+  registerKeys.add(r.key);
+  if (!r.scope || !events.has(r.event_id)) fail.push('Invalid research register event/scope: ' + r.key);
+  if (r.status?.startsWith('published')) {
+    const links = events.get(r.event_id)?.articles || [];
+    if (!links.some(a => a.id === r.post_id && a.url === r.post_url))
+      fail.push('Research register publication does not match chronology: ' + r.key);
+  }
+  if (r.commission_id) {
+    const c = commissionsById.get(r.commission_id);
+    if (!c || c.event !== r.event_id || c.status !== r.status || c.article_id !== r.post_id || c.article_url !== r.post_url)
+      fail.push('Research register commission drift: ' + r.key);
+  }
+}
 if (fail.length) {
   console.error('Chronology validation failed:\n' + fail.map(x=>' - '+x).join('\n'));
   process.exit(1);
