@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-16",
+  "version": "2026-11-18",
   "purpose": "Persistent historical research commissioning and publication register. Check event_id, research scope and existing WordPress posts across all statuses before commissioning; do not treat a published anchor as completion of every empirical follow-up.",
   "rules": [
     "Unique key per event and differentiated research question.",
@@ -104,6 +104,26 @@
         "https://content.govdelivery.com/accounts/USDHSCBP/bulletins/40b11c9"
       ],
       "editorial_note": "Separate from the August 27 oil-linked surcharge analysis; scenario calculations are illustrative, not causal estimates."
+    },
+    {
+      "key": "S25|2026-04-08-kharif-nbs-price-shield-supply-test",
+      "event_id": "S25",
+      "scope": "April 8 Kharif 2026 nutrient-based subsidy approval: seasonal rate and fiscal arithmetic, farm-level distributional incidence, and why price support is not proof of timely local delivery",
+      "status": "published-verified",
+      "post_id": 1828,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/18/india-april-2026-kharif-fertiliser-nbs-subsidy-sowing-supply/",
+      "historical_event_date": "2026-04-08",
+      "actual_publication_date": "2026-11-18",
+      "verified_at": "2026-11-18",
+      "word_count": 1581,
+      "primary_sources": [
+        "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2250032&lang=1&reg=35",
+        "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/apr/doc202648843001.pdf",
+        "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2211384&lang=1&reg=3",
+        "https://agritech.tnau.ac.in/agriculture/agri_nutrientmgt_priceoffertilizers.html",
+        "https://www.pib.gov.in/PressNoteDetails.aspx?ModuleId=3&NoteId=156820&lang=1&reg=3"
+      ],
+      "editorial_note": "Distinct from May kharif MSP article and November rabi NBS coverage. Kharif Cabinet briefing rates cross-checked against TNAU's September product schedule; no claim of actual 2026 kharif outturn or causal delivery effects. No matching open editorial commission."
     }
   ]
 }
