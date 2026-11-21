@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-18",
+  "version": "2026-11-21",
   "purpose": "Persistent historical research commissioning and publication register. Check event_id, research scope and existing WordPress posts across all statuses before commissioning; do not treat a published anchor as completion of every empirical follow-up.",
   "rules": [
     "Unique key per event and differentiated research question.",
@@ -124,6 +124,30 @@
         "https://www.pib.gov.in/PressNoteDetails.aspx?ModuleId=3&NoteId=156820&lang=1&reg=3"
       ],
       "editorial_note": "Distinct from May kharif MSP article and November rabi NBS coverage. Kharif Cabinet briefing rates cross-checked against TNAU's September product schedule; no claim of actual 2026 kharif outturn or causal delivery effects. No matching open editorial commission."
+    },
+    {
+      "key": "S54|2026-10-20-india-nz-fta-entry-into-force",
+      "event_id": "S54",
+      "scope": "India-New Zealand FTA entry into force: tariff schedule asymmetry, origin compliance, quota governance and distributional incidence",
+      "status": "published-verified",
+      "post_id": 1835,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/21/india-new-zealand-fta-entry-into-force-rules-origin-quotas-2026/",
+      "historical_event_date": "2026-10-20",
+      "actual_publication_date": "2026-11-21",
+      "verified_at": "2026-11-21",
+      "word_count": 1886,
+      "primary_sources": [
+        "https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2320142&reg=48&lang=1",
+        "https://www.commerce.gov.in/files/2026-04/final_1.pdf",
+        "https://www.customs.govt.nz/information-releases-and-legislation/legislation/international-agreements/free-trade-agreements/new-zealand-india-free-trade-agreement",
+        "https://www.customs.govt.nz/about-us/news/our-stories/customs-partnership-supports-traders-from-new-zealand-india-free-trade-agreement-day-one",
+        "https://www.legislation.govt.nz/act/public/2026/62/en/latest/",
+        "https://www.legislation.govt.nz/act/public/2026/63/en/latest/",
+        "https://www.legislation.govt.nz/secondary-legislation/pco-drafted/2026/290/en/latest/highlights/",
+        "https://www.mfat.govt.nz/en/trade/free-trade-agreements/free-trade-agreements-in-force/new-zealand-india-free-trade-agreement/key-outcomes",
+        "https://www.mfat.govt.nz/en/about-us/mfat-annual-reports/mfat-annual-report-2025-26/deliver-an-intensive-targeted-programme-of-trade-and-economic-diplomacy"
+      ],
+      "editorial_note": "Distinct from S11 negotiation coverage, S27 signing, and the existing apple-quota article. Focuses on the 20 October entry into force, tariff-line versus trade-value denominators, origin compliance, the 22 October New Zealand quota-law commencement and distributional incidence. No claim of realised trade, price or investment effects is made. The article records the difference between New Zealand Customs' operational self-declaration guidance and MFAT's broader Key Outcomes description."
     }
   ]
 }
