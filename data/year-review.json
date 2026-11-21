@@ -113,9 +113,10 @@
         "S11",
         "S13",
         "S27",
-        "S36"
+        "S36",
+        "S54"
       ],
-      "next": "Check customs rules, certificates and product-level preference utilisation.",
+      "next": "Measure product-level preference utilisation, origin certificates, quota allocations and trade after the first full quarter.",
       "tool": "/what-if/landed-cost/"
     },
     {
@@ -766,6 +767,20 @@
       ]
     },
     {
+      "id": "S54",
+      "date": "2026-10-20",
+      "when": "2026-10-20",
+      "detail": "India–New Zealand FTA entered into force. The tariff schedules now operate subject to product-specific origin rules, customs verification and separate quota administration; no post-entry trade or price effect is established yet.",
+      "priority": 2,
+      "source": "https://www.pib.gov.in/PressReleaseDetail.aspx?PRID=2320142&reg=48&lang=1",
+      "articles": [
+        {
+          "id": 1835,
+          "url": "https://thekakisto.wordpress.com/2026/11/21/india-new-zealand-fta-entry-into-force-rules-origin-quotas-2026/"
+        }
+      ]
+    },
+    {
       "id": "S46",
       "date": "2026-11-04",
       "when": "2026-11-04",
@@ -844,5 +859,5 @@
       ]
     }
   ],
-  "coverageLinkedThrough": "2026-11-14"
+  "coverageLinkedThrough": "2026-11-21"
 }
