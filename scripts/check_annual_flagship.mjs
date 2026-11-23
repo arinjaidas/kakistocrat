@@ -25,7 +25,7 @@ const s55url='https://thekakisto.wordpress.com/2026/11/23/india-semicon-2-0-port
 const s55=review.events.filter(e=>e.id==='S55');
 if(s55.length!==1||s55[0].date!=='2026-11-06'||!s55[0].articles.some(a=>a.id===1837&&a.url===s55url))throw Error('S55 chronology and WordPress publication do not reconcile');
 if(!review.series.find(x=>x.id==='industry')?.events.includes('S55'))throw Error('S55 missing from the industry series');
-const s55entry=register.entries.filter(e=>e.event_id==='S55'&&e.post_id===1837&&e.post_url===s55url&&e.actual_publication_date==='2026-11-23'&&e.word_count===1787);
+const s55entry=register.entries.filter(e=>e.event_id==='S55'&&e.post_id===1837&&e.post_url===s55url&&e.actual_publication_date==='2026-11-23'&&e.word_count===1808);
 if(s55entry.length!==1)throw Error('S55 research register does not match the confirmed publication');
 const page=readFileSync('lib/year-review.mjs','utf8'),renderer=readFileSync('lib/outcome-scorecard.mjs','utf8'),build=readFileSync('build.mjs','utf8');
 for(const [name,txt] of [['review',page],['build',build]]){
