@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-21",
+  "version": "2026-11-23",
   "purpose": "Persistent historical research commissioning and publication register. Check event_id, research scope and existing WordPress posts across all statuses before commissioning; do not treat a published anchor as completion of every empirical follow-up.",
   "rules": [
     "Unique key per event and differentiated research question.",
@@ -148,6 +148,25 @@
         "https://www.mfat.govt.nz/en/about-us/mfat-annual-reports/mfat-annual-report-2025-26/deliver-an-intensive-targeted-programme-of-trade-and-economic-diplomacy"
       ],
       "editorial_note": "Distinct from S11 negotiation coverage, S27 signing, and the existing apple-quota article. Focuses on the 20 October entry into force, tariff-line versus trade-value denominators, origin compliance, the 22 October New Zealand quota-law commencement and distributional incidence. No claim of realised trade, price or investment effects is made. The article records the difference between New Zealand Customs' operational self-declaration guidance and MFAT's broader Key Outcomes description."
+    },
+    {
+      "key": "S55|2026-11-06-semicon-2-0-portal-eligibility-matching-capital",
+      "event_id": "S55",
+      "scope": "Semicon 2.0 portal opening for Pillars 2, 3 and 4: eligibility thresholds, eligible capex, pari-passu matching, application access and public-risk controls",
+      "status": "published-verified",
+      "post_id": 1837,
+      "post_url": "https://thekakisto.wordpress.com/2026/11/23/india-semicon-2-0-portal-application-eligibility-matching-funds-2026/",
+      "historical_event_date": "2026-11-06",
+      "actual_publication_date": "2026-11-23",
+      "verified_at": "2026-11-23",
+      "word_count": 1787,
+      "primary_sources": [
+        "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2284784&lang=1&reg=48",
+        "https://www.meity.gov.in/static/uploads/2026/09/7a6e8695949c78a289790695b5302713.pdf",
+        "https://www.meity.gov.in/static/uploads/2026/09/de8d313249b7c089419a23154e75236d.pdf",
+        "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2333716&lang=2&reg=3"
+      ],
+      "editorial_note": "Distinct from S37's 15 July Cabinet approval and the 24 July supplier-qualification analysis. Focuses on the 31 August Gazette, 16 September Pillars 2-4 guidelines and 6 November application-portal launch, with particular attention to eligible capex, matching finance, entry thresholds and verification. Makes no claim of Semicon 2.0 project approvals, disbursement, output or jobs. The five production starts reported in November are identified as Semicon 1.0, not Semicon 2.0."
     }
   ]
 }
