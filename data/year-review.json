@@ -129,6 +129,7 @@
         "S30",
         "S37",
         "S46",
+        "S55",
         "S48"
       ],
       "next": "Check awards, disbursements, commissioning and qualified output against each scheme’s target.",
@@ -799,6 +800,20 @@
       ]
     },
     {
+      "id": "S55",
+      "date": "2026-11-06",
+      "when": "2026-11-06",
+      "detail": "MeitY launched the Semicon 2.0 application portal for Pillars 2, 3 and 4. Eligibility, matching finance and verification now govern access; portal launch is not project approval or disbursement.",
+      "priority": 1,
+      "source": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2333716&lang=2&reg=3",
+      "articles": [
+        {
+          "id": 1837,
+          "url": "https://thekakisto.wordpress.com/2026/11/23/india-semicon-2-0-portal-application-eligibility-matching-funds-2026/"
+        }
+      ]
+    },
+    {
       "id": "S47",
       "date": "2026-11-10",
       "when": "2026-11-10",
@@ -859,5 +874,5 @@
       ]
     }
   ],
-  "coverageLinkedThrough": "2026-11-21"
+  "coverageLinkedThrough": "2026-11-23"
 }
