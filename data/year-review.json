@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-11-13",
+  "asOf": "2026-11-25",
   "windowStart": "2025-11-14",
   "series": [
     {
@@ -33,6 +33,7 @@
         "S25",
         "S29",
         "S40",
+        "S56",
         "S45",
         "S48",
         "S50"
@@ -750,6 +751,20 @@
         {
           "id": 1114,
           "url": "https://thekakisto.wordpress.com/2026/10/09/rbi-october-2026-rate-hike-calibrated-tightening-inflation-breadth/"
+        }
+      ]
+    },
+    {
+      "id": "S56",
+      "date": "2026-10-10",
+      "when": "2026-10-10 / bank-hedge extension 10-12 / FAQs 10-15",
+      "detail": "RBI tightened INR FX derivatives: prohibited rebooking cancelled INR contracts, reduced specified limits for positions without establishing underlying exposure from USD 100m to USD 5m, and introduced 20% cash FERR for qualifying current-account purchase hedges above USD 2m. The 12 October circular extended FERR to authorised dealers’ own qualifying hedges and restricted non-resident INR NDDCs to hedging.",
+      "priority": 1,
+      "source": "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63783",
+      "articles": [
+        {
+          "id": 1841,
+          "url": "https://thekakisto.wordpress.com/2026/11/25/rbi-ferr-20-percent-forex-hedging-cash-cost-2026/"
         }
       ]
     },
