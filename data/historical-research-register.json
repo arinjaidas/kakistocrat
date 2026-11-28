@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-25",
+  "version": "2026-11-28",
   "purpose": "Persistent historical research commissioning and publication register. Check event_id, research scope and existing WordPress posts across all statuses before commissioning; do not treat a published anchor as completion of every empirical follow-up.",
   "rules": [
     "Unique key per event and differentiated research question.",
@@ -188,6 +188,20 @@
         "https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=63812"
       ],
       "editorial_note": "Differentiated from S45's oil-company dollar-window article. Focuses on FERR's scope, cash reserve calculation, bank funding/liquidity, distributional incidence and the 10-12 October rule sequence. Scenario funding costs are illustrative, not observed pass-through. No claim that the package stabilised the rupee or reduced speculative activity."
+    },
+    {
+      "key": "S29|2026-11-28-duty-outcome-volume-vintage",
+      "event_id": "S29",
+      "scope": "Retrospective test of the 13 May 2026 gold-import duty increase: post-change physical import volumes, price and calendar confounders, formal recycling and external-account incidence",
+      "status": "deferred-primary-volume-data-verification",
+      "checked_at": "2026-11-28",
+      "primary_sources": [
+        "https://tradestat.commerce.gov.in/meidb/commodity_wise_all_countries_import",
+        "https://taxinformation.cbic.gov.in/",
+        "https://www.pib.gov.in/"
+      ],
+      "decision": "No article commissioned or published in this run. The Commerce Department's interactive TradeStat HS 7108 monthly quantity series was not independently retrieved in the available browser route. Published import-value comparisons alone would not complete the original scope or support attribution to the duty.",
+      "remaining_evidence": "Obtain and independently reproduce the monthly HS 7108 quantity (kg/tonnes) series from the Department of Commerce TradeStat for Apr-Oct 2026 and matched 2025 months; verify the May effective-date split, CBIC notification vintage, tariff-value/unit-value changes, calendar and stock effects, and any formal recycling/substitution data. Then test whether the observed volume pattern is distinguishable from global price, currency and festive timing."
     }
   ]
 }
